@@ -1,7 +1,7 @@
 import express from "express";
 import csurf from "csurf";
 import rateLimit from "express-rate-limit";
-import { loginHandler, refreshHandler, registerHandler } from "./handlers";
+import { loginHandler, refreshHandler, registerHandler } from "./handlers.js";
 
 export const authRouter = express.Router();
 

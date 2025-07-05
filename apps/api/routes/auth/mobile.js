@@ -1,6 +1,6 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { loginHandler, refreshHandler, registerHandler } from "./handlers";
+import { loginHandler, refreshHandler, registerHandler } from "./handlers.js";
 import { requireMobileClient } from "../../middleware/auth.js";
 
 export const mobileAuthRouter = express.Router();
