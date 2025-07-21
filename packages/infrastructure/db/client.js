@@ -14,6 +14,11 @@ export const tableNames = {
   student_Status: "Student_Statuses",
   user: "Users",
   user_Status: "User_Statuses",
+  application_Project_Type: "Application_Project_Types",
+  application_Faculty: "Application_Faculties",
+  application_Problem_Type: "Application_Problem_Types",
+  faculty: "Faculties",
+  problem_Type: "Problem_Types",
 };
 
 export const tableSchemas = {
@@ -39,7 +44,53 @@ export const tableSchemas = {
       isNullable: false,
     },
   },
-  application: {},
+  application: {
+    uuid_application: {
+      nameMapped: "uuid_application",
+      dataType: "String",
+      isNullable: false,
+    },
+    uuidOutsider: {
+      nameMapped: "uuid_outsider",
+      dataType: "String",
+      isNullable: false,
+    },
+    title: {
+      nameMapped: "title",
+      dataType: "String",
+      isNullable: false,
+    },
+    shortDescription: {
+      nameMapped: "short_description",
+      dataType: "String",
+      isNullable: true,
+    },
+    description: {
+      nameMapped: "description",
+      dataType: "String",
+      isNullable: true,
+    },
+    deadline: {
+      nameMapped: "deadline",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    visibility: {
+      nameMapped: "visibility",
+      dataType: "String",
+      isNullable: true,
+    },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
   outsider: {
     uuid_outsider: {
       nameMapped: "uuid_outsider",
@@ -283,6 +334,78 @@ export const tableSchemas = {
   user_Status: {
     user_status_id: {
       nameMapped: "user_status_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+    name: { nameMapped: "name", dataType: "String", isNullable: false },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
+  application_Project_Type: {
+    application: {
+      nameMapped: "uuid_application",
+      dataType: "String",
+      isNullable: false,
+    },
+    projectType: {
+      nameMapped: "project_type_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+  },
+  application_Faculty: {
+    application: {
+      nameMapped: "uuid_application",
+      dataType: "String",
+      isNullable: false,
+    },
+    faculty: {
+      nameMapped: "faculty_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+  },
+  application_Problem_Type: {
+    application: {
+      nameMapped: "uuid_application",
+      dataType: "String",
+      isNullable: false,
+    },
+    problemType: {
+      nameMapped: "problem_type_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+  },
+  faculty: {
+    faculty_id: {
+      nameMapped: "faculty_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+    name: { nameMapped: "name", dataType: "String", isNullable: false },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
+  problem_Type: {
+    problem_type_id: {
+      nameMapped: "problem_type_id",
       dataType: "Int",
       isNullable: false,
     },

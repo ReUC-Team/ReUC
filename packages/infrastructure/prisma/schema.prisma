@@ -12,8 +12,8 @@ generator client {
 
 datasource db {
   // ==== DEPLOY LOCALLY
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = env("DATABASE_URL_TEST")
 }
 
 // ========= PRISMA MODELING RULES =========
@@ -51,11 +51,10 @@ model User {
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
 
-  admins      Admin[]
-  students    Student[]
-  professors  Professor[]
-  outsiders   Outsider[]
-  Application Application[]
+  admins     Admin[]
+  students   Student[]
+  professors Professor[]
+  outsiders  Outsider[]
 
   @@index([email])
   @@map("Users")
@@ -146,44 +145,74 @@ model Outsider {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
+  application Application[]
+
   @@index([uuidUser])
   @@map("Outsiders")
 }
 
-// ================== USERS RELATED MODELS ==================
+// ================== PROJECT RELATED MODELS ==================
+
+/**
+ * TODO: For futures features this fields could be added
+ * status (enum)      submitted, reviewed, approved, rejected, etc.
+ * reviewedBy         Admin UUID who reviewed it
+ * reviewNotes        Internal notes during evaluation
+ * archivedAt         Soft-delete logic
+ */
 model Application {
-  // ===TEMP
-  outsiderName        String   @map("outsider_name")
-  phone               String?
-  email               String?
-  // ===END TEMP
-  uuid_application    String   @id @default(uuid())
-  // TODO: the uuid_user will be used temporaly.
-  // This will be removed to use outsiders instead
-  uuidUser            String   @map("uuid_user")
-  user                User     @relation(fields: [uuidUser], references: [uuid_user])
-  name                String
-  // facultades
-  topicInterest       String?  @map("topic_interest")
-  // TEMP FIELD FOR DEADLINE
-  projectType         String?  @map("project_type")
-  // type                Int          @map("project_type_id")
-  // projectType         Project_Type @relation(fields: [type], references: [project_type_id])
-  estimatedTime       DateTime @map("estimated_time")
-  description         String?
-  extendedDescription String?  @map("extended_description")
-  visibility          String?
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt @map("updated_at")
+  uuid_application String   @id @default(uuid())
+  uuidOutsider     String   @map("uuid_outsider")
+  outsider         Outsider @relation(fields: [uuidOutsider], references: [uuid_outsider])
+  title            String
+  shortDescription String?  @map("short_description")
+  description      String?
+  deadline         DateTime
+  visibility       String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
 
-  Project                     Project[]
-  Project_Type                Project_Type? @relation(fields: [project_TypeProject_type_id], references: [project_type_id])
-  project_TypeProject_type_id Int?
+  project                Project[]
+  applicationProjectType Application_Project_Type[]
+  applicationFaculty     Application_Faculty[]
+  applicationProblemType Application_Problem_Type[]
 
-  @@index([uuidUser])
-  @@index([topicInterest])
-  @@index([createdAt]) // filtering or sorting by date
+  @@index([uuidOutsider])
+  @@index([createdAt])
   @@map("Applications")
+}
+
+model Application_Project_Type {
+  application String @map("uuid_application")
+  projectType Int    @map("project_type_id")
+
+  uuidApplication Application  @relation(fields: [application], references: [uuid_application])
+  projectTypeId   Project_Type @relation(fields: [projectType], references: [project_type_id])
+
+  @@id([application, projectType])
+  @@map("Application_Project_Types")
+}
+
+model Application_Faculty {
+  application String @map("uuid_application")
+  faculty     Int    @map("faculty_id")
+
+  uuidApplication Application @relation(fields: [application], references: [uuid_application])
+  facultyTypeId   Faculty     @relation(fields: [faculty], references: [faculty_id])
+
+  @@id([application, faculty])
+  @@map("Application_Faculties")
+}
+
+model Application_Problem_Type {
+  application String @map("uuid_application")
+  problemType Int    @map("problem_type_id")
+
+  uuidApplication Application  @relation(fields: [application], references: [uuid_application])
+  problemTypeId   Problem_Type @relation(fields: [problemType], references: [problem_type_id])
+
+  @@id([application, problemType])
+  @@map("Application_Problem_Types")
 }
 
 model Project {
@@ -208,6 +237,18 @@ model Project {
   @@map("Projects")
 }
 
+// ================== UNIVERSITY RELATED MODELS ==================
+model Faculty {
+  faculty_id Int      @id @default(autoincrement())
+  name       String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  applicationFaculty Application_Faculty[]
+
+  @@map("Faculties")
+}
+
 model Project_Type {
   project_type_id     Int      @id @default(autoincrement())
   name                String
@@ -219,8 +260,36 @@ model Project_Type {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  Application Application[]
-  Project     Project[]
+  project                Project[]
+  applicationProjectType Application_Project_Type[]
 
   @@map("Project_Types")
 }
+
+model Problem_Type {
+  problem_type_id Int      @id @default(autoincrement())
+  name            String   @unique
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  applicationProblemType Application_Problem_Type[]
+
+  @@map("Problem_Types")
+}
+
+// ================== OTHERS RELATED MODELS ==================
+// model File {
+//   uuid_file    String   @id @default(uuid())
+//   storedPath   String   @map("stored_path")
+//   mimeType     String   @map("mime_type")
+//   fileSize     Int      @map("file_size")
+//   fileKind     String   @map("file_kind")
+//   createdAt    DateTime @default(now()) @map("created_at")
+//   updatedAt    DateTime @updatedAt @map("updated_at")
+
+//   @@map("Files")
+// }
+
+// model File_Link {
+//   file_link_id Int @id @default()
+// }

@@ -5,6 +5,7 @@ import { userStatusSeedData } from "./userStatus.seed.js";
 import { studentStatusSeedData } from "./studentStatus.seed.js";
 import { professorRoleSeedData } from "./professorRole.seed.js";
 import { userSeedData } from "./user.seed.js";
+import { facultySeedData } from "./faculty.seed.js";
 
 const prisma = new PrismaClient();
 
@@ -16,6 +17,8 @@ async function main() {
   await prisma.professor_Role.deleteMany();
   await prisma.admin.deleteMany();
   await prisma.student.deleteMany();
+  await prisma.faculty.deleteMany();
+  await prisma.outsider.deleteMany();
   await prisma.user.deleteMany();
   console.timeEnd("DeleteMany");
   console.time("CreateRealAdmin");
@@ -50,6 +53,8 @@ async function main() {
   await prisma.student_Status.createMany({ data: studentStatusSeedData });
   // ====== Professor_Role ======
   await prisma.professor_Role.createMany({ data: professorRoleSeedData });
+  // ====== Faculty ======
+  await prisma.faculty.createMany({ data: facultySeedData });
   console.timeEnd("CreateDefaultData");
 }
 
