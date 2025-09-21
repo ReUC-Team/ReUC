@@ -14,6 +14,14 @@ export const tableNames = {
   student_Status: "Student_Statuses",
   user: "Users",
   user_Status: "User_Statuses",
+  // application_Project_Type: "Application_Project_Types", // Linking Tables without standard schema
+  // application_Faculty: "Application_Faculties", // Linking Tables without standard schema
+  // application_Problem_Type: "Application_Problem_Types", // Linking Tables without standard schema
+  faculty: "Faculties",
+  problem_Type: "Problem_Types",
+  project_Status: "Project_Statuses",
+  file: "Files",
+  file_Link: "File_Links", // Linking Table with standard schema
 };
 
 export const tableSchemas = {
@@ -39,7 +47,53 @@ export const tableSchemas = {
       isNullable: false,
     },
   },
-  application: {},
+  application: {
+    uuid_application: {
+      nameMapped: "uuid_application",
+      dataType: "String",
+      isNullable: false,
+    },
+    uuidOutsider: {
+      nameMapped: "uuid_outsider",
+      dataType: "String",
+      isNullable: false,
+    },
+    title: {
+      nameMapped: "title",
+      dataType: "String",
+      isNullable: false,
+    },
+    shortDescription: {
+      nameMapped: "short_description",
+      dataType: "String",
+      isNullable: false,
+    },
+    description: {
+      nameMapped: "description",
+      dataType: "String",
+      isNullable: false,
+    },
+    deadline: {
+      nameMapped: "deadline",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    visibility: {
+      nameMapped: "visibility",
+      dataType: "String",
+      isNullable: true,
+    },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
   outsider: {
     uuid_outsider: {
       nameMapped: "uuid_outsider",
@@ -287,6 +341,141 @@ export const tableSchemas = {
       isNullable: false,
     },
     name: { nameMapped: "name", dataType: "String", isNullable: false },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
+  faculty: {
+    faculty_id: {
+      nameMapped: "faculty_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+    name: { nameMapped: "name", dataType: "String", isNullable: false },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
+  problem_Type: {
+    problem_type_id: {
+      nameMapped: "problem_type_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+    name: { nameMapped: "name", dataType: "String", isNullable: false },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
+  project_Status: {
+    project_status_id: {
+      nameMapped: "project_status_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+    name: { nameMapped: "name", dataType: "String", isNullable: false },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
+  file: {
+    uuid_file: {
+      nameMapped: "uuid_file",
+      dataType: "String",
+      isNullable: false,
+    },
+    storedPath: {
+      nameMapped: "stored_path",
+      dataType: "String",
+      isNullable: false,
+    },
+    storedName: {
+      nameMapped: "stored_name",
+      dataType: "String",
+      isNullable: true,
+    },
+    originalName: {
+      nameMapped: "original_name",
+      dataType: "String",
+      isNullable: true,
+    },
+    mimetype: { nameMapped: "mimetype", dataType: "String", isNullable: false },
+    fileSize: { nameMapped: "file_size", dataType: "Int", isNullable: false },
+    fileKind: {
+      nameMapped: "file_kind",
+      dataType: "String",
+      isNullable: false,
+    },
+    isAsset: {
+      nameMapped: "is_asset",
+      dataType: "Boolean",
+      isNullable: true,
+    },
+    createdAt: {
+      nameMapped: "created_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+    updatedAt: {
+      nameMapped: "updated_at",
+      dataType: "DateTime",
+      isNullable: false,
+    },
+  },
+  file_Link: {
+    file_link_id: {
+      nameMapped: "file_link_id",
+      dataType: "Int",
+      isNullable: false,
+    },
+    modelTarget: {
+      nameMapped: "model_target",
+      dataType: "String",
+      isNullable: false,
+    },
+    uuidTarget: {
+      nameMapped: "uuid_target",
+      dataType: "String",
+      isNullable: false,
+    },
+    purpose: {
+      nameMapped: "purpose",
+      dataType: "String",
+      isNullable: false,
+    },
+    uuidFile: {
+      nameMapped: "uuid_file",
+      dataType: "String",
+      isNullable: false,
+    },
     createdAt: {
       nameMapped: "created_at",
       dataType: "DateTime",

@@ -12,10 +12,10 @@ export default function useRequestProject() {
     shortDescription: "",
     description: "",
     deadline: "",
-    
+
     // cambio de imageFile a file
     file: null,
-    
+
     // --- Campos convertidos a arrays para múltiples selecciones ---
     projectType: [],
     faculty: [],
@@ -37,7 +37,7 @@ export default function useRequestProject() {
       setForm((prev) => ({
         ...prev,
         imageDefault: e.target.value,
-        imageFile: null // Con esto limpiamos cualquier archivo seleccionado anteriormente
+        imageFile: null, // Con esto limpiamos cualquier archivo seleccionado anteriormente
       }));
       return;
     }
@@ -51,7 +51,7 @@ export default function useRequestProject() {
           ...prev,
           [name]: checked
             ? [...prevArr, value]
-            : prevArr.filter((v) => v !== value)
+            : prevArr.filter((v) => v !== value),
         };
       });
       return;
@@ -64,7 +64,7 @@ export default function useRequestProject() {
           ...prev,
           file: files[0],
           fileName: files[0].name,
-          imageDefault: "" // Se limpia cualquier imagen predeterminada seleccionada
+          imageDefault: "", // Se limpia cualquier imagen predeterminada seleccionada
         }));
       }
       return;
@@ -75,7 +75,7 @@ export default function useRequestProject() {
       setForm((prev) => ({
         ...prev,
         imageDefault: value,
-        imageFile: null 
+        imageFile: null,
       }));
       return;
     }
@@ -83,7 +83,7 @@ export default function useRequestProject() {
     // Campos de texto / date / selects
     setForm((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -133,44 +133,28 @@ export default function useRequestProject() {
       return;
     }
 
-     try {
-      const response = await create(form);
+    const payload = new FormData();
+    Object.entries(form).forEach(([key, val]) => {
+      if (Array.isArray(val)) {
+        val.forEach((v) => payload.append(key, v));
+      } else if (val instanceof File) {
+        payload.append(key, val); // actual uploaded file
+      } else if (val !== null && val !== undefined) {
+        payload.append(key, val);
+      }
+    });
+
+    try {
+      const response = await create(payload);
       if (!response.success) {
         if (response.logout) navigate("/");
-
         setError(response.err || "Error en el registro");
         return;
       }
       navigate("/explore-projects/project-details");
-    } catch (error) {
-      setError(error.message || "Algo salió mal");
+    } catch (err) {
+      setError(err.message || "Algo salió mal");
     }
-
-    // Propuesta de código para enviar el formulario como FormData
-
-    // try {
-    //   // --- Preparar payload ---
-    //   const payload = new FormData();
-      
-    //   // Añadir todos los campos al FormData
-    //   Object.entries(form).forEach(([key, val]) => {
-    //     if (Array.isArray(val)) {
-    //       val.forEach((v) => payload.append(key, v));
-    //     } else if (val != null) {
-    //       payload.append(key, val);
-    //     }
-    //   });
-
-    //   const response = await create(payload); // espera que create acepte FormData
-    //   if (!response.success) {
-    //     if (response.logout) navigate("/");
-    //     setError(response.err || "Error en el registro");
-    //     return;
-    //   }
-    //   navigate("/dashboard");
-    // } catch (err) {
-    //   setError(err.message || "Algo salió mal");
-    // }
   };
 
   return { form, error, handleChange, handleSubmit };

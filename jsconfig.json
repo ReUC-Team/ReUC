@@ -6,7 +6,8 @@
       "@reuc/presentation/*": ["apps/api/*"],
       "@reuc/application/*": ["packages/application/*"],
       "@reuc/domain/*": ["packages/domain/*"],
-      "@reuc/infrastructure/*": ["packages/infrastructure/*"]
+      "@reuc/infrastructure/*": ["packages/infrastructure/*"],
+      "@reuc/file-storage/*": ["packages/file-storage/*"]
     },
     "module": "ESNext",
     "moduleResolution": "node"

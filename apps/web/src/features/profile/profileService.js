@@ -19,6 +19,7 @@ export async function putProfile(data) {
     method: "PUT",
     headers: {
       "X-CSRF-Token": csrfToken,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
@@ -38,6 +39,9 @@ export async function putProfile(data) {
 export async function getProfile() {
   const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/outsider/profile`, {
     method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
   });
 
   const bodyRes = await res.json();

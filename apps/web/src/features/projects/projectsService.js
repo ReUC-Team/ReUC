@@ -12,16 +12,54 @@ export async function getCSRFToken() {
   return csrfToken;
 }
 
+export async function getMetadata() {
+  const res = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/metadata`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  const bodyRes = await res.json();
+
+  if (!res.ok) {
+    return { success: false, err: bodyRes.err };
+  }
+
+  const transformedBanners = bodyRes.data.metadata.defaultBanners.map(
+    (banner) => {
+      return {
+        name: banner.name,
+        uuid: banner.uuid,
+        url: `${API_URL}${banner.url}`,
+      };
+    }
+  );
+
+  const finalMetadata = {
+    ...bodyRes.data.metadata,
+    defaultBanners: transformedBanners,
+  };
+
+  return { success: true, data: finalMetadata };
+}
+
 export async function create(data) {
   const csrfToken = await getCSRFToken();
 
-  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/project/create`, {
-    method: "POST",
-    headers: {
-      "X-CSRF-Token": csrfToken,
-    },
-    body: JSON.stringify(data),
-  });
+  const res = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/create`,
+    {
+      method: "POST",
+      headers: {
+        "X-CSRF-Token": csrfToken,
+      },
+      body: data,
+    }
+  );
 
   const bodyRes = await res.json();
 

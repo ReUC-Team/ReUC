@@ -17,6 +17,9 @@ export async function getTables() {
     `${API_URL}/admin/meta/tables`,
     {
       method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     }
   );
 
@@ -37,6 +40,9 @@ export async function getFields(table) {
     `${API_URL}/admin/meta/tables/${table}/fields`,
     {
       method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     }
   );
 
@@ -74,6 +80,7 @@ export async function getRecords(table, page, perPage, query, sort) {
       method: "POST",
       headers: {
         "X-CSRF-Token": csrfToken,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ page, perPage, query, sort }),
     }

@@ -1,3 +1,8 @@
+/**
+ * Validate that a date string is in the future and in YYYY-MM-DD format.
+ * @param {string} dateString – Date to validate.
+ * @returns {string|null} – Null if valid, otherwise error message.
+ */
 export function validateDate(dateString) {
   if (typeof dateString !== "string") {
     return "La fecha debe ser una cadena de texto.";
@@ -22,6 +27,11 @@ export function validateDate(dateString) {
   return null;
 }
 
+/**
+ * Validate a university ID: 8 digits (student) or 4 digits (teacher).
+ * @param {string} universityId – ID to validate.
+ * @returns {string|null} – Null if valid, otherwise error message.
+ */
 export function validateUniversityId(universityId) {
   if (universityId.length !== 8 && universityId.length !== 4)
     return "El número de cuenta debe tener 8 dígitos (alumno) o 4 (maestro).";
@@ -31,6 +41,11 @@ export function validateUniversityId(universityId) {
   return null;
 }
 
+/**
+ * Validate that a string is a proper UUID v4.
+ * @param {string} uuid – UUID string.
+ * @returns {string|null} – Null if valid, otherwise error message.
+ */
 export function validateUuid(uuid) {
   if (
     !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(

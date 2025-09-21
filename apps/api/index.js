@@ -7,9 +7,10 @@ import dotenv from "dotenv";
 import mobileRouter from "./routes/mobile/index.js";
 
 import { authRouter } from "./routes/auth/index.js";
-import { projectRouter } from "./routes/project/index.js";
+import { applicationRouter } from "./routes/application/index.js";
 import { profileRouter } from "./routes/profile/index.js";
 import { adminRouter } from "./routes/admin.js";
+import { fileRouter } from "./routes/file/index.js";
 
 dotenv.config();
 
@@ -45,13 +46,16 @@ app.use("/mobile", mobileRouter);
 app.use("/auth", authRouter);
 
 // Routes Project
-app.use("/project", projectRouter);
+app.use("/application", applicationRouter);
 
 // Routes Admin
 app.use("/admin", adminRouter);
 
 // Routes Outsider
 app.use("/outsider", profileRouter);
+
+// Routes File
+app.use("/file", fileRouter);
 
 // Routes base
 app.get("/", (req, res) => {

@@ -1,21 +1,34 @@
 // packages/infrastructure/seed.js
 import { PrismaClient } from "../generated/prisma/client.js";
 import { projectTypeSeedData } from "./projectType.seed.js";
+import { problemTypeSeedData } from "./problemType.seed.js";
 import { userStatusSeedData } from "./userStatus.seed.js";
 import { studentStatusSeedData } from "./studentStatus.seed.js";
 import { professorRoleSeedData } from "./professorRole.seed.js";
+import { fileSeedData } from "./file.seed.js";
 import { userSeedData } from "./user.seed.js";
+import { facultySeedData } from "./faculty.seed.js";
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.time("DeleteMany");
+  await prisma.file_Link.deleteMany();
+  await prisma.file.deleteMany();
+  await prisma.application_Faculty.deleteMany();
+  await prisma.application_Problem_Type.deleteMany();
+  await prisma.application_Project_Type.deleteMany();
+  await prisma.application.deleteMany();
   await prisma.project_Type.deleteMany();
+  await prisma.problem_Type.deleteMany();
   await prisma.user_Status.deleteMany();
   await prisma.student_Status.deleteMany();
   await prisma.professor_Role.deleteMany();
   await prisma.admin.deleteMany();
   await prisma.student.deleteMany();
+  await prisma.faculty.deleteMany();
+  await prisma.outsider.deleteMany();
+  await prisma.professor.deleteMany();
   await prisma.user.deleteMany();
   console.timeEnd("DeleteMany");
   console.time("CreateRealAdmin");
@@ -33,23 +46,28 @@ async function main() {
     data: [{ uuidUser: users[0].uuid_user }],
   });
   console.timeEnd("CreateRealAdmin");
-  console.time("CreateDummyData");
-  const dummyData = await userSeedData();
-  let newDummyData = { count: 0 };
-  if (dummyData.length !== 0) {
-    newDummyData = await prisma.user.createMany({ data: dummyData });
-  }
-  console.log(newDummyData.count);
-  console.timeEnd("CreateDummyData");
+  // console.time("CreateDummyData");
+  // const dummyData = await userSeedData();
+  // let newDummyData = { count: 0 };
+  // if (dummyData.length !== 0) {
+  //   newDummyData = await prisma.user.createMany({ data: dummyData });
+  // }
+  // console.timeEnd("CreateDummyData");
   console.time("CreateDefaultData");
   // ====== Project_Type ======
   await prisma.project_Type.createMany({ data: projectTypeSeedData });
+  // ====== Problem_Type ======
+  await prisma.problem_Type.createMany({ data: problemTypeSeedData });
   // ====== User_Status ======
   await prisma.user_Status.createMany({ data: userStatusSeedData });
   // ====== User_Status ======
   await prisma.student_Status.createMany({ data: studentStatusSeedData });
   // ====== Professor_Role ======
   await prisma.professor_Role.createMany({ data: professorRoleSeedData });
+  // ====== Faculty ======
+  await prisma.faculty.createMany({ data: facultySeedData });
+  // ====== Project_Type ======
+  await prisma.file.createMany({ data: fileSeedData });
   console.timeEnd("CreateDefaultData");
 }
 

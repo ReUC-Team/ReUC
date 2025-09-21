@@ -1,62 +1,98 @@
 export class Application {
   constructor({
-    // ===TEMP
-    outsiderName,
-    phone = undefined,
-    email = undefined,
-    // ===END TEMP
     uuid_application = undefined,
-    uuidUser,
-    name,
-    // topicInterest,
-    // projectType,
-    estimatedTime,
-    description = undefined,
-    extendedDescription = undefined,
-    visibility,
+    uuidOutsider,
+    title,
+    shortDescription,
+    description,
+    deadline,
+    visibility = undefined, // It is not present in the form rn
+    applicationProjectType = [],
+    applicationFaculty = [],
+    applicationProblemType = [],
+    applicationProblemTypeOther = undefined,
   }) {
-    this.outsiderName = outsiderName;
-    this.uuidUser = uuidUser;
-    this.name = name;
-    // this.topicInterest = topicInterest;
-    // this.projectType = projectType;
-    this.estimatedTime = new Date(estimatedTime);
-    this.visibility = visibility;
-
-    if (typeof phone == "undefined" && typeof email == "undefined")
-      throw new Error(
-        "At least one contact method (phone or email) must be provided."
-      );
-
-    if (
-      typeof description == "undefined" &&
-      typeof extendedDescription == "undefined"
-    )
-      throw new Error(
-        "At least one description (description or extendedDescription) must be provided."
-      );
+    this.checkRequiredFields({
+      uuidOutsider,
+      title,
+      shortDescription,
+      description,
+      deadline,
+    });
 
     this.uuid_application = uuid_application;
-    this.phone = phone;
-    this.email = email;
+    this.uuidOutsider = uuidOutsider;
+    this.title = title;
+    this.shortDescription = shortDescription;
     this.description = description;
-    this.extendedDescription = extendedDescription;
+    this.deadline = new Date(deadline);
+    this.visibility = visibility;
+    this.applicationProjectType = this.parseAndValidateNumberArray(
+      applicationProjectType,
+      "Tipo de Proyecto"
+    );
+    this.applicationFaculty = this.parseAndValidateNumberArray(
+      applicationFaculty,
+      "Facultad"
+    );
+    this.applicationProblemType = this.parseAndValidateNumberArray(
+      applicationProblemType,
+      "Tipo de Problematica"
+    );
+    this.applicationCustomProblemType = this.normalizeProblemType(
+      applicationProblemTypeOther
+    );
   }
 
   static allowedFields = [
-    "outsiderName",
-    "uuidUser",
-    "name",
-    // "topicInterest",
-    // "projectType",
-    "estimatedTime",
-    "visibility",
     "uuid_application",
-    "phone",
-    "email",
+    "uuidOutsider",
+    "title",
+    "shortDescription",
     "description",
-    "extendedDescription",
+    "deadline",
+    "visibility",
+    "applicationProjectType",
+    "applicationFaculty",
+    "applicationProblemType",
+    "applicationCustomProblemType",
   ];
+
+  parseAndValidateNumberArray(input = [], key = "Unknow") {
+    const normalizedInput = Array.isArray(input) ? input : [input];
+    const parsedArray = normalizedInput.map(Number);
+
+    parsedArray.map((n) => {
+      if (isNaN(n)) {
+        throw new Error(`El campo "${key}" contiene un valor inválido.`);
+      }
+    });
+
+    return parsedArray;
+  }
+
+  normalizeProblemType(value = undefined) {
+    if (value === undefined || value === " " || value === "") {
+      return undefined;
+    }
+
+    return value.trim().toLowerCase();
+  }
+
+  checkRequiredFields(fields = {}) {
+    for (const [key, value] of Object.entries(fields)) {
+      if (
+        value === undefined ||
+        value === null ||
+        value === " " ||
+        value === ""
+      ) {
+        throw new Error(
+          `El campo ${key} es obligatorio y no puede estar vacío.`
+        );
+      }
+    }
+  }
 
   toPrimitives() {
     const primitive = {};
