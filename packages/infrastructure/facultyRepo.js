@@ -15,9 +15,9 @@ export const facultyRepo = {
   async getAll() {
     return await db.faculty.findMany();
   },
-  async findIdsByNames(names) {
+  async findById(ids) {
     return await db.faculty.findMany({
-      where: { name: { in: names } },
+      where: { faculty_id: { in: ids } },
       select: { faculty_id: true },
     });
   },

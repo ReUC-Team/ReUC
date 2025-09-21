@@ -11,6 +11,12 @@ export const problemTypeRepo = {
   async save(data) {
     return await db.problem_Type.create({ data });
   },
+  async findById(ids) {
+    return await db.problem_Type.findMany({
+      where: { problem_type_id: { in: ids } },
+      select: { problem_type_id: true },
+    });
+  },
   async findByNameOrCreate(name) {
     const existing = await db.problem_Type.findUnique({ where: { name } });
 
@@ -29,5 +35,11 @@ export const problemTypeRepo = {
 
   async getAll() {
     return await db.problem_Type.findMany();
+  },
+  async getLimited(offset, limit) {
+    return await db.problem_Type.findMany({
+      skip: offset,
+      take: limit,
+    });
   },
 };

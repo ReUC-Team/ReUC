@@ -15,9 +15,9 @@ export const projectTypeRepo = {
   async getAll() {
     return await db.project_Type.findMany();
   },
-  async findIdsByNames(names) {
+  async findById(ids) {
     return await db.project_Type.findMany({
-      where: { name: { in: names } },
+      where: { project_type_id: { in: ids } },
       select: { project_type_id: true },
     });
   },
