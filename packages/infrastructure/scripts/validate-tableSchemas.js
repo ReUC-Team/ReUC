@@ -9,6 +9,7 @@ const mapSqliteTypeToSchemaType = (sqliteType) => {
   if (type.includes("CHAR") || type.includes("TEXT") || type.includes("CLOB"))
     return "String";
   if (type === "INTEGER") return "Int";
+  if (type === "BOOLEAN") return "Boolean";
   if (type === "REAL" || type === "FLOAT" || type === "DOUBLE") return "Float";
   if (type === "NUMERIC" || type === "DECIMAL") return "Float";
   if (type.includes("DATE") || type.includes("TIME")) return "DateTime";
@@ -76,7 +77,7 @@ const main = async () => {
 
       if (realCol.isNullable !== config.isNullable) {
         console.error(
-          `❌ Nullability mismatch for '${modelName}.${prismaField}' → '${columnName}': expected nullable=${config.isNullable}, got ${realCol.isNullable}`
+          `❌ Nullability mismatch for '${modelName}.${prismaField}' → '${columnName}': expected nullable=${realCol.isNullable}, got ${config.isNullable}`
         );
         hasError = true;
       }

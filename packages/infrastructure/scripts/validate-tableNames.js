@@ -33,8 +33,17 @@ const main = async () => {
     (value) => !realTableNames.includes(value)
   );
 
-  // 3. Report issues
-  if (missingKeys.length || invalidValues.length) {
+  // 3. Duplicate values in tableNames
+  const valueCountMap = dbTableValues.reduce((acc, val) => {
+    acc[val] = (acc[val] || 0) + 1;
+    return acc;
+  }, {});
+  const duplicateValues = Object.entries(valueCountMap)
+    .filter(([, count]) => count > 1)
+    .map(([value]) => value);
+
+  // --- REPORT ISSUES ---
+  if (missingKeys.length || invalidValues.length || duplicateValues.length) {
     if (missingKeys.length) {
       console.error(
         `Missing tableNames keys for models: ${missingKeys.join(", ")}`
@@ -47,6 +56,18 @@ const main = async () => {
         )}`
       );
     }
+    if (duplicateValues.length) {
+      const duplicatesDetailed = duplicateValues
+        .map((val) => {
+          const keys = Object.entries(tableNames)
+            .filter(([, v]) => v === val)
+            .map(([k]) => k);
+          return `${val} ← used by: ${keys.join(", ")}`;
+        })
+        .join("\n");
+      console.error(`Duplicate tableNames values:\n${duplicatesDetailed}`);
+    }
+
     process.exit(1);
   } else {
     console.log(
