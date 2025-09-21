@@ -4,6 +4,7 @@
   "type": "module",
   "main": "index.js",
   "dependencies": {
-    "@reuc/domain": "workspace:*"
+    "@reuc/domain": "workspace:*",
+    "@reuc/file-storage": "workspace:*"
   }
 }
