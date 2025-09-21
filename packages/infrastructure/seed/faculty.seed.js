@@ -8,7 +8,4 @@ export const facultySeedData = [
   {
     name: "FECAM",
   },
-  {
-    name: "EDUC",
-  },
 ];
