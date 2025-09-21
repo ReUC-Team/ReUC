@@ -1,51 +1,28 @@
 import React, { useState, useRef } from 'react'
-import defaultBanner1 from '@/assets/banners/tecnologia.jpg'
-import defaultBanner2 from '@/assets/banners/medio-ambiente.png'
-import defaultBanner3 from '@/assets/banners/vida-marina.jpg'
 import pdfIcon from '@/assets/icons/pdf.png'
 import docIcon from '@/assets/icons/doc.png'
 import zipIcon from '@/assets/icons/zip.png'
-
-const PROJECT_TYPES = [
-  { key: 'tesis', label: 'Tesis' },
-  { key: 'servicio', label: 'Servicio Social Constitucional' },
-  { key: 'proyecto-integrador', label: 'Proyectos Integradores' },
-  { key: 'practicas-profesionales', label: 'Prácticas Profesionales' },
-  { key: 'proyecto-investigacion', label: 'Proyectos de Investigación' },
-]
-
-const FACULTIES = [
-  { key: 'FIE', label: 'FIE' },
-  { key: 'FACIMAR', label: 'FACIMAR' },
-  { key: 'FECAM', label: 'FECAM' },
-  { key: 'EDUC', label: 'EDUC' },
-]
-
-const PROBLEM_TYPES = [
-  { key: 'ambiental', label: 'Ambiental' },
-  { key: 'tecnologica', label: 'Tecnológica' },
-  { key: 'social', label: 'Social' },
-  { key: 'logistica', label: 'Logística' },
-  { key: 'otro', label: 'Otro' },
-]
-
-const DEFAULT_BANNERS = [defaultBanner1, defaultBanner2, defaultBanner3]
+import useFormProjectMetadata from "../hooks/useFormProjectMetadata"
 
 export default function RequestProjectForm({ form, handleChange, handleSubmit }) {
   const [showInfo, setShowInfo] = useState(false)
   const [selectedDefaultImage, setSelectedDefaultImage] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
   const fileInputRef = useRef(null)
-
+  
+  const { faculties, projectTypes, problemTypes, defaultBanners } = useFormProjectMetadata()
+  const extendedProblemTypes = [...problemTypes, { problem_type_id: "otro", name: "Otro" }];
+  
+  
   // Función para manejar la selección de imagen predeterminada
-  const handleDefaultImageSelect = (src) => {
-    setSelectedDefaultImage(src)
+  const handleDefaultImageSelect = (banner) => {
+    setSelectedDefaultImage(banner.url)
     
     // Crear un evento sintético para simular el cambio en el formulario
     handleChange({
       target: { 
         name: 'imageDefault', 
-        value: src, 
+        value: banner.url, 
         type: 'text' 
       },
     })
@@ -236,16 +213,16 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PROJECT_TYPES.map(({ key, label }) => (
-              <label key={key} className="inline-flex items-center gap-2">
+            {projectTypes.map(({ project_type_id, name }) => (
+              <label key={project_type_id} className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="projectType"
-                  value={key}
-                  checked={form.projectType.includes(key)}
+                  value={project_type_id}
+                  checked={form.projectType.includes(String(project_type_id))}
                   onChange={handleChange}
                 />
-                <span className="text-gray-700">{label}</span>
+                <span className="text-gray-700">{name}</span>
               </label>
             ))}
           </div>
@@ -257,16 +234,16 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
             Facultad sugerida <span className="text-sm text-gray-500">(sugerido)</span>
           </label>
           <div className="flex flex-wrap gap-4">
-            {FACULTIES.map(({ key, label }) => (
-              <label key={key} className="inline-flex items-center gap-2">
+            {faculties.map(({ faculty_id, name }) => (
+              <label key={faculty_id} className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="faculty"
-                  value={key}
-                  checked={form.faculty.includes(key)}
+                  value={faculty_id}
+                  checked={form.faculty.includes(String(faculty_id))}
                   onChange={handleChange}
                 />
-                <span className="text-gray-700">{label}</span>
+                <span className="text-gray-700">{name}</span>
               </label>
             ))}
           </div>
@@ -277,16 +254,16 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
             Tipo de problemática <span className="text-sm text-gray-500">(sugerido)</span>
           </label>
           <div className="flex flex-wrap gap-4">
-            {PROBLEM_TYPES.map(({ key, label }) => (
-              <label key={key} className="inline-flex items-center gap-2">
+            {extendedProblemTypes.map(({ problem_type_id, name }) => (
+              <label key={problem_type_id} className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="problemType"
-                  value={key}
-                  checked={form.problemType.includes(key)}
+                  value={problem_type_id}
+                  checked={form.problemType.includes(String(problem_type_id))}
                   onChange={handleChange}
                 />
-                <span className="text-gray-700">{label}</span>
+                <span className="text-gray-700">{name}</span>
               </label>
             ))}
           </div>
@@ -391,18 +368,18 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
           <div className="mt-4">
             <p className="text-gray-700 text-sm mb-2">O selecciona una imagen predeterminada para el banner:</p>
             <div className="flex gap-4">
-              {DEFAULT_BANNERS.map((src, index) => (
+              {defaultBanners.map((banner, index) => (
                 <div key={index} className="flex flex-col items-center">
                   <img
-                    src={src}
-                    alt={`Banner predeterminado ${index + 1}`}
-                    onClick={() => handleDefaultImageSelect(src)}
+                    src={banner.url}
+                    alt={banner.name}
+                    onClick={() => handleDefaultImageSelect(banner)}
                     className={`w-20 h-12 object-cover cursor-pointer rounded-lg border-2 transition-all ${
-                      selectedDefaultImage === src ? 'border-lime-600 shadow-md' : 'border-transparent hover:border-gray-300'
+                      selectedDefaultImage === banner.uuid ? 'border-lime-600 shadow-md' : 'border-transparent hover:border-gray-300'
                     }`}
                   />
                   <span className="text-xs mt-1 text-gray-500">
-                    {selectedDefaultImage === src ? 'Seleccionado' : `Opción ${index + 1}`}
+                    {selectedDefaultImage === banner.uuid ? 'Seleccionado' : `Opción ${index + 1}`}
                   </span>
                 </div>
               ))}
