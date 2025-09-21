@@ -5,7 +5,6 @@ export async function fetchWithAuth(url, options = {}) {
 
   const headers = {
     ...(options.headers || {}),
-    "Content-Type": "application/json",
     Authorization: `Bearer ${accessToken}`,
   };
 
@@ -31,7 +30,6 @@ export async function fetchWithAuthAndAutoRefresh(url, options = {}) {
 
       const headers = {
         ...(options.headers || {}),
-        "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       };
 
