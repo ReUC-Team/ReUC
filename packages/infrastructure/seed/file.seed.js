@@ -1,7 +1,10 @@
+import { STORAGE_CONFIG } from "@reuc/file-storage/constants/paths.js";
+
+const path = STORAGE_CONFIG.local.basePath;
+
 export const fileSeedData = [
   {
-    storedPath:
-      "/home/zama/Documents/ReUC/packages/file-storage/storage/application-bannerTecnologia.jpg",
+    storedPath: `${path}/application-bannerTecnologia.jpg`,
     storedName: "application-bannerTecnologia.jpg",
     originalName: "Tecnologia.jpg",
     mimetype: "image/jpg",
@@ -10,8 +13,7 @@ export const fileSeedData = [
     isAsset: true,
   },
   {
-    storedPath:
-      "/home/zama/Documents/ReUC/packages/file-storage/storage/application-bannerMedio-ambiente.png",
+    storedPath: `${path}/application-bannerMedio-ambiente.png`,
     storedName: "application-bannerMedio-ambiente.png",
     originalName: "Medio-ambiente.png",
     mimetype: "image/png",
@@ -20,8 +22,7 @@ export const fileSeedData = [
     isAsset: true,
   },
   {
-    storedPath:
-      "/home/zama/Documents/ReUC/packages/file-storage/storage/application-bannerVida-marina.jpg",
+    storedPath: `${path}/application-bannerVida-marina.jpg`,
     storedName: "application-bannerVida-marina.jpg",
     originalName: "Vida-marina.jpg",
     mimetype: "image/jpg",
