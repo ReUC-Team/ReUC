@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import pdfIcon from '@/assets/icons/pdf.png'
 import docIcon from '@/assets/icons/doc.png'
 import zipIcon from '@/assets/icons/zip.png'
@@ -8,7 +8,9 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
   const [showInfo, setShowInfo] = useState(false)
   const [selectedDefaultImage, setSelectedDefaultImage] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
+  const [selectedFilePreview, setSelectedFilePreview] = useState(null);
   const fileInputRef = useRef(null)
+
   
   const { faculties, projectTypes, problemTypes, defaultBanners } = useFormProjectMetadata()
   const extendedProblemTypes = [...problemTypes, { problem_type_id: "otro", name: "Otro" }];
@@ -27,30 +29,40 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
       },
     })
     
-    // Resetear el input de archivo para evitar conflictos
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+    // limpiar archivo local si existía
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setSelectedFile(null);
+    if (selectedFilePreview) {
+      URL.revokeObjectURL(selectedFilePreview);
+      setSelectedFilePreview(null);
     }
-  }
+};
 
-  // Función para manejar cambios en el input de archivo
+  // cuando seleccionan archivo desde input
   const handleFileInputChange = (e) => {
-    // Resetear la imagen predeterminada si se selecciona un archivo
     if (e.target.files && e.target.files.length > 0) {
-      setSelectedDefaultImage(null)
-      setSelectedFile(e.target.files[0])
+      const file = e.target.files[0];
+
+      // revoke previous preview
+      if (selectedFilePreview) URL.revokeObjectURL(selectedFilePreview);
+
+      const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : null;
+      setSelectedFilePreview(preview);
+
+      setSelectedDefaultImage(null);
+      setSelectedFile(file);
+
+      // pasar evento al handler original para que actualice form
+      handleChange(e);
     }
-    
-    // Pasar el evento al manejador de cambios original
-    handleChange(e)
-  }
+  };
   
   // Obtener el icono adecuado según el tipo de archivo
   const getFileIcon = (file) => {
     if (!file) return null
     
     if (file.type.startsWith('image/')) {
-      return URL.createObjectURL(file)
+      return selectedFilePreview
     } else if (file.type === 'application/pdf') {
       return pdfIcon
     } else if (file.type === 'application/msword' || 
@@ -74,6 +86,15 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
     const baseName = file.name.substring(0, file.name.lastIndexOf('.'))
     return baseName.substring(0, 16) + '...' + '.' + extension
   }
+
+// limpiar preview en unmount
+useEffect(() => {
+  return () => {
+    if (selectedFilePreview) URL.revokeObjectURL(selectedFilePreview);
+  };
+}, [selectedFilePreview]);
+
+
 
   return (
     <form
@@ -369,17 +390,17 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
             <p className="text-gray-700 text-sm mb-2">O selecciona una imagen predeterminada para el banner:</p>
             <div className="flex gap-4">
               {defaultBanners.map((banner, index) => (
-                <div key={index} className="flex flex-col items-center">
+                <div key={banner.uuid || index} className="flex flex-col items-center">
                   <img
                     src={banner.url}
-                    alt={banner.name}
+                    alt={banner.originalName}
                     onClick={() => handleDefaultImageSelect(banner)}
                     className={`w-20 h-12 object-cover cursor-pointer rounded-lg border-2 transition-all ${
-                      selectedDefaultImage === banner.uuid ? 'border-lime-600 shadow-md' : 'border-transparent hover:border-gray-300'
+                      selectedDefaultImage === banner.url ? 'border-lime-600 shadow-md' : 'border-transparent hover:border-gray-300'
                     }`}
                   />
                   <span className="text-xs mt-1 text-gray-500">
-                    {selectedDefaultImage === banner.uuid ? 'Seleccionado' : `Opción ${index + 1}`}
+                    {selectedDefaultImage === banner.url ? 'Seleccionado' : `Opción ${index + 1}`}
                   </span>
                 </div>
               ))}
