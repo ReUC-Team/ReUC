@@ -6,7 +6,7 @@ import { loginHandler, refreshHandler, registerHandler } from "./handlers.js";
 export const authRouter = express.Router();
 
 const csrfProtection = csurf({ cookie: true });
-const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 200 });
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20 });
 
 authRouter.use(authLimiter);
 
