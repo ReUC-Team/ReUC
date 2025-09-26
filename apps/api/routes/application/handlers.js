@@ -1,4 +1,5 @@
 import application from "@reuc/application/applications/index.js";
+import { ValidationError } from "@reuc/application/errors/ValidationError.js";
 
 /** TODO: if outsider session expires, then save the form data and the
  * URL action that tried to achieve, in order to use after confirm login.
@@ -28,7 +29,7 @@ export async function createApplicationHandler(req, res) {
 
 export async function getApplicationMetadataHandler(req, res) {
   try {
-    const response = await application.getMetadata();
+    const response = await application.createMetadata();
 
     return res.status(200).json({
       success: true,
@@ -38,5 +39,24 @@ export async function getApplicationMetadataHandler(req, res) {
     });
   } catch (err) {
     return res.status(404).json({ success: false, err: err.message });
+  }
+}
+
+export async function getApplicationsByFacultyHandler(req, res) {
+  try {
+    const { applications } = await application.getByFaculty({
+      body: req.body,
+    });
+
+    return res.status(201).json({
+      success: true,
+      data: {
+        applications,
+      },
+    });
+  } catch (err) {
+    const code = err instanceof ValidationError ? 400 : 500;
+
+    return res.status(code).json({ success: false, err: err.message });
   }
 }

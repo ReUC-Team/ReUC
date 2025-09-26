@@ -182,11 +182,101 @@ export const applicationRepo = {
     }
   },
 
-  async getAll() {
-    return await db.application.findMany({
-      orderBy: { createdAt: "desc" },
+  async getLimitedByFacultyWithoutProjectRelation({
+    faculty = "",
+    page = 1,
+    perPage = 50,
+  }) {
+    const skip = (page - 1) * perPage;
+    const take = perPage;
+
+    // 1. Query to get the faculty we will be filtering or exit early returning nothing
+    const facultyFound = faculty ? await facultyRepo.findByName(faculty) : null;
+
+    if (faculty && !facultyFound) {
+      return {
+        applications: [],
+        metadata: { totalItems: 0, totalPages: 0, currentPage: page },
+      };
+    }
+
+    const where = {
+      project: {
+        none: {},
+      },
+      ...(facultyFound && {
+        applicationFaculty: {
+          some: {
+            faculty: facultyFound.faculty_id,
+          },
+        },
+      }),
+    };
+
+    // 2. Query to get the applications or exit early returning nothing
+    const [applications, totalItems] = await db.$transaction([
+      db.application.findMany({
+        where,
+        select: {
+          uuid_application: true,
+          title: true,
+          shortDescription: true,
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take,
+      }),
+      db.application.count({ where }),
+    ]);
+
+    if (applications.length === 0) {
+      return {
+        applications: [],
+        metadata: { totalItems: 0, totalPages: 0, currentPage: page },
+      };
+    }
+
+    const applicationIds = applications.map((app) => app.uuid_application);
+
+    // 3. Query to get all the relevant file_Link
+    const bannerLinks = await db.file_Link.findMany({
+      where: {
+        modelTarget: "APPLICATION",
+        uuidTarget: {
+          in: applicationIds,
+        },
+        purpose: "BANNER",
+      },
+      select: {
+        modelTarget: true,
+        uuidTarget: true,
+        purpose: true,
+      },
     });
+
+    const bannerMap = new Map(
+      bannerLinks.map((link) => [
+        link.uuidTarget,
+        `/${link.modelTarget}/${link.purpose}/${link.uuidTarget}`,
+      ])
+    );
+
+    const applicationsWithBanners = applications.map((app) => ({
+      ...app,
+      bannerUrl: bannerMap.get(app.uuid_application) || null,
+    }));
+
+    return {
+      applications: applicationsWithBanners,
+      metadata: {
+        totalItems,
+        totalPages: Math.ceil(totalItems / perPage),
+        currentPage: page,
+      },
+    };
   },
+
+  // async
 };
 
 /**

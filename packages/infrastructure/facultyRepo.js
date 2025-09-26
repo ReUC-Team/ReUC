@@ -21,4 +21,13 @@ export const facultyRepo = {
       select: { faculty_id: true },
     });
   },
+  async findByName(name) {
+    return await db.faculty.findFirst({
+      where: { name: { contains: name, mode: "insensitive" } },
+      select: {
+        name: true,
+        faculty_id: true,
+      },
+    });
+  },
 };

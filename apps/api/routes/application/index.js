@@ -5,6 +5,7 @@ import { authMiddleware, requireOutsider } from "../../middleware/auth.js";
 import {
   createApplicationHandler,
   getApplicationMetadataHandler,
+  getApplicationsByFacultyHandler,
 } from "./handlers.js";
 
 export const applicationRouter = express.Router();
@@ -16,7 +17,8 @@ const csrfProtection = csurf({ cookie: true });
  */
 const upload = multer();
 
-applicationRouter.get("/metadata", getApplicationMetadataHandler);
+// ====== CREATE FORM
+applicationRouter.get("/create/metadata", getApplicationMetadataHandler);
 
 applicationRouter.post(
   "/create",
@@ -51,4 +53,12 @@ applicationRouter.post(
    * - buffer: A Buffer of the entire file
    */
   createApplicationHandler
+);
+
+// ====== EXPLORE PAGE
+applicationRouter.get(
+  "/explore/:faculty",
+  authMiddleware,
+  requireOutsider,
+  getApplicationsByFacultyHandler
 );

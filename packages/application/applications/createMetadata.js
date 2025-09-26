@@ -3,7 +3,7 @@ import { getAll as getAllFaculties } from "@reuc/domain/faculty/getAll.js";
 import { getDefaultApplicationMeta } from "@reuc/domain/problemTypes/getDefaultApplicationMeta.js";
 import { getAssetApplicationBanners } from "@reuc/domain/file/getAssetApplicationBanners.js";
 
-export async function getMetadata() {
+export async function createMetadata() {
   const [projectTypes, problemTypes, faculties, defaultBanners] =
     await Promise.all([
       getAllProjectTypes(),

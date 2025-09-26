@@ -1,9 +1,11 @@
 import { create } from "./create.js";
-import { getMetadata } from "./getMetadata.js";
+import { createMetadata } from "./createMetadata.js";
+import { getByFaculty } from "./getByFaculty.js";
 
 const application = {
   create,
-  getMetadata,
+  createMetadata,
+  getByFaculty,
 };
 
 export default application;

@@ -12,9 +12,47 @@ export async function getCSRFToken() {
   return csrfToken;
 }
 
+export async function exploreApplications() {
+  const res = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/explore`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  const bodyRes = await res.json();
+
+  if (!res.ok) {
+    return { success: false, err: bodyRes.err };
+  }
+
+  const transformedBanners = bodyRes.data.applications.applications.map(
+    (app) => {
+      return {
+        uuid_application: app.uuid_application,
+        title: app.title,
+        shortDescription: app.shortDescription,
+        bannerUrl: `${API_URL}${app.bannerUrl}`,
+      };
+    }
+  );
+
+  const finalApplications = {
+    ...bodyRes.data.applications,
+    applications: transformedBanners,
+  };
+  console.log(finalApplications);
+
+  return { success: true, data: finalApplications };
+}
+exploreApplications();
+
 export async function getMetadata() {
   const res = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/metadata`,
+    `${API_URL}/application/create/metadata`,
     {
       method: "GET",
       headers: {
@@ -72,3 +110,28 @@ export async function create(data) {
 
   return { success: true, data: bodyRes.data.application };
 }
+
+export async function getProfileStatus() {
+  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/profile/status`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const bodyRes = await res.json();
+
+  console.log(bodyRes);
+
+  if (!res.ok) {
+    const msg =
+      res.status !== 404
+        ? bodyRes.err
+        : "Hubo un problema al obtener los datos del perfil";
+
+    return { success: false, err: msg };
+  }
+
+  return { success: true, data: bodyRes.data };
+}
+console.log(getProfileStatus());
