@@ -193,13 +193,6 @@ export const applicationRepo = {
     // 1. Query to get the faculty we will be filtering or exit early returning nothing
     const facultyFound = faculty ? await facultyRepo.findByName(faculty) : null;
 
-    if (faculty && !facultyFound) {
-      return {
-        applications: [],
-        metadata: { totalItems: 0, totalPages: 0, currentPage: page },
-      };
-    }
-
     const where = {
       project: {
         none: {},

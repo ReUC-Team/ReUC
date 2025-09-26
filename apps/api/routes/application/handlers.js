@@ -27,7 +27,7 @@ export async function createApplicationHandler(req, res) {
   }
 }
 
-export async function getApplicationMetadataHandler(req, res) {
+export async function getCreateApplicationMetadataHandler(req, res) {
   try {
     const response = await application.createMetadata();
 
@@ -44,8 +44,13 @@ export async function getApplicationMetadataHandler(req, res) {
 
 export async function getApplicationsByFacultyHandler(req, res) {
   try {
+    const { faculty } = req.params;
+    const { page, perPage } = req.query;
+
     const { applications } = await application.getByFaculty({
-      body: req.body,
+      faculty: faculty || "",
+      page: parseInt(page) || 1,
+      perPage: parseInt(perPage) || 25,
     });
 
     return res.status(201).json({
@@ -58,5 +63,20 @@ export async function getApplicationsByFacultyHandler(req, res) {
     const code = err instanceof ValidationError ? 400 : 500;
 
     return res.status(code).json({ success: false, err: err.message });
+  }
+}
+
+export async function getExploreApplicationsMetadataHandler(req, res) {
+  try {
+    const { metadata } = await application.exploreMetadata();
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        metadata,
+      },
+    });
+  } catch (err) {
+    return res.status(404).json({ success: false, err: err.message });
   }
 }

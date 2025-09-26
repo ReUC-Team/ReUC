@@ -4,8 +4,9 @@ import multer from "multer";
 import { authMiddleware, requireOutsider } from "../../middleware/auth.js";
 import {
   createApplicationHandler,
-  getApplicationMetadataHandler,
+  getCreateApplicationMetadataHandler,
   getApplicationsByFacultyHandler,
+  getExploreApplicationsMetadataHandler,
 } from "./handlers.js";
 
 export const applicationRouter = express.Router();
@@ -18,7 +19,7 @@ const csrfProtection = csurf({ cookie: true });
 const upload = multer();
 
 // ====== CREATE FORM
-applicationRouter.get("/create/metadata", getApplicationMetadataHandler);
+applicationRouter.get("/metadata/create", getCreateApplicationMetadataHandler);
 
 applicationRouter.post(
   "/create",
@@ -57,8 +58,14 @@ applicationRouter.post(
 
 // ====== EXPLORE PAGE
 applicationRouter.get(
-  "/explore/:faculty",
+  "/explore{/:faculty}",
   authMiddleware,
   requireOutsider,
   getApplicationsByFacultyHandler
+);
+
+// ====== EXPLORE PAGE METADATA
+applicationRouter.get(
+  "/metadata/explore",
+  getExploreApplicationsMetadataHandler
 );

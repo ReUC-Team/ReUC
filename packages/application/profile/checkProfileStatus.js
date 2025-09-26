@@ -4,8 +4,6 @@ import { ValidationError } from "../errors/ValidationError.js";
 import { isProfileComplete } from "@reuc/domain/outsider/isProfileComplete.js";
 
 export async function checkProfileStatus({ uuidOutsider }) {
-  console.log(uuidOutsider);
-
   const uuidError = validateUuid(uuidOutsider);
   if (uuidError) throw new ValidationError(uuidError);
 

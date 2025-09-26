@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { create } from "../projectsService.js";
+import { createApplication } from "../projectsService.js";
 
 export default function useRequestProject() {
   const [form, setForm] = useState({
@@ -145,7 +145,7 @@ export default function useRequestProject() {
     });
 
     try {
-      const response = await create(payload);
+      const response = await createApplication(payload);
       if (!response.success) {
         if (response.logout) navigate("/");
         setError(response.err || "Error en el registro");

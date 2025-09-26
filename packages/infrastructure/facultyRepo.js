@@ -13,7 +13,12 @@ export const facultyRepo = {
   },
 
   async getAll() {
-    return await db.faculty.findMany();
+    return await db.faculty.findMany({
+      select: {
+        faculty_id: true,
+        name: true,
+      },
+    });
   },
   async findById(ids) {
     return await db.faculty.findMany({

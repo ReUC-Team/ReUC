@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getMetadata } from "../projectsService.js";
+import { getCreateMetadata } from "../projectsService.js";
 
 export default function useFormProjectMetadata() {
   const [faculties, setFaculty] = useState([]);
@@ -10,7 +10,7 @@ export default function useFormProjectMetadata() {
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        const response = await getMetadata();
+        const response = await getCreateMetadata();
 
         if (!response.success) {
           console.error(

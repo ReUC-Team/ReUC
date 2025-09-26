@@ -12,6 +12,27 @@ export async function getCSRFToken() {
   return csrfToken;
 }
 
+export async function getExploreApplicationsMetadata() {
+  const res = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/metadata/explore`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  const bodyRes = await res.json();
+
+  if (!res.ok) {
+    return { success: false, err: bodyRes.err };
+  }
+
+  return { success: true, data: bodyRes.data.metadata.faculties };
+}
+console.log(await getExploreApplicationsMetadata());
+
 export async function exploreApplications() {
   const res = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/application/explore`,
@@ -44,15 +65,14 @@ export async function exploreApplications() {
     ...bodyRes.data.applications,
     applications: transformedBanners,
   };
-  console.log(finalApplications);
 
   return { success: true, data: finalApplications };
 }
-exploreApplications();
+console.log(await exploreApplications());
 
-export async function getMetadata() {
+export async function getCreateMetadata() {
   const res = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/create/metadata`,
+    `${API_URL}/application/metadata/create`,
     {
       method: "GET",
       headers: {
@@ -85,7 +105,7 @@ export async function getMetadata() {
   return { success: true, data: finalMetadata };
 }
 
-export async function create(data) {
+export async function createApplication(data) {
   const csrfToken = await getCSRFToken();
 
   const res = await fetchWithAuthAndAutoRefresh(
@@ -121,8 +141,6 @@ export async function getProfileStatus() {
 
   const bodyRes = await res.json();
 
-  console.log(bodyRes);
-
   if (!res.ok) {
     const msg =
       res.status !== 404
@@ -134,4 +152,4 @@ export async function getProfileStatus() {
 
   return { success: true, data: bodyRes.data };
 }
-console.log(getProfileStatus());
+console.log(await getProfileStatus());
