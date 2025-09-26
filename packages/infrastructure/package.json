@@ -4,14 +4,15 @@
   "type": "module",
   "main": "index.js",
   "dependencies": {
-    "@reuc/file-storage": "workspace:*",
     "@prisma/client": "^6.6.0",
+    "@reuc/file-storage": "workspace:*",
     "prisma": "^6.6.0"
   },
   "scripts": {
     "test": "dotenv -e .env.test -- vitest run"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.0.0",
     "dotenv-cli": "^8.0.0",
     "vitest": "^3.1.1"
   },

@@ -251,6 +251,9 @@ importers:
         specifier: ^6.6.0
         version: 6.6.0(typescript@5.8.3)
     devDependencies:
+      '@faker-js/faker':
+        specifier: ^10.0.0
+        version: 10.0.0
       dotenv-cli:
         specifier: ^8.0.0
         version: 8.0.0
@@ -1108,6 +1111,10 @@ packages:
   '@expo/xcpretty@4.3.2':
     resolution: {integrity: sha512-ReZxZ8pdnoI3tP/dNnJdnmAk7uLT4FjsKDGW7YeDdvdOMz2XCQSmSCM9IWlrXuWtMF9zeSB6WJtEhCQ41gQOfw==}
     hasBin: true
+
+  '@faker-js/faker@10.0.0':
+    resolution: {integrity: sha512-UollFEUkVXutsaP+Vndjxar40Gs5JL2HeLcl8xO1QAjJgOdhc3OmBFWyEylS+RddWaaBiAzH+5/17PLQJwDiLw==}
+    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
   '@floating-ui/core@1.7.0':
     resolution: {integrity: sha512-FRdBLykrPPA6P76GGGqlex/e7fbe0F1ykgxHYNXQsH/iTEtjMj/f9bpY5oQqbjt5VgZvgz/uKXbGuROijh3VLA==}
@@ -6078,6 +6085,8 @@ snapshots:
       chalk: 4.1.2
       find-up: 5.0.0
       js-yaml: 4.1.0
+
+  '@faker-js/faker@10.0.0': {}
 
   '@floating-ui/core@1.7.0':
     dependencies:
