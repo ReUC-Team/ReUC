@@ -9,7 +9,6 @@ export async function getByUuids({ uuidUser, uuidOutsider }) {
 
   const userData = await user.getByUuid({ uuidUser });
   const outsiderData = await outsider.getByUuid({ uuidOutsider });
-  console.log(outsiderData);
 
   return {
     profile: {

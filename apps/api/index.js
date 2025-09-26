@@ -52,7 +52,7 @@ app.use("/application", applicationRouter);
 app.use("/admin", adminRouter);
 
 // Routes Outsider
-app.use("/outsider", profileRouter);
+app.use("/profile", profileRouter);
 
 // Routes File
 app.use("/file", fileRouter);

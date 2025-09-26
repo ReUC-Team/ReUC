@@ -43,3 +43,22 @@ export async function getProfileHandler(req, res) {
     return res.status(code).json({ success: false, err: err.message });
   }
 }
+
+export async function getProfileStatusHandler(req, res) {
+  try {
+    const outsider = req.outsider;
+
+    const status = await profile.checkProfileStatus({
+      uuidOutsider: outsider.uuid_outsider,
+    });
+
+    return res.status(200).json({
+      success: true,
+      data: status,
+    });
+  } catch (err) {
+    const code = err instanceof ValidationError ? 404 : 400;
+
+    return res.status(code).json({ success: false, err: err.message });
+  }
+}

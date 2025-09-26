@@ -10,13 +10,13 @@ export const mobileProfileRouter = express.Router();
 
 mobileProfileRouter.use(requireMobileClient);
 
-mobileProfileRouter.post(
+mobileProfileRouter.get(
   "/get",
   authMiddleware,
   requireOutsider,
   getProfileHandler
 );
-mobileProfileRouter.post(
+mobileProfileRouter.patch(
   "/edit",
   authMiddleware,
   requireOutsider,
