@@ -35,8 +35,6 @@ function prepareFilePayload({ imageDefault, fileName, file }) {
 }
 
 export async function create({ uuidAuthor, body, file }) {
-  console.log(body);
-
   const dateError = validateDate(body.deadline);
   if (dateError) throw new ValidationError(dateError);
 

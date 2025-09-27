@@ -33,7 +33,7 @@ export const fileRepo = {
       },
     });
   },
-  async getFileLinkByModelTargetANDUuidTargetANDPurpose(
+  async getFileByModelTargetUuidTargetPurpose(
     modelTarget,
     uuidTarget,
     purpose
@@ -46,8 +46,17 @@ export const fileRepo = {
           purpose,
         },
       },
-      include: {
-        file: true,
+      select: {
+        file: {
+          select: {
+            uuid_file: true,
+            storedName: true,
+            originalName: true,
+            storedPath: true,
+            fileSize: true,
+            mimetype: true,
+          },
+        },
       },
     });
   },

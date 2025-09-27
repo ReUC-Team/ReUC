@@ -1,6 +1,6 @@
-export async function userSeedData() {
+export async function outsiderSeedData(limit = 10) {
   try {
-    const response = await fetch("https://dummyjson.com/users?limit=100");
+    const response = await fetch(`https://dummyjson.com/users?limit=${limit}`);
     const { users } = await response.json();
 
     const emailMap = new Map();
@@ -16,6 +16,13 @@ export async function userSeedData() {
           firstName: user.firstName,
           lastName: user.lastName,
           lastLoginIp: user.ip,
+          outsiders: {
+            create: {
+              organizationName: user.company.name,
+              phoneNumber: user.phone,
+              location: `${user.address.address} ${user.address.state}, ${user.address.city}`,
+            },
+          },
         });
       }
 

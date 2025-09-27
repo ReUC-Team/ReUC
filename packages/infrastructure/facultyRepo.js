@@ -13,12 +13,26 @@ export const facultyRepo = {
   },
 
   async getAll() {
-    return await db.faculty.findMany();
+    return await db.faculty.findMany({
+      select: {
+        faculty_id: true,
+        name: true,
+      },
+    });
   },
   async findById(ids) {
     return await db.faculty.findMany({
       where: { faculty_id: { in: ids } },
       select: { faculty_id: true },
+    });
+  },
+  async findByName(name) {
+    return await db.faculty.findFirst({
+      where: { name: { contains: name, mode: "insensitive" } },
+      select: {
+        name: true,
+        faculty_id: true,
+      },
     });
   },
 };

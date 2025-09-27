@@ -1,12 +1,13 @@
 import { PrismaClient } from "../generated/prisma/client.js";
-import { projectTypeSeedData } from "./projectType.seed.js";
-import { problemTypeSeedData } from "./problemType.seed.js";
-import { userStatusSeedData } from "./userStatus.seed.js";
-import { studentStatusSeedData } from "./studentStatus.seed.js";
-import { professorRoleSeedData } from "./professorRole.seed.js";
-import { fileSeedData } from "./file.seed.js";
-import { userSeedData } from "./user.seed.js";
+import { applicationSeedData } from "./application.seed.js";
 import { facultySeedData } from "./faculty.seed.js";
+import { fileSeedData } from "./file.seed.js";
+import { outsiderSeedData } from "./outsider.seed.js";
+import { problemTypeSeedData } from "./problemType.seed.js";
+import { professorRoleSeedData } from "./professorRole.seed.js";
+import { projectTypeSeedData } from "./projectType.seed.js";
+import { studentStatusSeedData } from "./studentStatus.seed.js";
+import { userStatusSeedData } from "./userStatus.seed.js";
 
 const prisma = new PrismaClient();
 
@@ -81,13 +82,82 @@ const seedCoreData = async () => {
  * Seeds the database with a large amount of dummy data for testing.
  */
 async function seedDummyData() {
-  console.log("  - Generating dummy user data...");
-  const dummyUsers = await userSeedData();
-  if (dummyUsers.length > 0) {
-    const { count } = await prisma.user.createMany({ data: dummyUsers });
-    console.log(`  - Created ${count} dummy users.`);
+  // ======================= USERS =======================
+  console.log("  - Generating dummy user and outsider data...");
+  const outsidersToCreate = await outsiderSeedData(10); // Generate 10 outsiders
+
+  if (outsidersToCreate.length > 0) {
+    await Promise.all(
+      outsidersToCreate.map((user) => prisma.user.create({ data: user }))
+    );
+    console.log(
+      `  - Created ${outsidersToCreate.length} dummy users/outsiders.`
+    );
   } else {
     console.log("  - No dummy users to create.");
+  }
+  // ======================= APPLICATIONS =======================
+  console.log("  - Generating dummy application data...");
+  const allOutsiders = await prisma.outsider.findMany();
+  const allFaculties = await prisma.faculty.findMany();
+  const allProjectTypes = await prisma.project_Type.findMany();
+  const allProblemTypes = await prisma.problem_Type.findMany();
+
+  const applicationsToCreate = applicationSeedData(
+    allOutsiders,
+    allFaculties,
+    allProjectTypes,
+    allProblemTypes,
+    25
+  );
+
+  if (applicationsToCreate.length > 0) {
+    await Promise.all(
+      applicationsToCreate.map((appData) =>
+        prisma.application.create({ data: appData })
+      )
+    );
+    console.log(
+      `  - Created ${applicationsToCreate.length} dummy applications.`
+    );
+  } else {
+    console.log("  - No dummy applications to create.");
+  }
+
+  // ======================= FILE_LINKS -> APPLICATIONS =======================
+  console.log("  - Linking asset files to new applications...");
+  const createdApplications = await prisma.application.findMany({
+    select: { uuid_application: true },
+  });
+  const assetFiles = await prisma.file.findMany({
+    where: { isAsset: true },
+    select: { uuid_file: true },
+  });
+
+  if (createdApplications.length > 0 && assetFiles.length > 0) {
+    const fileLinksToCreate = [];
+
+    for (const app of createdApplications) {
+      const randomFile =
+        assetFiles[Math.floor(Math.random() * assetFiles.length)];
+
+      fileLinksToCreate.push({
+        modelTarget: "APPLICATION",
+        uuidTarget: app.uuid_application,
+        purpose: "BANNER",
+        uuidFile: randomFile.uuid_file,
+      });
+    }
+
+    const { count } = await prisma.file_Link.createMany({
+      data: fileLinksToCreate,
+      skipDuplicates: true,
+    });
+    console.log(`  - Created ${count} file links for banners.`);
+  } else {
+    console.log(
+      "  - Skipping file linking (no applications or asset files found)."
+    );
   }
 }
 
@@ -100,7 +170,7 @@ async function main() {
   await runTask("Clearing database", clearDatabase);
   await runTask("Seeding catalog data", seedCatalogs);
   await runTask("Seeding core data", seedCoreData);
-  // await runTask("Seeding dummy data", seedDummyData);
+  await runTask("Seeding dummy data", seedDummyData);
   console.log("\nSeeding complete! The database is ready.");
 }
 

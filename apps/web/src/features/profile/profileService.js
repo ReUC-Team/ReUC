@@ -15,8 +15,8 @@ export async function getCSRFToken() {
 export async function putProfile(data) {
   const csrfToken = await getCSRFToken();
 
-  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/outsider/edit`, {
-    method: "PUT",
+  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/profile/edit`, {
+    method: "PATCH",
     headers: {
       "X-CSRF-Token": csrfToken,
       "Content-Type": "application/json",
@@ -37,7 +37,7 @@ export async function putProfile(data) {
 }
 
 export async function getProfile() {
-  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/outsider/profile`, {
+  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/profile/get`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

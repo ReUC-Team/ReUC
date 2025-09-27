@@ -9,7 +9,7 @@ export async function getByUuid({ uuidOutsider }) {
     return { outsider };
   } catch (err) {
     if (err instanceof NotFoundError)
-      throw new ValidationError("La tabla no existe");
+      throw new ValidationError("El rol asignado al usuario no existe");
     throw err;
   }
 }
