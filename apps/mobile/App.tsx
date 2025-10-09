@@ -1,35 +1,50 @@
 // apps/mobile/App.tsx
 import 'react-native-gesture-handler'
-import React, { useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
+import { View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import * as Font from 'expo-font'
-import AppLoading from 'expo-app-loading'
+import * as SplashScreen from 'expo-splash-screen'
 import { ThemeProvider } from './src/context/ThemeContext'
 import AppNavigator from './src/routes/AppNavigator'
 import Toast from 'react-native-toast-message'
 
+// Mantener la splash screen visible mientras cargamos recursos
+SplashScreen.preventAutoHideAsync()
+
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false)
+  const [appIsReady, setAppIsReady] = useState(false)
 
-  // Cargar las fuentes al inicio
-  const loadFonts = () =>
-    Font.loadAsync({
-      'OpenDyslexic-Regular': require('./src/assets/fonts/OpenDyslexic3-Regular.ttf'),
-      'OpenDyslexic-Bold': require('./src/assets/fonts/OpenDyslexic3-Bold.ttf')
-    })
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // Cargar fuentes
+        await Font.loadAsync({
+          'OpenDyslexic-Regular': require('./src/assets/fonts/OpenDyslexic3-Regular.ttf'),
+          'OpenDyslexic-Bold': require('./src/assets/fonts/OpenDyslexic3-Bold.ttf')
+        })
+      } catch (e) {
+        console.warn(e)
+      } finally {
+        setAppIsReady(true)
+      }
+    }
 
-  if (!fontsLoaded) {
-    return (
-      <AppLoading
-        startAsync={loadFonts}
-        onFinish={() => setFontsLoaded(true)}
-        onError={console.warn}
-      />
-    )
+    prepare()
+  }, [])
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync()
+    }
+  }, [appIsReady])
+
+  if (!appIsReady) {
+    return null
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <ThemeProvider>
         <AppNavigator />
         <Toast />
