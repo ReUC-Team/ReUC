@@ -1,25 +1,34 @@
-import { createStorageAdapter } from "./storageFactory.js";
-import { MODEL_FILE_RULES } from "../constants/mimetypes.js";
+import { LocalAdapter } from "../adapters/LocalAdapter.js";
 import { processImage } from "../processors/imageProcessor.js";
 import { processDocument } from "../processors/documentProcessor.js";
-import { generateStoredName, sanitizeDisplayName } from "../utils/fileUtils.js";
+import { generateStoredName, sanitizeDisplayName } from "../utils/nameUtils.js";
+import { getFileRule } from "../shared/ruleUtils.js";
+import * as FileStorageError from "../errors/index.js";
 
 export class FileService {
-  constructor() {
-    this.adapter = createStorageAdapter();
+  /**
+   * @param {LocalAdapter} adapter - An initialized storage adapter instance.
+   */
+  constructor(adapter) {
+    this.adapter = adapter;
   }
 
   /**
-   * Save the file into storage and return a metadata object suitable for DB insertion.
+   * Processes, saves a file, and returns metadata for persistence.
    *
-   * @param {Buffer} buffer
-   * @param {Object} opts
-   * @param {string} opts.originalName - user provided filename (display name)
-   * @param {string} opts.mimetype
-   * @param {string} opts.targetModel - e.g. 'APPLICATION'
-   * @param {string} opts.uuidTarget - uuid of target entity (optional here)
-   * @param {string} opts.purpose - e.g. 'BANNER'
-   * @param {Object} opts.processorOptions - options for processors
+   * @param {Buffer} buffer - The raw file buffer.
+   * @param {object} options - Options for saving the file.
+   * @param {string} options.originalName - The original filename.
+   * @param {string} options.mimetype - The mimetype of the file.
+   * @param {string} options.targetModel - The domain model this file is for (e.g., 'APPLICATION').
+   * @param {string} options.purpose - The purpose of the file (e.g., 'BANNER').
+   * @param {string|null} [options.uuidTarget=null] - The UUID of the target entity.
+   * @param {object} [options.processorOptions={}] - Options for the file processor.
+   *
+   * @returns {Promise<object>} A promise that resolves to the file metadata object.
+   * @throws {RuleNotFoundError} If the model/purpose combination has no defined rule.
+   * @throws {ProcessingError} If the file processing fails.
+   * @throws {AdapterError} If the underlying storage adapter fails to save the file.
    */
   async saveFile(
     buffer,
@@ -27,22 +36,44 @@ export class FileService {
       originalName,
       mimetype,
       targetModel,
-      uuidTarget = null,
       purpose,
+      uuidTarget = null,
       processorOptions = {},
     }
   ) {
-    const ruleKind = MODEL_FILE_RULES?.[targetModel]?.[purpose]?.kind;
-    if (!ruleKind)
-      throw Error(
-        `Invalid file configuration: model='${targetModel}', purpose='${purpose}' - No file kind rule defined`
+    const rule = getFileRule(targetModel, purpose);
+    if (!rule)
+      throw new FileStorageError.RuleNotFoundError(
+        `No rule found for model="${targetModel}" with purpose="${purpose}"`,
+        {
+          details: {
+            rule: "invalid_rule",
+            message: `Invalid rule for ${targetModel} ${purpose}`,
+          },
+        }
       );
 
+    const ruleKind = rule.kind;
+
     let processedBuffer = buffer;
-    if (ruleKind === "image") {
-      processedBuffer = await processImage(buffer, processorOptions);
-    } else if (ruleKind === "document") {
-      processedBuffer = await processDocument(buffer, processorOptions);
+    let finalMimetype = mimetype;
+    let finalSize = buffer.length;
+
+    try {
+      if (ruleKind === "image") {
+        const imageProcessed = await processImage(buffer, processorOptions);
+
+        processedBuffer = imageProcessed.buffer;
+        finalMimetype = imageProcessed.mimetype;
+        finalSize = imageProcessed.size;
+      } else if (ruleKind === "document") {
+        processedBuffer = await processDocument(buffer, processorOptions);
+      }
+    } catch (err) {
+      throw new FileStorageError.ProcessingError(
+        `Failed to process ${ruleKind}: ${err.message}`,
+        { cause: err }
+      );
     }
 
     const storedName = generateStoredName(originalName || "file");
@@ -50,16 +81,14 @@ export class FileService {
 
     const stored = await this.adapter.save(processedBuffer, storedName);
 
-    const fileKind = ruleKind;
-
     return {
       storedPath: stored.path,
       storedName: stored.fileName || storedName,
       storage: stored.storage || "local",
       originalName: displayName || null,
-      mimetype,
-      fileSize: processedBuffer.length,
-      fileKind,
+      mimetype: finalMimetype,
+      fileSize: finalSize,
+      fileKind: ruleKind,
       modelTarget: targetModel,
       uuidTarget,
       purpose,
@@ -67,8 +96,11 @@ export class FileService {
   }
 
   /**
-   * Delete a file
-   * @param {string} storedPath
+   * Deletes a file from the storage adapter.
+   * @param {string} storedPath - The full path of the file to delete.
+   *
+   * @returns {Promise<boolean>} A promise that resolves to true if deleted, false otherwise.
+   * @throws {AdapterError} If the underlying storage adapter fails to delete the file.
    */
   async deleteFile(storedPath) {
     return this.adapter.delete(storedPath);

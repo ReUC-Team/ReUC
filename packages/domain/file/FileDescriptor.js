@@ -1,57 +1,44 @@
-import { MODEL_FILE_RULES } from "@reuc/file-storage/constants/mimetypes.js";
+import { BaseEntity } from "../shared/BaseEntity.js";
+import * as DomainError from "../errors/index.js";
+import { getFileRule } from "@reuc/file-storage/shared/ruleUtils.js";
 
-export class FileDescriptor {
-  constructor({ name, modelTarget, purpose, isDefault = false }) {
-    this.checkRequiredFields({
-      name,
-      modelTarget,
-      purpose,
-    });
-
-    this.name = name;
-    this.modelTarget = String(modelTarget).toUpperCase();
-    this.purpose = String(purpose).toUpperCase();
-    this.isDefault = Boolean(isDefault);
-
-    if (!MODEL_FILE_RULES?.[this.modelTarget]?.[this.purpose]) {
-      throw new Error(
-        `Propósito ${this.purpose} no disponible para el modelo ${this.modelTarget}`
-      );
-    }
-  }
-
+export class FileDescriptor extends BaseEntity {
   static allowedFields = ["name", "modelTarget", "purpose", "isDefault"];
 
-  // TODO: Make a base model for all the domain items class
-  // this will be inherited by all the features domain has
-  // this base model will contain likely all the repetitive
-  // method that almost every domain class have
-  // e.g. checkRequiredFields, toPrimitives
+  constructor(data) {
+    super(data, FileDescriptor.allowedFields);
 
-  checkRequiredFields(fields = {}) {
-    for (const [key, value] of Object.entries(fields)) {
-      if (
-        value === undefined ||
-        value === null ||
-        value === " " ||
-        value === ""
-      ) {
-        throw new Error(
-          `El campo ${key} es obligatorio y no puede estar vacío.`
-        );
-      }
-    }
-  }
-
-  toPrimitives() {
-    const primitive = {};
-
-    for (const key of FileDescriptor.allowedFields) {
-      if (this[key] !== undefined) {
-        primitive[key] = this[key];
+    const missingFields = [];
+    for (const field of ["name", "modelTarget", "purpose"]) {
+      if (typeof this[field] !== "string" || this[field].trim() === "") {
+        missingFields.push({
+          field,
+          rule: "missing_or_empty",
+        });
       }
     }
 
-    return primitive;
+    if (missingFields.length > 0)
+      throw new DomainError.ValidationError(
+        "Required file descriptor fields were missing.",
+        { details: missingFields }
+      );
+
+    this.modelTarget = String(this.modelTarget).toUpperCase();
+    this.purpose = String(this.purpose).toUpperCase();
+    this.isDefault = Boolean(this.isDefault);
+
+    if (!getFileRule(this.modelTarget, this.purpose)) {
+      throw new DomainError.BusinessRuleError(
+        `File purpose '${this.purpose}' is not available for the model '${this.modelTarget}'.`,
+        {
+          details: {
+            rule: "invalid_model_purpose_combination",
+            modelTarget: this.modelTarget,
+            purpose: this.purpose,
+          },
+        }
+      );
+    }
   }
 }

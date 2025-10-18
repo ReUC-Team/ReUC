@@ -1,4 +1,6 @@
-import { PrismaClient } from "../generated/prisma/client.js";
+import { PrismaClient, Prisma } from "@prisma/client";
+import { FileService } from "@reuc/file-storage/services/FileService.js";
+import { createStorageAdapter } from "@reuc/file-storage/services/storageFactory.js";
 
 // key => PrismaClient model
 // value => PostgreSQL table
@@ -490,3 +492,25 @@ export const tableSchemas = {
 };
 
 export const db = new PrismaClient();
+
+export const isPrismaError = (err) =>
+  err instanceof Prisma.PrismaClientKnownRequestError;
+
+let fileServiceInstance;
+(() => {
+  try {
+    const adapter = createStorageAdapter();
+    fileServiceInstance = new FileService(adapter);
+  } catch (err) {
+    console.error(err.message, err.stack);
+
+    process.exit(1);
+  }
+})();
+
+export const getFileService = () => {
+  if (!fileServiceInstance)
+    throw new Error("File Service has not been initialized.");
+
+  return fileServiceInstance;
+};

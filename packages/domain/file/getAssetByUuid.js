@@ -1,10 +1,38 @@
+import * as DomainError from "../errors/index.js";
 import { fileRepo } from "@reuc/infrastructure/fileRepo.js";
-import { NotFoundError } from "../errors/NotFoundError.js";
+import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
 
+/**
+ * Retrieves a single asset file by its UUID.
+ * @param {string} uuid - The UUID of the file.
+ *
+ * @throws {DomainError.NotFoundError} If the file is not found or is not an asset.
+ * @throws {DomainError.DomainError} For any unexpected errors.
+ */
 export async function getAssetByUuid(uuid) {
-  const assetFound = await fileRepo.getAssetByUuid(uuid);
+  try {
+    const asset = await fileRepo.getAssetByUuid(uuid);
 
-  if (!assetFound) throw new NotFoundError("No file found or not accessible.");
+    if (!asset)
+      throw new DomainError.NotFoundError(
+        `Asset with UUID ${uuid} could not be found.`,
+        { details: { resource: "file", identifier: uuid } }
+      );
 
-  return assetFound;
+    return asset;
+  } catch (err) {
+    if (err instanceof DomainError.DomainError) throw err;
+
+    if (err instanceof InfrastructureError.InfrastructureError)
+      throw new DomainError.DomainError(
+        "The fetch of the asset could not be completed due to a system error.",
+        { cause: err }
+      );
+
+    console.error(`Domain error (getAssetByUuid):`, err);
+    throw new DomainError.DomainError(
+      "An unexpected error occurred while fetching the asset.",
+      { cause: err }
+    );
+  }
 }

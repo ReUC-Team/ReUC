@@ -76,7 +76,7 @@ export async function login(data) {
 
 export async function logout() {
   const res = await fetch(`${API_URL}/auth/logout`, {
-    method: "POST",
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },

@@ -1,11 +1,15 @@
-import { getAdminTableNames } from "./getAdminTableNames.js";
-import { getAdminTableSchema } from "./getAdminTableSchema.js";
-import { fetchAdminTableRecords } from "./fetchAdminTableRecords.js";
+import { getTableNames } from "./getTableNames.js";
+import { getTableSchema } from "./getTableSchema.js";
+import { getLimitedTableRecords } from "./getLimitedTableRecords.js";
 
+/**
+ * The 'admin' entity in the application layer, grouping all use cases
+ * for administrative panel functionality.
+ */
 const admin = {
-  getAdminTableNames,
-  getAdminTableSchema,
-  fetchAdminTableRecords,
+  getTableNames,
+  getTableSchema,
+  getLimitedTableRecords,
 };
 
 export default admin;

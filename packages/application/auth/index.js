@@ -1,12 +1,17 @@
 import { login } from "./login.js";
 import { register } from "./register.js";
-import { sessionAuth, sessionRefresh } from "./session.js";
+import { authenticate } from "./authenticate.js";
+import { refresh } from "./refresh.js";
 
-const session = {
+/**
+ * The 'auth' entity in the application layer, grouping all authentication
+ * and session management use cases.
+ */
+const auth = {
   login,
   register,
-  auth: sessionAuth,
-  refresh: sessionRefresh,
+  authenticate,
+  refresh,
 };
 
-export default session;
+export default auth;

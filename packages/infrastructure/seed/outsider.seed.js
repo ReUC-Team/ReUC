@@ -16,7 +16,7 @@ export async function outsiderSeedData(limit = 10) {
           firstName: user.firstName,
           lastName: user.lastName,
           lastLoginIp: user.ip,
-          outsiders: {
+          outsider: {
             create: {
               organizationName: user.company.name,
               phoneNumber: user.phone,

@@ -1,112 +1,117 @@
+import config from "../../config/index.js";
 import session from "@reuc/application/auth/index.js";
-import { Warning } from "@reuc/application/errors/Warning.js";
-import { ValidationError } from "@reuc/application/errors/ValidationError.js";
 
-const REFRESH_TOKEN_EXPIRES = process.env.REFRESH_TOKEN_EXPIRES_INT;
+const REFRESH_TOKEN_MAX_AGE = config.jwt.refreshExpiresInInt;
 
-export async function registerHandler(req, res, isWeb = true) {
-  try {
-    const response = await session.register({
+/**
+ * A factory that creates a registration handler for either web or mobile clients.
+ */
+export function registerHandler(isWeb = true) {
+  return async (req, res) => {
+    const { user, tokens } = await session.register({
       body: req.body,
       ip: req.ip,
       userAgent: req.headers["user-agent"],
+      tokenConfig: config.jwt,
     });
 
     if (isWeb) {
-      return res
-        .cookie("refreshToken", response.tokens.refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "Strict",
-          maxAge: REFRESH_TOKEN_EXPIRES,
-        })
-        .status(201)
-        .json({
-          success: true,
-          data: {
-            user: response.user,
-            accessToken: response.tokens.accessToken,
-          },
-        });
-    } else {
+      res.cookie("refreshToken", tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: REFRESH_TOKEN_MAX_AGE,
+      });
+
       return res.status(201).json({
         success: true,
-        data: {
-          user: response.user,
-          tokens: response.tokens,
-        },
+        data: { user, accessToken: tokens.accessToken },
       });
     }
-  } catch (err) {
-    const code = err instanceof ValidationError ? 422 : 400;
 
-    return res.status(code).json({ success: false, err: err.message });
-  }
+    return res.status(201).json({
+      success: true,
+      data: { user, tokens },
+    });
+    c;
+  };
 }
 
-export async function loginHandler(req, res, isWeb = true) {
-  try {
-    const response = await session.login({
+/**
+ * A factory that creates a login handler for either web or mobile clients.
+ */
+export function loginHandler(isWeb = true) {
+  return async (req, res) => {
+    const { user, tokens } = await session.login({
       data: req.body,
       ip: req.ip,
       userAgent: req.headers["user-agent"],
+      tokenConfig: config.jwt,
     });
 
     if (isWeb) {
-      return res
-        .cookie("refreshToken", response.tokens.refreshToken, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "Strict",
-          maxAge: REFRESH_TOKEN_EXPIRES,
-        })
-        .status(201)
-        .json({
-          success: true,
-          data: {
-            user: response.user,
-            accessToken: response.tokens.accessToken,
-          },
-        });
-    } else {
-      return res.status(201).json({
+      res.cookie("refreshToken", tokens.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Strict",
+        maxAge: REFRESH_TOKEN_MAX_AGE,
+      });
+
+      return res.status(200).json({
         success: true,
-        data: {
-          user: response.user,
-          tokens: response.tokens,
-        },
+        data: { user, accessToken: tokens.accessToken },
       });
     }
-  } catch (err) {
-    const code =
-      err instanceof Warning ? 500 : err instanceof ValidationError ? 422 : 400;
 
-    const success = err instanceof Warning;
-
-    return res.status(code).json({
-      success,
-      err: err.message,
+    return res.status(200).json({
+      success: true,
+      data: { user, tokens },
     });
-  }
+  };
 }
 
-export function refreshHandler(req, res, isWeb = true) {
-  try {
+/**
+ * Handles user logout by clearing the refresh token cookie.
+ */
+export function logoutHandler(req, res) {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict",
+  });
+
+  res.status(200).json({ success: true, message: "Logout successful." });
+}
+
+/**
+ * Returns the authenticated user's session and role information.
+ */
+export function roleStatusHandler(req, res) {
+  res.status(200).json({
+    success: true,
+    data: {
+      user: req.user,
+      role: req.role,
+    },
+  });
+}
+
+/**
+ * A factory that creates a token refresh handler for either web or mobile clients.
+ */
+export function refreshHandler(isWeb = true) {
+  return async (req, res) => {
     const refreshToken = isWeb
-      ? req.cookies.refreshToken
-      : req.body.refreshToken;
+      ? req.cookies?.refreshToken
+      : req.body?.refreshToken;
 
-    if (!refreshToken)
-      return res.status(400).json({ error: "Falta el token de autenticación" });
-
-    const accessToken = session.refresh({
+    const { accessToken } = await session.refresh({
       token: refreshToken,
       ip: req.ip,
-      ua: req.headers["user-agent"],
+      userAgent: req.headers["user-agent"],
+      tokenConfig: config.jwt,
     });
 
-    res.json({ accessToken });
-  } catch {
-    res.status(401).json({ error: "Token inválido." });
-  }
+    res.status(200).json({ success: true, data: { accessToken } });
+  };
 }

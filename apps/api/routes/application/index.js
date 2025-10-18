@@ -1,15 +1,18 @@
 import express from "express";
 import csurf from "csurf";
 import multer from "multer";
-import { authMiddleware, requireOutsider } from "../../middleware/auth.js";
+import { authMiddleware, requireRole } from "../../middleware/auth.js";
+import asyncHandler from "../../utils/asyncHandler.js";
 import {
   createApplicationHandler,
-  getCreateApplicationMetadataHandler,
-  getApplicationsByFacultyHandler,
-  getExploreApplicationsMetadataHandler,
+  getCreationFormDataHandler,
+  getExploreApplicationsHandler,
+  getExploreFiltersHandler,
 } from "./handlers.js";
 
 export const applicationRouter = express.Router();
+applicationRouter.use(authMiddleware);
+
 const csrfProtection = csurf({ cookie: true });
 /**
  * This will wrap all the files if multiple where added
@@ -18,14 +21,14 @@ const csrfProtection = csurf({ cookie: true });
  */
 const upload = multer();
 
-// ====== CREATE FORM
-applicationRouter.get("/metadata/create", getCreateApplicationMetadataHandler);
-
+applicationRouter.get(
+  "/metadata/create",
+  asyncHandler(getCreationFormDataHandler)
+);
 applicationRouter.post(
   "/create",
-  authMiddleware,
   csrfProtection,
-  requireOutsider,
+  requireRole("outsider"),
   /**
    * This enable me the file on the `req` object
    * req.file // THIS HOLD THE IMAGE ON `file` FIELD
@@ -38,9 +41,7 @@ applicationRouter.post(
    * e.g. upload.fields([{ name: 'fieldName1', maxCount: 1 }, { name: 'fieldName2', maxCount: 8 }])
    * req.files['fieldName1'] // HOLD THE `1` IMAGE ON THE `fieldName1` FIELD AS AN ARRAY
    * req.files['fieldName2'] // HOLD THE `8` IMAGES ON THE `fieldName2` FIELD AS AN ARRAY
-   */
-  upload.single("file"),
-  /**
+   *
    * What contains in the `req.file`, `req.files[0]` or `req.files['fieldName'][0]`
    * Is an object with the following attributes
    * - fieldname: Field name specified in the form
@@ -53,19 +54,15 @@ applicationRouter.post(
    * - path: The full path to the uploaded file
    * - buffer: A Buffer of the entire file
    */
-  createApplicationHandler
+  upload.single("file"),
+  asyncHandler(createApplicationHandler)
 );
-
-// ====== EXPLORE PAGE
 applicationRouter.get(
   "/explore{/:faculty}",
-  authMiddleware,
-  requireOutsider,
-  getApplicationsByFacultyHandler
+  requireRole("outsider"),
+  asyncHandler(getExploreApplicationsHandler)
 );
-
-// ====== EXPLORE PAGE METADATA
 applicationRouter.get(
   "/metadata/explore",
-  getExploreApplicationsMetadataHandler
+  asyncHandler(getExploreFiltersHandler)
 );

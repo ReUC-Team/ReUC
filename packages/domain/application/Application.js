@@ -1,49 +1,7 @@
-export class Application {
-  constructor({
-    uuid_application = undefined,
-    uuidOutsider,
-    title,
-    shortDescription,
-    description,
-    deadline,
-    visibility = undefined, // It is not present in the form rn
-    applicationProjectType = [],
-    applicationFaculty = [],
-    applicationProblemType = [],
-    applicationProblemTypeOther = undefined,
-  }) {
-    this.checkRequiredFields({
-      uuidOutsider,
-      title,
-      shortDescription,
-      description,
-      deadline,
-    });
+import { BaseEntity } from "../shared/BaseEntity.js";
+import * as DomainError from "../errors/index.js";
 
-    this.uuid_application = uuid_application;
-    this.uuidOutsider = uuidOutsider;
-    this.title = title;
-    this.shortDescription = shortDescription;
-    this.description = description;
-    this.deadline = new Date(deadline);
-    this.visibility = visibility;
-    this.applicationProjectType = this.parseAndValidateNumberArray(
-      applicationProjectType,
-      "Tipo de Proyecto"
-    );
-    this.applicationFaculty = this.parseAndValidateNumberArray(
-      applicationFaculty,
-      "Facultad"
-    );
-    this.applicationProblemType = this.parseAndValidateNumberArray(
-      applicationProblemType,
-      "Tipo de Problematica"
-    );
-    this.applicationCustomProblemType = this.normalizeProblemType(
-      applicationProblemTypeOther
-    );
-  }
-
+export class Application extends BaseEntity {
   static allowedFields = [
     "uuid_application",
     "uuidOutsider",
@@ -58,51 +16,90 @@ export class Application {
     "applicationCustomProblemType",
   ];
 
-  parseAndValidateNumberArray(input = [], key = "Unknow") {
-    const normalizedInput = Array.isArray(input) ? input : [input];
-    const parsedArray = normalizedInput.map(Number);
+  constructor(data) {
+    super(data, Application.allowedFields);
 
-    parsedArray.map((n) => {
-      if (isNaN(n)) {
-        throw new Error(`El campo "${key}" contiene un valor inválido.`);
+    const requiredFields = [
+      "uuidOutsider",
+      "title",
+      "shortDescription",
+      "description",
+      "deadline",
+    ];
+    const missingFields = [];
+    for (const field of requiredFields) {
+      const value = this[field];
+      if (typeof value !== "string" || value.trim() === "") {
+        missingFields.push({
+          field,
+          rule: "missing_or_empty",
+        });
       }
-    });
+    }
 
-    return parsedArray;
+    if (missingFields.length > 0)
+      throw new DomainError.ValidationError(
+        "Required application fields were missing.",
+        { details: missingFields }
+      );
+
+    this.deadline = new Date(this.deadline);
+    if (isNaN(this.deadline.getTime())) {
+      throw new DomainError.ValidationError("Deadline must be a valid date.", {
+        details: {
+          field: "deadline",
+          rule: "invalid_format",
+          expected: "YYYY-MM-DD",
+        },
+      });
+    }
+
+    this.applicationProjectType = this._parseAndValidateNumberArray(
+      this.applicationProjectType,
+      "Project Type"
+    );
+    this.applicationFaculty = this._parseAndValidateNumberArray(
+      this.applicationFaculty,
+      "Faculty"
+    );
+    this.applicationProblemType = this._parseAndValidateNumberArray(
+      this.applicationProblemType,
+      "Problem Type"
+    );
+    this.applicationCustomProblemType = this._normalizeString(
+      this.applicationCustomProblemType
+    );
   }
 
-  normalizeProblemType(value = undefined) {
-    if (value === undefined || value === " " || value === "") {
+  _parseAndValidateNumberArray(input = [], fieldName = "Unknown") {
+    const normalized = Array.isArray(input)
+      ? input
+      : [input].filter((i) => i !== null && i !== undefined);
+
+    return normalized.map((val) => {
+      const num = Number(val);
+
+      if (isNaN(num)) {
+        throw new DomainError.ValidationError(
+          `Field '${fieldName}' contains an invalid non-numeric value.`,
+          {
+            details: {
+              field: fieldName,
+              rule: "invalid_characters",
+            },
+          }
+        );
+      }
+
+      return num;
+    });
+  }
+
+  _normalizeString(value) {
+    if (value === undefined || value === null || String(value).trim() === "") {
       return undefined;
     }
 
-    return value.trim().toLowerCase();
-  }
-
-  checkRequiredFields(fields = {}) {
-    for (const [key, value] of Object.entries(fields)) {
-      if (
-        value === undefined ||
-        value === null ||
-        value === " " ||
-        value === ""
-      ) {
-        throw new Error(
-          `El campo ${key} es obligatorio y no puede estar vacío.`
-        );
-      }
-    }
-  }
-
-  toPrimitives() {
-    const primitive = {};
-
-    for (const key of Application.allowedFields) {
-      if (this[key] !== undefined) {
-        primitive[key] = this[key];
-      }
-    }
-
-    return primitive;
+    return String(value).trim().toLowerCase();
   }
 }

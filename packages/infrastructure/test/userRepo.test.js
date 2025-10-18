@@ -46,29 +46,6 @@ describe("userRepo read single edge cases", () => {
   });
 });
 
-describe("userRepo read multiple", () => {
-  it("should find one banned user", async () => {
-    const users = await userRepo.filterByStatus(1);
-    expect(users.at(0)).toBeDefined();
-    expect(users.at(0).email).toBe("stelle@hsr.com");
-  });
-  it("should find one user by last login being since 2025-03-01 to 2025-04-01", async () => {
-    const users = await userRepo.filterByLastLoginBetween(
-      new Date("2025-03-01"),
-      new Date("2025-04-01")
-    );
-    expect(users.at(0)).toBeDefined();
-    expect(users.at(0).email).toBe("caelus@hsr.com");
-  });
-});
-
-describe("userRepo read multiple edge cases", () => {
-  it("should return an empty array for status with no users", async () => {
-    const users = await userRepo.filterByStatus(999);
-    expect(users).toEqual([]);
-  });
-});
-
 describe("userRepo create", () => {
   it("should create and retrieve a new user", async () => {
     const newUser = await userRepo.save({

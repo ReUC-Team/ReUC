@@ -1,24 +1,70 @@
-import { db } from "./db/client.js";
+import { db, isPrismaError } from "./db/client.js";
+import DatabaseError from "./errors/DatabaseError.js";
+import InfrastructureError from "./errors/InfrastructureError.js";
 
 export const projectTypeRepo = {
-  async update(id, updates) {
-    return await db.project_Type.update({
-      where: { project_type_id: id },
-      data: { updates },
-    });
-  },
-
-  async save(data) {
-    return await db.project_Type.create({ data });
-  },
-
+  /**
+   * Retrieves all project types.
+   *
+   * @throws {DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError} For other unexpected errors.
+   */
   async getAll() {
-    return await db.project_Type.findMany();
+    try {
+      return await db.project_Type.findMany({
+        select: {
+          project_type_id: true,
+          name: true,
+          estimatedTime: true,
+          minTeamAdvisorsSize: true,
+          maxTeamAdvisorsSize: true,
+          minTeamMembersSize: true,
+          maxTeamMembersSize: true,
+        },
+        orderBy: { name: "asc" },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new DatabaseError(
+          `Unexpected database error while querying projectTypes: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(`Infrastructure error (projectTypeRepo.getAll): ${err}`);
+      throw new InfrastructureError(
+        "Unexpected Infrastructure error while querying projectTypes",
+        { cause: err }
+      );
+    }
   },
-  async findById(ids) {
-    return await db.project_Type.findMany({
-      where: { project_type_id: { in: ids } },
-      select: { project_type_id: true },
-    });
+  /**
+   * Finds multiple project types by their IDs.
+   * @param {Array<number>} ids - An array of project type IDs.
+   *
+   * @throws {DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError} For other unexpected errors.
+   */
+  async findByIds(ids) {
+    try {
+      return await db.project_Type.findMany({
+        where: { project_type_id: { in: ids } },
+        select: { project_type_id: true },
+        orderBy: { name: "asc" },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new DatabaseError(
+          `Unexpected database error while querying projectTypes: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (projectTypeRepo.findByIds) with IDs ${ids}: ${err}`
+      );
+      throw new InfrastructureError(
+        "Unexpected Infrastructure error while querying projectTypes",
+        { cause: err }
+      );
+    }
   },
 };

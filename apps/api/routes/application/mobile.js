@@ -1,20 +1,24 @@
 import express from "express";
 import multer from "multer";
 import {
-  authMiddleware,
-  requireOutsider,
   requireMobileClient,
+  authMiddleware,
+  requireRole,
 } from "../../middleware/auth.js";
+import asyncHandler from "../../utils/asyncHandler.js";
 import { createApplicationHandler } from "./handlers.js";
 
 export const mobileApplicationRouter = express.Router();
+mobileApplicationRouter.use(
+  requireMobileClient,
+  authMiddleware,
+  requireRole("outsider")
+);
+
 const upload = multer();
-mobileApplicationRouter.use(requireMobileClient);
 
 mobileApplicationRouter.post(
   "/create",
-  authMiddleware,
-  requireOutsider,
-  upload.single("file"), // checkout index.js for more details
-  createApplicationHandler
+  upload.single("file"),
+  asyncHandler(createApplicationHandler)
 );
