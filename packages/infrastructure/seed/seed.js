@@ -71,7 +71,7 @@ const seedCoreData = async () => {
     data: {
       email: "alex.jeraza@gmail.com",
       password: "$2b$15$9VKuYMoE0/X/q/9hQFskUeRVXo.tgxnl4/CH9kks4crzB22ltAq1O",
-      admins: {
+      admin: {
         create: {},
       },
     },

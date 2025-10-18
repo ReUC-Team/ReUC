@@ -1,4 +1,3 @@
-// constants/fileRules.js
 export const ALLOWED_MIME_TYPES = {
   images: ["image/jpeg", "image/png", "image/webp"],
   documents: ["application/pdf"],

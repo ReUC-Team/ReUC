@@ -1,13 +1,17 @@
 import { create } from "./create.js";
-import { createMetadata } from "./createMetadata.js";
-import { getByFaculty } from "./getByFaculty.js";
-import { exploreMetadata } from "./exploreMetadata.js";
+import { getCreationFormData } from "./getCreationFormData.js";
+import { getExploreApplications } from "./getExploreApplications.js";
+import { getExploreFilters } from "./getExploreFilters.js";
 
-const application = {
+/**
+ * The 'applications' entity in the application layer, grouping all applications
+ * file handling and data agregation.
+ */
+const applications = {
   create,
-  createMetadata,
-  getByFaculty,
-  exploreMetadata,
+  getCreationFormData,
+  getExploreApplications,
+  getExploreFilters,
 };
 
-export default application;
+export default applications;

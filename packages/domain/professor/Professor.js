@@ -1,37 +1,36 @@
-export class Professor {
-  constructor({
-    uuid_professor = undefined,
-    uuidUser,
-    universityId,
-    role = undefined,
-  }) {
-    this.uuidUser = uuidUser;
+import { BaseEntity } from "../shared/BaseEntity.js";
+import * as DomainError from "../errors/index.js";
 
-    if (universityId.length !== 4)
-      throw new Error(
-        "University ID must be exactly 4 characters long and consist of numbers."
-      );
-
-    this.universityId = universityId;
-
-    if (role != undefined && typeof role != "number")
-      throw new Error("Status must be a number");
-
-    this.uuid_professor = uuid_professor;
-    this.role = role;
-  }
-
+export class Professor extends BaseEntity {
   static allowedFields = ["uuid_professor", "uuidUser", "universityId", "role"];
 
-  toPrimitives() {
-    const primitive = {};
+  constructor(data) {
+    super(data, Professor.allowedFields);
 
-    for (const key of Professor.allowedFields) {
-      if (this[key] !== undefined) {
-        primitive[key] = this[key];
-      }
-    }
+    if (this.universityId && this.universityId.length !== 4)
+      throw new DomainError.ValidationError(
+        "University ID must be exactly 4 characters long.",
+        {
+          details: {
+            field: "universityId",
+            rule: "invalid_length",
+            received: this.universityId.length,
+            allowed: 4,
+          },
+        }
+      );
 
-    return primitive;
+    if (this.role !== undefined && typeof this.role !== "number")
+      throw new DomainError.ValidationError(
+        "Professor role must be a number.",
+        {
+          details: {
+            field: "role",
+            rule: "invalid_format",
+            received: typeof this.status,
+            allowed: "number",
+          },
+        }
+      );
   }
 }

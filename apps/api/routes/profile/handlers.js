@@ -1,64 +1,54 @@
 import profile from "@reuc/application/profile/index.js";
-import { ValidationError } from "@reuc/application/errors/ValidationError.js";
 
+/**
+ * Handles updating the user's and outsider's profile information.
+ */
 export async function editProfileHandler(req, res) {
-  try {
-    const user = req.user;
-    const outsider = req.outsider;
+  const user = req.user;
+  const outsider = req.role;
 
-    const response = await profile.update({
-      uuidOutsider: outsider.uuid_outsider,
-      uuidUser: user.uuid_user,
-      body: req.body,
-    });
+  const { profile: updatedProfile } = await profile.update({
+    uuidUser: user.uuid_user,
+    uuidOutsider: outsider.uuid,
+    body: req.body,
+  });
 
-    return res.status(200).json({
-      success: true,
-      data: {},
-    });
-  } catch (err) {
-    const code = err instanceof ValidationError ? 422 : 400;
-
-    return res.status(code).json({ success: false, err: err.message });
-  }
+  return res.status(200).json({
+    success: true,
+    data: { profile: updatedProfile },
+  });
 }
 
+/**
+ * Handles fetching the combined user and outsider profile.
+ */
 export async function getProfileHandler(req, res) {
-  try {
-    const user = req.user;
-    const outsider = req.outsider;
+  const user = req.user;
+  const outsider = req.role;
 
-    const response = await profile.getByUuids({
-      uuidOutsider: outsider.uuid_outsider,
-      uuidUser: user.uuid_user,
-    });
+  const { profile: profileData } = await profile.getByUuids({
+    uuidUser: user.uuid_user,
+    uuidOutsider: outsider.uuid,
+  });
 
-    return res.status(200).json({
-      success: true,
-      data: response.profile,
-    });
-  } catch (err) {
-    const code = err instanceof ValidationError ? 422 : 400;
-
-    return res.status(code).json({ success: false, err: err.message });
-  }
+  return res.status(200).json({
+    success: true,
+    data: { profile: profileData },
+  });
 }
 
+/**
+ * Handles checking the completion status of an outsider's profile.
+ */
 export async function getProfileStatusHandler(req, res) {
-  try {
-    const outsider = req.outsider;
+  const outsider = req.role;
 
-    const status = await profile.checkProfileStatus({
-      uuidOutsider: outsider.uuid_outsider,
-    });
+  const { status } = await profile.checkStatus({
+    uuidOutsider: outsider.uuid,
+  });
 
-    return res.status(200).json({
-      success: true,
-      data: status,
-    });
-  } catch (err) {
-    const code = err instanceof ValidationError ? 404 : 400;
-
-    return res.status(code).json({ success: false, err: err.message });
-  }
+  return res.status(200).json({
+    success: true,
+    data: status,
+  });
 }

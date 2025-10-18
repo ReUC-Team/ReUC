@@ -1,24 +1,18 @@
 import express from "express";
 import {
-  authMiddleware,
-  requireOutsider,
   requireMobileClient,
+  authMiddleware,
+  requireRole,
 } from "../../middleware/auth.js";
-import { editProfileHandler, getProfileHandler } from "./handlers.js";
+import asyncHandler from "../../utils/asyncHandler.js";
+import { editProfileHandler } from "./handlers.js";
 
 export const mobileProfileRouter = express.Router();
 
-mobileProfileRouter.use(requireMobileClient);
+mobileProfileRouter.use(
+  requireMobileClient,
+  authMiddleware,
+  requireRole("outsider")
+);
 
-mobileProfileRouter.get(
-  "/get",
-  authMiddleware,
-  requireOutsider,
-  getProfileHandler
-);
-mobileProfileRouter.patch(
-  "/edit",
-  authMiddleware,
-  requireOutsider,
-  editProfileHandler
-);
+mobileProfileRouter.patch("/edit", asyncHandler(editProfileHandler));

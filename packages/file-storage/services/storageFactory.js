@@ -1,19 +1,29 @@
-import { STORAGE_CONFIG } from "../constants/paths.js";
+import ConfigurationError from "../errors/ConfigurationError.js";
+import { STORAGE_CONFIG } from "../config/storage.js";
+import { STORAGE_BACKENDS } from "../constants/storage.js";
 import { LocalAdapter } from "../adapters/LocalAdapter.js";
-// import { S3Adapter } from "../adapters/S3Adapter.js"; // Possble implementation for cloud storage
+// import { S3Adapter } from "../adapters/S3Adapter.js";
+// Possble implementation for cloud storage
 
+/**
+ * Creates an instance of a storage adapter based on the configuration.
+ *
+ * @returns {LocalAdapter} An instance of the configured storage adapter.
+ * @throws {ConfigurationError} If the storage backend is not defined or is unknown.
+ */
 export function createStorageAdapter() {
-  const backend = STORAGE_CONFIG.backend;
-  const config = STORAGE_CONFIG[backend] || undefined;
+  const { backend, local } = STORAGE_CONFIG;
 
-  console.log("Using backen storage: ", backend, "with ", config);
+  if (!backend) {
+    throw new ConfigurationError("Storage backend is not defined.");
+  }
 
   switch (backend) {
-    case "local":
-      return new LocalAdapter();
-    // case "s3":
-    //   return new S3Adapter();
+    case STORAGE_BACKENDS.LOCAL:
+      return LocalAdapter.create(local);
+    // case STORAGE_BACKENDS.S3:
+    //   return async new S3Adapter(s3);
     default:
-      throw new Error(`Unknow storage backend: ${backend}`);
+      throw new ConfigurationError(`Unknown storage backend: ${backend}`);
   }
 }

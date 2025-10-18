@@ -1,60 +1,92 @@
 import fs from "fs";
+import { promises as fsPromises } from "fs";
 import file from "@reuc/application/file/index.js";
+import * as ApplicationError from "@reuc/application/errors/index.js";
 
+/**
+ * Handles serving a public asset file by its UUID.
+ */
 export async function getPublicAssetHandler(req, res) {
-  try {
-    const { uuid } = req.params;
+  const { uuid } = req.params;
 
-    const { file: assetFile } = await file.getAsset({
-      uuidFile: uuid,
-    });
+  const { file: assetFile } = await file.getAsset({
+    uuidFile: uuid,
+  });
 
-    if (!fs.existsSync(assetFile.storedPath)) {
-      throw new Error(
-        "Lo sentimos, parece que este archivo ya no está disponible."
-      );
-    }
+  await ensureFileExists(assetFile.storedPath);
 
-    res.setHeader("Content-Type", assetFile.mimetype);
-    res.setHeader("Content-Length", assetFile.fileSize);
-
-    const stream = fs.createReadStream(assetFile.storedPath);
-    stream.on("error", (err) => {
-      if (!res.headersSent) res.status(500).json({ success: false, err: err });
-    });
-
-    stream.pipe(res);
-  } catch (err) {
-    return res.status(404).json({ success: false, err: err.message });
-  }
+  await streamFile(
+    res,
+    assetFile.storedPath,
+    assetFile.mimetype,
+    assetFile.fileSize
+  );
 }
 
+/**
+ * Handles serving a protected file based on its model relationship.
+ */
 export async function getFileHandler(req, res) {
-  try {
-    const { model, uuidmodel, purpose } = req.params;
+  const { model, uuidmodel, purpose } = req.params;
 
-    const { file: fileData } = await file.getFile({
-      modelTarget: model,
-      uuidTarget: uuidmodel,
-      purpose,
-    });
+  const { file: fileData } = await file.getFile({
+    modelTarget: model,
+    uuidTarget: uuidmodel,
+    purpose,
+  });
 
-    if (!fs.existsSync(fileData.storedPath)) {
-      throw new Error(
-        "Lo sentimos, parece que este archivo ya no está disponible."
-      );
-    }
+  await ensureFileExists(fileData.storedPath);
 
-    res.setHeader("Content-Type", fileData.mimetype);
-    res.setHeader("Content-Length", fileData.fileSize);
+  await streamFile(
+    res,
+    fileData.storedPath,
+    fileData.mimetype,
+    fileData.fileSize
+  );
+}
 
-    const stream = fs.createReadStream(fileData.storedPath);
+/**
+ * A private helper to safely stream a file to the response, wrapping the operation
+ * in a Promise to ensure stream errors are caught by the asyncHandler.
+ * @private
+ */
+function streamFile(res, filePath, mimetype, fileSize) {
+  return new Promise((resolve, reject) => {
+    res.setHeader("Content-Type", mimetype);
+    res.setHeader("Content-Length", fileSize);
+
+    const stream = fs.createReadStream(filePath);
+
     stream.on("error", (err) => {
-      if (!res.headersSent) res.status(500).json({ success: false, err: err });
+      console.error("File stream error:", err);
+      // Reject with a standard ApplicationError so the centralized handler can process it.
+      reject(
+        new ApplicationError.ApplicationError(
+          "An error occurred while streaming the file."
+        )
+      );
     });
 
     stream.pipe(res);
-  } catch (err) {
-    return res.status(404).json({ success: false, err: err.message });
+
+    // Resolve the promise when the response is finished or the client closes the connection.
+    res.on("finish", resolve);
+    res.on("close", resolve);
+  });
+}
+
+/**
+ * Checks if a file exists on disk and throws a NotFoundError if not.
+ * This handles server inconsistencies where a DB record exists but the file is gone.
+ * @private
+ */
+async function ensureFileExists(filePath) {
+  try {
+    await fsPromises.access(filePath);
+  } catch (error) {
+    console.error(`File not found on disk at path: ${filePath}`);
+    throw new ApplicationError.NotFoundError(
+      "The requested file asset is no longer available."
+    );
   }
 }

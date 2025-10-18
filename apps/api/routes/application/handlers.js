@@ -1,82 +1,74 @@
 import application from "@reuc/application/applications/index.js";
 import { ValidationError } from "@reuc/application/errors/ValidationError.js";
 
-/** TODO: if outsider session expires, then save the form data and the
- * URL action that tried to achieve, in order to use after confirm login.
- * Give much thought about it like how to manage if the user dont try to
- * login after receive error for a while.
+// TODO: if outsider session expires, then save the form data and the
+// URL action that tried to achieve, in order to use after confirm login.
+// Give much thought about it like how to manage if the user dont try to
+// login after receive error for a while.
+
+/**
+ * Handles the creation of a new application.
  */
 export async function createApplicationHandler(req, res) {
-  try {
-    const response = await application.create({
-      uuidAuthor: req.outsider.uuid_outsider,
-      body: req.body,
-      file: req.file, // checkout index.js for more details
-    });
+  const response = await application.create({
+    uuidAuthor: req.role.uuid,
+    body: req.body,
+    file: req.file, // checkout index.js for more details
+  });
 
-    return res.status(201).json({
-      success: true,
-      data: {
-        application: response.application,
-      },
-    });
-  } catch (err) {
-    return res
-      .status(400)
-      .json({ success: false, err: `${err.message} ${err.stack}` });
-  }
+  return res.status(201).json({
+    success: true,
+    data: {
+      application: response.application,
+    },
+  });
 }
 
-export async function getCreateApplicationMetadataHandler(req, res) {
-  try {
-    const response = await application.createMetadata();
+/**
+ * Handles fetching the metadata required for the application creation form.
+ */
+export async function getCreationFormDataHandler(req, res) {
+  const response = await application.getCreationFormData();
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        metadata: response.metadata,
-      },
-    });
-  } catch (err) {
-    return res.status(404).json({ success: false, err: err.message });
-  }
+  return res.status(200).json({
+    success: true,
+    data: {
+      metadata: response.metadata,
+    },
+  });
 }
 
-export async function getApplicationsByFacultyHandler(req, res) {
-  try {
-    const { faculty } = req.params;
-    const { page, perPage } = req.query;
+/**
+ * Handles fetching a paginated list of applications, optionally filtered by faculty.
+ */
+export async function getExploreApplicationsHandler(req, res) {
+  const { faculty } = req.params;
+  const { page, perPage } = req.query;
 
-    const { applications } = await application.getByFaculty({
-      faculty: faculty || "",
-      page: parseInt(page) || 1,
-      perPage: parseInt(perPage) || 25,
-    });
+  const { applications } = await application.getExploreApplications({
+    faculty,
+    page,
+    perPage,
+  });
 
-    return res.status(201).json({
-      success: true,
-      data: {
-        applications,
-      },
-    });
-  } catch (err) {
-    const code = err instanceof ValidationError ? 400 : 500;
-
-    return res.status(code).json({ success: false, err: err.message });
-  }
+  return res.status(200).json({
+    success: true,
+    data: {
+      applications,
+    },
+  });
 }
 
-export async function getExploreApplicationsMetadataHandler(req, res) {
-  try {
-    const { metadata } = await application.exploreMetadata();
+/**
+ * Handles fetching the metadata required for the application exploration page.
+ */
+export async function getExploreFiltersHandler(req, res) {
+  const { metadata } = await application.getExploreFilters();
 
-    return res.status(200).json({
-      success: true,
-      data: {
-        metadata,
-      },
-    });
-  } catch (err) {
-    return res.status(404).json({ success: false, err: err.message });
-  }
+  return res.status(200).json({
+    success: true,
+    data: {
+      metadata,
+    },
+  });
 }

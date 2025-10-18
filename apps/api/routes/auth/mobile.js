@@ -1,19 +1,14 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
-import { loginHandler, refreshHandler, registerHandler } from "./handlers.js";
 import { requireMobileClient } from "../../middleware/auth.js";
+import asyncHandler from "../../utils/asyncHandler.js";
+import { loginHandler, refreshHandler, registerHandler } from "./handlers.js";
 
 export const mobileAuthRouter = express.Router();
 
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20 });
+mobileAuthRouter.use(authLimiter, requireMobileClient);
 
-mobileAuthRouter.use(authLimiter);
-mobileAuthRouter.use(requireMobileClient);
-
-mobileAuthRouter.post("/refresh", (req, res) =>
-  refreshHandler(req, res, false)
-);
-mobileAuthRouter.post("/register", (req, res) =>
-  registerHandler(req, res, false)
-);
-mobileAuthRouter.post("/login", (req, res) => loginHandler(req, res, false));
+mobileAuthRouter.post("/refresh", asyncHandler(refreshHandler(false)));
+mobileAuthRouter.post("/register", asyncHandler(registerHandler(false)));
+mobileAuthRouter.post("/login", asyncHandler(loginHandler(false)));

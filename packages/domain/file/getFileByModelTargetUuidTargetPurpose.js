@@ -1,18 +1,49 @@
+import * as DomainError from "../errors/index.js";
 import { fileRepo } from "@reuc/infrastructure/fileRepo.js";
-import { NotFoundError } from "../errors/NotFoundError.js";
+import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
 
+/**
+ * Retrieves a file linked to a specific entity and purpose.
+ * @param {string} modelTarget - The name of the target model (e.g., "APPLICATION").
+ * @param {string} uuidTarget - The UUID of the target entity.
+ * @param {string} purpose - The purpose of the file link (e.g., "BANNER").
+ *
+ * @throws {DomainError.NotFoundError} If no file link is found.
+ * @throws {DomainError.DomainError} For any unexpected errors.
+ */
 export async function getFileByModelTargetUuidTargetPurpose(
   modelTarget,
   uuidTarget,
   purpose
 ) {
-  const file = await fileRepo.getFileByModelTargetUuidTargetPurpose(
-    modelTarget,
-    uuidTarget,
-    purpose
-  );
+  try {
+    const file = await fileRepo.getFileByModelTargetUuidTargetPurpose(
+      modelTarget,
+      uuidTarget,
+      purpose
+    );
 
-  if (!file) throw new NotFoundError("No file found.");
+    if (!file) {
+      throw new DomainError.NotFoundError(
+        `A file for the specified target could not be found.`,
+        { details: { resource: "file", modelTarget, purpose, uuidTarget } }
+      );
+    }
 
-  return file.file;
+    return file;
+  } catch (err) {
+    if (err instanceof DomainError.DomainError) throw err;
+
+    if (err instanceof InfrastructureError.InfrastructureError)
+      throw new DomainError.DomainError(
+        "The fetch of the file could not be completed due to a system error.",
+        { cause: err }
+      );
+
+    console.error(`Domain error (getFileByModelTargetUuidTargetPurpose):`, err);
+    throw new DomainError.DomainError(
+      "An unexpected error occurred while fetching the file link.",
+      { cause: err }
+    );
+  }
 }

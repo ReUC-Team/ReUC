@@ -7,7 +7,7 @@
 // Agregue binaryTargets = ["native", "rhel-openssl-3.0.x"] porque el que tienes no es compatible para mi sistema
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  // output   = "../generated/prisma"
 }
 
 datasource db {
@@ -50,10 +50,10 @@ model User {
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime     @updatedAt @map("updated_at")
 
-  admins     Admin[]
-  students   Student[]
-  professors Professor[]
-  outsiders  Outsider[]
+  admin     Admin?
+  student   Student?
+  professor Professor?
+  outsider  Outsider?
 
   @@index([email])
   @@map("Users")
@@ -185,7 +185,7 @@ model Professor_Role {
 
 model Faculty {
   faculty_id Int      @id @default(autoincrement())
-  name       String
+  name       String   @unique
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
@@ -196,7 +196,7 @@ model Faculty {
 
 model Project_Type {
   project_type_id     Int      @id @default(autoincrement())
-  name                String
+  name                String   @unique
   estimatedTime       String   @map("estimated_time")
   minTeamMembersSize  Int      @map("min_team_members_size")
   maxTeamMembersSize  Int      @map("max_team_members_size")
@@ -214,6 +214,7 @@ model Project_Type {
 model Problem_Type {
   problem_type_id Int      @id @default(autoincrement())
   name            String   @unique
+  isPredefined    Boolean? @default(false) @map("is_predefined")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 

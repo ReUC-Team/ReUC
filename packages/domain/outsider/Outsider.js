@@ -1,19 +1,6 @@
-export class Outsider {
-  constructor({
-    uuid_outsider = undefined,
-    uuidUser,
-    organizationName = undefined,
-    phoneNumber = undefined,
-    location = undefined,
-  }) {
-    this.uuidUser = uuidUser;
+import { BaseEntity } from "../shared/BaseEntity.js";
 
-    this.uuid_outsider = uuid_outsider;
-    this.organizationName = organizationName;
-    this.phoneNumber = phoneNumber;
-    this.location = location;
-  }
-
+export class Outsider extends BaseEntity {
   static allowedFields = [
     "uuid_outsider",
     "uuidUser",
@@ -22,15 +9,7 @@ export class Outsider {
     "location",
   ];
 
-  toPrimitives() {
-    const primitive = {};
-
-    for (const key of Outsider.allowedFields) {
-      if (this[key] !== undefined) {
-        primitive[key] = this[key];
-      }
-    }
-
-    return primitive;
+  constructor(data) {
+    super(data, Outsider.allowedFields);
   }
 }
