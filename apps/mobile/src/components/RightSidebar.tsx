@@ -14,6 +14,7 @@ import {
   Switch,
 } from 'react-native'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native' 
 import { useThemedStyles } from '../hooks/useThemedStyles'
 import { createRightSidebarStyles } from '../styles/components/header/RightSidebar.styles'
 import { useTheme } from '../context/ThemeContext' 
@@ -63,18 +64,16 @@ export default function RightSidebar({
   userAvatar
 }: Props) {
   const styles = useThemedStyles(createRightSidebarStyles)
+  const navigation = useNavigation<any>() // ⬅️ USA useNavigation
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
-  // Utiliza los nuevos valores del contexto
   const { themeMode, setThemeMode, isDarkMode, isHighContrast } = useTheme()
 
-  // Refleja el estado del contexto en los switches
   const [accessibilitySettings, setAccessibilitySettings] = useState({
     darkMode: themeMode === 'dark',
     highContrast: themeMode === 'highContrast',
   })
 
-  // Mantiene los switches sincronizados con el contexto
   useEffect(() => {
     setAccessibilitySettings({
       darkMode: themeMode === 'dark',
@@ -136,17 +135,27 @@ export default function RightSidebar({
 
   const handleMenuPress = (item: MenuItem | string) => {
     let screen = typeof item === "string" ? item : item.screen
+    
     if (typeof item !== "string" && item.hasSubmenu) {
       toggleSubmenu(item.screen)
     } else {
-      onNavigate?.(screen)
+      // ⬇️ USA navigation.navigate EN LUGAR DE onNavigate
+      if (onNavigate) {
+        onNavigate(screen)
+      } else {
+        navigation.navigate(screen) // ⬅️ Navega directamente
+      }
       onClose()
     }
   }
 
   const handleAccessibilityPress = (setting: string) => {
     if (setting === 'fontChange') {
-      onNavigate?.('FontSettings')
+      if (onNavigate) {
+        onNavigate('FontSettings')
+      } else {
+        navigation.navigate('FontSettings') // ⬅️ Navega directamente
+      }
       onClose()
     }
   }

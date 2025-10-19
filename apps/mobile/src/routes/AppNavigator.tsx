@@ -13,6 +13,7 @@ import LandingPage   from '../features/landing/pages/LandingPage'
 import LoginPage     from '../features/auth/pages/LoginPageNative'
 import RegisterPage  from '../features/auth/pages/RegisterPageNative'
 import DashboardMain from '../features/dashboard/external/pages/DashboardMain'
+import ProfileScreen from '../features/profile/pages/ProfileScreen'
 
 const Stack = createNativeStackNavigator()
 
@@ -74,11 +75,11 @@ const AppNavigator: React.FC = () => (
         )}
       </Stack.Screen>
 
-      {/* Profile screen */}
+      {/* Profile screen - ⬇️ USA PROFILESCREEN EN LUGAR DE <View /> */}
       <Stack.Screen name="Profile">
         {() => (
           <DashboardLayout>
-            <View /> 
+            <ProfileScreen />
           </DashboardLayout>
         )}
       </Stack.Screen>
