@@ -79,7 +79,13 @@ export async function registerUser({ body, ip, userAgent, tokenConfig }) {
       expiresIn: tokenConfig.refreshExpiresIn,
     });
 
-    const { password, ...userToReturn } = savedUser;
+    const { password: _, ...safeUser } = savedUser;
+
+    const userToReturn = {
+      role: rolePrefix,
+      uuid_role: role.uuid_outsider || role.uuid_student || role.uuid_professor,
+      ...safeUser,
+    };
 
     return { user: userToReturn, accessToken, refreshToken };
   } catch (err) {

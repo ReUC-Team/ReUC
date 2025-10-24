@@ -14,7 +14,11 @@ export const userRepo = {
     try {
       return await db.user.create({
         data: user,
-        select: { uuid_user: true, email: true },
+        select: {
+          uuid_user: true,
+          email: true,
+          userStatus: { select: { user_status_id: true, name: true } },
+        },
       });
     } catch (err) {
       if (isPrismaError(err)) {
@@ -108,7 +112,8 @@ export const userRepo = {
         select: {
           uuid_user: true,
           email: true,
-          userStatus: { select: { name: true } },
+          userStatus: { select: { user_status_id: true, name: true } },
+          password: true, // Used by Login, Normally this side never return this field.
           admin: { select: { uuid_admin: true } },
           student: { select: { uuid_student: true } },
           professor: { select: { uuid_professor: true } },

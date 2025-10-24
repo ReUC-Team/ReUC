@@ -8,15 +8,13 @@
     "@reuc/file-storage": "workspace:*"
   },
   "scripts": {
-    "test": "dotenv -e .env.test -- vitest run"
+    "test": "dotenv -e .env.test -- vitest run",
+    "db:seed": "node ./seed/seed.js"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.0.0",
     "dotenv-cli": "^8.0.0",
     "prisma": "^6.16.2",
     "vitest": "^3.1.1"
-  },
-  "prisma": {
-    "seed": "node seed/seed.js"
   }
 }

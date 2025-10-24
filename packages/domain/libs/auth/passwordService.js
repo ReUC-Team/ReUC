@@ -19,9 +19,9 @@ export const passwordService = {
       if (!plainPassword) throw new Error("Password cannot be empty.");
 
       return await bcrypt.hash(plainPassword, SALT_ROUNDS);
-    } catch (error) {
-      console.error("Error (passwordService.hash):", error);
-      throw new DomainError("Could not process password.");
+    } catch (err) {
+      console.error("Error (passwordService.hash):", err);
+      throw new DomainError("Could not process password.", { cause: err });
     }
   },
 
@@ -38,9 +38,11 @@ export const passwordService = {
       if (!plainPassword || !hashedPassword) return false;
 
       return await bcrypt.compare(plainPassword, hashedPassword);
-    } catch (error) {
-      console.error("Error (passwordService.compare):", error);
-      throw new DomainError("Could not process password comparison.");
+    } catch (err) {
+      console.error("Error (passwordService.compare):", err);
+      throw new DomainError("Could not process password comparison.", {
+        cause: err,
+      });
     }
   },
 };

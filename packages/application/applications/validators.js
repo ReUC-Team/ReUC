@@ -135,7 +135,7 @@ export function validateExploreQuery({ faculty, page, perPage }) {
     }
   }
 
-  if (details.length > 0) {
-    throw new ValidationError("Invalid query parameters.", details);
+  if (allErrors.length > 0) {
+    throw new ValidationError("Invalid query parameters.", allErrors);
   }
 }
