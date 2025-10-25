@@ -13,7 +13,7 @@ export const applicationRepo = {
    * @param {object} file - An object containing either a `customImage` to upload or a `defaultImage` to link.
    *
    * @throws {InfrastructureError.FileOperationError} If the file upload or processing fails.
-   * @throws {InfrastructureError.ConflictError} If exist a constraint error (P2003).
+   * @throws {InfrastructureError.ForeignKeyConstraintError} If exist a constraint error (P2003).
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
@@ -61,9 +61,9 @@ export const applicationRepo = {
         if (err.code === "P2003") {
           const field = err.meta.constraint;
 
-          throw new InfrastructureError.ConflictError(
+          throw new InfrastructureError.ForeignKeyConstraintError(
             `An application with this ${field} failed to create the application.`,
-            { details: { field } }
+            { details: { field, rule: "foreign_key_violation" } }
           );
         }
 
@@ -97,42 +97,73 @@ export const applicationRepo = {
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
   async getLimitedByFacultyWithoutProjectRelation({
-    faculty = "",
+    faculty = undefined,
     page = 1,
     perPage = 50,
   }) {
     try {
       const where = await _buildGetLimitedWhereClause(faculty);
+      const select = {
+        uuid_application: true,
+        title: true,
+        shortDescription: true,
+      };
+      const sort = { createdAt: "desc" };
       const skip = (page - 1) * perPage;
+      const take = perPage;
 
       // Step 1: Query the primary data
-      const [applications, totalItems] = await _fetchApplicationsAndCount(
+      const [applicationsRaw, totalItems] = await _fetchApplicationsAndCount(
         where,
-        { skip, take: perPage }
+        { select, sort, skip, take }
       );
 
-      if (applications.length === 0)
+      const queryParams = {};
+      if (faculty) {
+        queryParams.faculty = faculty;
+      }
+
+      if (applicationsRaw.length === 0) {
         return {
-          applications: [],
-          metadata: { totalItems: 0, totalPages: 0, currentPage: page },
+          records: [],
+          metadata: {
+            pagination: {
+              page: Number(page),
+              perPage: Number(perPage),
+              totalPages: 0,
+              filteredItems: 0,
+            },
+            query: queryParams,
+            sort,
+          },
         };
+      }
 
       // Step 2: Query and prepare the related data
-      const applicationIds = applications.map((app) => app.uuid_application);
+      const applicationIds = applicationsRaw.map((app) => app.uuid_application);
       const bannerMap = await _fetchAndMapBannerUrls(applicationIds);
 
       // Step 3: Stitch the data together
-      const applicationWithBanners = applications.map((app) => ({
-        ...app,
+      const applicationsWithBanners = applicationsRaw.map((app) => ({
+        uuid_application: app.uuid_application,
+        title: app.title,
+        shortDescription: app.shortDescription,
         bannerUrl: bannerMap.get(app.uuid_application) || null,
       }));
 
+      const totalPages = Math.ceil(totalItems / perPage);
+
       return {
-        applications: applicationWithBanners,
+        records: applicationsWithBanners,
         metadata: {
-          totalItems,
-          totalPages: Math.ceil(totalItems / perPage),
-          currentPage: page,
+          pagination: {
+            page: Number(page),
+            perPage: Number(perPage),
+            totalPages,
+            filteredItems: totalItems,
+          },
+          query: queryParams,
+          sort,
         },
       };
     } catch (err) {
@@ -304,15 +335,17 @@ async function _buildGetLimitedWhereClause(facultyName) {
  * A private helper to fetch the primary application data and total count.
  * @param {object} where - The Prisma `where` clause.
  * @param {object} pagination - An object with `skip` and `take` values.
+ * @param {number} pagination.select - The selected fields that the query will return.
+ * @param {number} pagination.sort - The sorted rule to how return the records.
  * @param {number} pagination.skip - The offset from where to start fetching.
  * @param {number} pagination.take - The limit of applications to fetch.
  */
-async function _fetchApplicationsAndCount(where, { skip, take }) {
+async function _fetchApplicationsAndCount(where, { select, sort, skip, take }) {
   return db.$transaction([
     db.application.findMany({
       where,
-      select: { uuid_application: true, title: true, shortDescription: true },
-      orderBy: { createdAt: "desc" },
+      select,
+      orderBy: sort,
       skip,
       take,
     }),

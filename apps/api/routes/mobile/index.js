@@ -7,6 +7,6 @@ const mobileRouter = express.Router();
 
 mobileRouter.use("/auth", mobileAuthRouter);
 mobileRouter.use("/application", mobileApplicationRouter);
-mobileRouter.use("/outsider", mobileProfileRouter);
+mobileRouter.use("/profile", mobileProfileRouter);
 
 export default mobileRouter;

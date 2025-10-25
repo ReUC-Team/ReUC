@@ -1,0 +1,20 @@
+{
+  "description": "Successful response containing metadata for the application creation form.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "$ref": "../common/ObjectMetadata.json"
+            }
+          },
+          "required": ["metadata"]
+        }
+      }
+    }
+  ]
+}

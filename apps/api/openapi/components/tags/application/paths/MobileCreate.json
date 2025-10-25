@@ -1,0 +1,45 @@
+{
+  "post": {
+    "summary": "(Mobile) Create a new application",
+    "description": "Submits a new application. Requires **\"outsider\"** role and Mobile API Key. Handles multipart/form-data for optional custom banner upload.",
+    "tags": ["Application"],
+    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "allOf": [
+              { "$ref": "../payload/ApplicationCreate.json" },
+              {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Optional: Custom banner image file. Required if 'defaultImage' is not provided."
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Application created successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/CreateSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "409": { "$ref": "../../../responses/Error409.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

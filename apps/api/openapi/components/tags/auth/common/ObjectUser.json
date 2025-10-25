@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "description": "User information excluding sensitive details like password.",
+  "properties": {
+    "uuid_user": {
+      "type": "string",
+      "format": "uuid",
+      "example": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "example": "test@example.com"
+    },
+    "uuid_role": {
+      "type": "string",
+      "format": "uuid",
+      "example": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    "role": {
+      "type": "string",
+      "example": "outsider"
+    },
+    "userStatus": {
+      "type": "object",
+      "properties": {
+        "user_status_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "verified"
+        }
+      },
+      "description": "User status object",
+      "nullable": true
+    }
+  },
+  "required": ["uuid_user", "email", "uuid_role", "role", "userStatus"]
+}

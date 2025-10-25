@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "properties": {
+    "project_type_id": { "type": "integer", "example": 1 },
+    "name": { "type": "string", "example": "Research" },
+    "estimatedTime": { "type": "string", "example": "6 Months" },
+    "minTeamMembersSize": { "type": "integer", "example": 2 },
+    "maxTeamMembersSize": { "type": "integer", "example": 5 },
+    "minTeamAdvisorsSize": { "type": "integer", "example": 1 },
+    "maxTeamAdvisorsSize": { "type": "integer", "example": 2 }
+  },
+  "required": [
+    "project_type_id",
+    "name",
+    "estimatedTime",
+    "minTeamMembersSize",
+    "maxTeamMembersSize",
+    "minTeamAdvisorsSize",
+    "maxTeamAdvisorsSize"
+  ]
+}

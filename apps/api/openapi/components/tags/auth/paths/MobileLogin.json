@@ -1,0 +1,43 @@
+{
+  "post": {
+    "summary": "(Mobile) Login a user",
+    "description": "Authenticates a user with email and password, returning user data along with access and refresh tokens.",
+    "tags": ["Auth"],
+    "security": [
+      {
+        "ApiKeyAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../payload/Login.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Ok - Login successful.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/MobileLoginSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

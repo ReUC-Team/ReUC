@@ -1,0 +1,23 @@
+{
+  "description": "Defines the successful response body for user logout.",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "description": "Empty data object for logout.",
+          "example": {}
+        },
+        "message": {
+          "type": "string",
+          "example": "Logout successful."
+        }
+      },
+      "required": ["success", "data", "message"]
+    }
+  ]
+}

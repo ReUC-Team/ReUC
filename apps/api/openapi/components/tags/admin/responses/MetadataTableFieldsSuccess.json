@@ -1,0 +1,48 @@
+{
+  "description": "Schema definition for the specified table.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "schema": {
+              "type": "object",
+              "description": "Map of field names to their properties.",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "nameMapped": {
+                    "type": "string",
+                    "description": "Actual column name in DB"
+                  },
+                  "dataType": {
+                    "type": "string",
+                    "description": "Prisma data type (e.g., String, Int, DateTime)"
+                  },
+                  "isNullable": { "type": "boolean" }
+                },
+                "required": ["nameMapped", "dataType", "isNullable"]
+              },
+              "example": {
+                "email": {
+                  "nameMapped": "email",
+                  "dataType": "String",
+                  "isNullable": false
+                },
+                "createdAt": {
+                  "nameMapped": "createdAt",
+                  "dataType": "DateTime",
+                  "isNullable": false
+                }
+              }
+            }
+          },
+          "required": ["schema"]
+        }
+      }
+    }
+  ]
+}

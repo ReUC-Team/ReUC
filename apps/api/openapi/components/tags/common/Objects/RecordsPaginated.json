@@ -1,0 +1,18 @@
+{
+  "type": "object",
+  "description": "Standard structure for responses containing a paginated list of records and associated metadata.",
+  "properties": {
+    "records": {
+      "type": "array",
+      "description": "The list of records for the current page.",
+      "items": {
+        "type": "object",
+        "description": "Structure varies depending on the endpoint."
+      }
+    },
+    "metadata": {
+      "$ref": "./Metadata.json"
+    }
+  },
+  "required": ["records", "metadata"]
+}

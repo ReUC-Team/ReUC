@@ -1,0 +1,22 @@
+{
+  "description": "List of available table names for admin operations.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "tables": {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["user", "application", "file"]
+            }
+          },
+          "required": ["tables"]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "description": "Metadata for paginated results, including pagination details and applied filters/sorting.",
+  "properties": {
+    "pagination": {
+      "$ref": "./Pagination.json"
+    },
+    "query": {
+      "type": "object",
+      "description": "The query filters applied to the request (if any). Structure depends on the endpoint.",
+      "nullable": true,
+      "example": { "faculty": "FIE" }
+    },
+    "sort": {
+      "type": "object",
+      "description": "The sorting applied to the request (if any). Structure depends on the endpoint.",
+      "nullable": true,
+      "example": { "createdAt": "desc" }
+    }
+  },
+  "required": ["pagination", "query", "sort"]
+}

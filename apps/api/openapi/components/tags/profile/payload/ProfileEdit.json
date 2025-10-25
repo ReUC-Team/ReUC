@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "description": "Payload for updating user and outsider profile information.",
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "example": "John"
+    },
+    "middleName": {
+      "type": "string",
+      "example": "Fitzgerald"
+    },
+    "lastName": {
+      "type": "string",
+      "example": "Doe"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "description": "User's contact phone number.",
+      "example": "+523141234567"
+    },
+    "location": {
+      "type": "string",
+      "description": "User's location or address.",
+      "example": "Manzanillo, Colima, Mexico"
+    },
+    "organizationName": {
+      "type": "string",
+      "description": "Name of the outsider's organization.",
+      "example": "Example Corp."
+    }
+  },
+  "required": ["organizationName", "phoneNumber", "location"]
+}

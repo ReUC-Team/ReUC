@@ -1,0 +1,20 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Get metadata for creating an application",
+    "description": "Retrieves necessary data like available faculties, project types, problem types, and default banners for populating the application creation form.",
+    "tags": ["Application"],
+    "security": [{ "BearerAuth": [] }],
+    "responses": {
+      "200": {
+        "description": "Metadata retrieved successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/MetadataCreateSuccess.json" }
+          }
+        }
+      },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

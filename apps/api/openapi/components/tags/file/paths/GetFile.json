@@ -1,0 +1,49 @@
+{
+  "get": {
+    "summary": "Get a protected file associated with a model",
+    "description": "Retrieves and streams a file linked to a specific model instance (e.g., a user's avatar, an application's custom banner). Requires authentication.",
+    "tags": ["File"],
+    "security": [
+      {
+        "BearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "$ref": "../parameters/Model.json"
+      },
+      {
+        "$ref": "../parameters/Purpose.json"
+      },
+      {
+        "$ref": "../parameters/UuidModel.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The requested file content.",
+        "content": {
+          "*/*": {
+            "schema": {
+              "type": "string",
+              "format": "binary",
+              "description": "The raw file content. Content-Type and Content-Length headers will indicate the specific file type and size."
+            }
+          }
+        }
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "403": {
+        "$ref": "../../../responses/Error403.json"
+      },
+      "404": {
+        "$ref": "../../../responses/Error404.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

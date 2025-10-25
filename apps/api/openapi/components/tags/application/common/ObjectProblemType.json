@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "properties": {
+    "problem_type_id": { "type": "integer", "example": 1 },
+    "name": { "type": "string", "example": "Sustainability" }
+  },
+  "required": ["problem_type_id", "name"]
+}

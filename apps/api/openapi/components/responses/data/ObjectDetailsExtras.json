@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "expected": {
+      "type": "string",
+      "description": "The expected value or format.",
+      "example": 8
+    },
+    "received": {
+      "type": "string",
+      "description": "The value that was received and failed validation.",
+      "example": "image/gif"
+    },
+    "allowed": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "A list of allowed values.",
+      "example": ["asc", "desc"]
+    },
+    "max": {
+      "type": "integer",
+      "description": "The maximum allowed value (e.g., for size in bytes or string length).",
+      "example": 5242880
+    },
+    "level": {
+      "type": "string",
+      "description": "The validation level that was applied (e.g., for string validation).",
+      "example": "name"
+    }
+  }
+}

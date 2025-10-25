@@ -1,0 +1,21 @@
+{
+  "get": {
+    "summary": "Get available table names",
+    "description": "Retrieves a list of all table/model names accessible via the admin data endpoints.",
+    "tags": ["Admin"],
+    "security": [{ "BearerAuth": [] }],
+    "responses": {
+      "200": {
+        "description": "List of table names.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/MetadataTablesSuccess.json" }
+          }
+        }
+      },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

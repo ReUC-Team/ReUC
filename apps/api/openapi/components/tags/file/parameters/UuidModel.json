@@ -1,0 +1,10 @@
+{
+  "name": "uuidmodel",
+  "in": "path",
+  "required": true,
+  "description": "The unique identifier (UUID) of the specific model instance the file belongs to.",
+  "schema": {
+    "type": "string",
+    "format": "uuid"
+  }
+}

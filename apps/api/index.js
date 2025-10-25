@@ -2,6 +2,9 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import csrf from "csurf";
 import cors from "cors";
+import path from "path";
+import fs from 'fs';
+import { fileURLToPath } from "url";
 import config from "./config/index.js";
 import errorHandler from "./middleware/errorHandler.js";
 
@@ -20,6 +23,9 @@ import { fileRouter } from "./routes/file/index.js";
 const PORT = config.next.port;
 const HOST = config.next.host;
 const ORIGIN = config.next.origin;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ----- DECLARING VARIABLES ROUTES -----
 
@@ -75,6 +81,14 @@ app.get("/", (req, res) => {
 app.get("/csrf-token", csrfProtection, (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
+
+const docsPath = path.join(__dirname, "docs");
+if (fs.existsSync(docsPath)) {
+  app.use("/docs", express.static(docsPath));
+} else {
+  console.warn(`[WARNING] Documentation directory not found at ${docsPath}.`);
+  console.warn('Run "pnpm run docs:build" to generate the documentation.');
+}
 
 // ----- REGISTER CENTRALIZED ERROR HANDLER -----
 

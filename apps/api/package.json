@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "TZ=UTC node index.js"
+    "dev": "TZ=UTC node index.js",
+    "docs:build": "redocly build-docs ./openapi/openapi.json -o ./docs/index.html"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +21,10 @@
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.1",
     "multer": "^2.0.1"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.8.0",
+    "ajv": "^8.17.1",
+    "react": "19.1.0"
   }
 }

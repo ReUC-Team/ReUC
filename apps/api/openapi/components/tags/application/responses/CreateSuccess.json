@@ -1,0 +1,36 @@
+{
+  "description": "Successful response after creating an application (Web).",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "application": {
+              "type": "object",
+              "properties": {
+                "uuid_application": { "type": "string", "format": "uuid" },
+                "title": { "type": "string" },
+                "shortDescription": { "type": "string" },
+                "description": { "type": "string" },
+                "deadline": { "type": "string", "format": "date-time" },
+                "uuidOutsider": { "type": "string", "format": "uuid" }
+              },
+              "required": [
+                "uuid_application",
+                "title",
+                "shortDescription",
+                "description",
+                "deadline",
+                "uuidOutsider"
+              ]
+            }
+          },
+          "required": ["application"]
+        }
+      }
+    }
+  ]
+}

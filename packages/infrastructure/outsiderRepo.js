@@ -6,7 +6,7 @@ export const outsiderRepo = {
    * Creates a new outsider role.
    * @param {object} outsider The core data and related IDs
    *
-   * @throws {InfrastructureError.ConflictError} If exist a constraint error (P2002).
+   * @throws {InfrastructureError.UniqueConstraintError} If exist a constraint error (P2002).
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
@@ -21,9 +21,9 @@ export const outsiderRepo = {
         if (err.code === "P2002") {
           const field = err.meta.target[0];
 
-          throw new InfrastructureError.ConflictError(
+          throw new InfrastructureError.UniqueConstraintError(
             `A outsider with this ${field} already owns the role.`,
-            { details: { field } }
+            { details: { field, rule: "unique_constraint" } }
           );
         }
 

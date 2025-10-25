@@ -1,0 +1,21 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Get metadata for exploring applications",
+    "description": "Retrieves data needed for filtering applications, such as available faculties. Requires **\"outsider\"** role.",
+    "tags": ["Application"],
+    "security": [{ "BearerAuth": [] }],
+    "responses": {
+      "200": {
+        "description": "Filter metadata retrieved successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/MetadataExploreSuccess.json" }
+          }
+        }
+      },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

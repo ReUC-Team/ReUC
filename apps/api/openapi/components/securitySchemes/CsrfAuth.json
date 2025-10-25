@@ -1,0 +1,6 @@
+{
+  "type": "apiKey",
+  "name": "X-CSRF-Token",
+  "in": "header",
+  "description": "CSRF token required for all state-changing web routes (POST, PATCH, DELETE). This is typically handled by the browser automatically with cookies."
+}

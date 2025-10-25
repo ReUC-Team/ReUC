@@ -25,7 +25,7 @@ export async function getByUuids({ uuidUser, uuidOutsider }) {
         firstName: userData.firstName,
         middleName: userData.middleName,
         lastName: userData.lastName,
-        status: userData.userStatus.name,
+        status: userData.userStatus,
         organizationName: outsiderData.organizationName,
         phoneNumber: outsiderData.phoneNumber,
         location: outsiderData.location,

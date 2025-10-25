@@ -1,0 +1,35 @@
+{
+  "description": "Paginated list of records from the specified table.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "records": {
+              "allOf": [
+                { "$ref": "../../common/Objects/RecordsPaginated.json" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "records": {
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "An array of record objects matching the table's schema."
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "required": ["records"]
+        }
+      },
+      "required": ["data"]
+    }
+  ]
+}

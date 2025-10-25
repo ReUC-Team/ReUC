@@ -1,0 +1,27 @@
+{
+  "description": "Unauthorized - Authentication is required and has failed or has not yet been provided. The request lacks valid authentication credentials.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "allOf": [
+          {
+            "$ref": "./data/ResponseError.json"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "example": "AUTHENTICATION_FAILURE"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

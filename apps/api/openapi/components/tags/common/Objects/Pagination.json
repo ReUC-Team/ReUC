@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "description": "Pagination details.",
+  "properties": {
+    "page": { "$ref": "../parameters/Page.json#/PageParam/schema" },
+    "perPage": { "$ref": "../parameters/PerPage.json#/PerPageParam/schema" },
+    "totalPages": { "type": "integer", "example": 3 },
+    "filteredItems": {
+      "type": "integer",
+      "example": 62,
+      "description": "Number of items after filters are applied."
+    },
+    "totalItems": {
+      "type": "integer",
+      "nullable": true,
+      "description": "Total number of items available to filter.\n - To avoid extra queries, this field may be omitted for some endpoints or resources.",
+      "example": 139
+    }
+  },
+  "required": ["page", "perPage", "totalPages", "totalItems"]
+}

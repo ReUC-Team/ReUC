@@ -1,0 +1,26 @@
+{
+  "description": "Defines the successful response body for web user registration (201 Created).",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "$ref": "../common/ObjectUser.json"
+            },
+            "accessToken": {
+              "type": "string",
+              "description": "JWT Access Token to make requests on protected resources."
+            }
+          },
+          "required": ["user", "accessToken"]
+        }
+      }
+    }
+  ]
+}

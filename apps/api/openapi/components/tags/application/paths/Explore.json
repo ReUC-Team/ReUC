@@ -1,0 +1,27 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Explore available applications",
+    "description": "Retrieves a paginated list of applications, optionally filtered by faculty. Requires **\"outsider\"** role.",
+    "tags": ["Application"],
+    "security": [{ "BearerAuth": [] }],
+    "parameters": [
+      { "$ref": "../common/ParameterFaculty.json" },
+      { "$ref": "../../common/parameters/Page.json" },
+      { "$ref": "../../common/parameters/PerPage.json" }
+    ],
+    "responses": {
+      "200": {
+        "description": "Applications retrieved successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/ExploreSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

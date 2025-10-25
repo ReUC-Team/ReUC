@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "description": "Payload for registering a new user.",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "example": "test@example.com"
+    },
+    "password": {
+      "type": "string",
+      "format": "password",
+      "example": "Password123"
+    },
+    "confirmPassword": {
+      "type": "string",
+      "format": "password",
+      "example": "Password123"
+    },
+    "universityId": {
+      "type": "string",
+      "example": "12345678",
+      "nullable": true,
+      "description": "Required if email ends with @ucol.mx"
+    }
+  },
+  "required": ["email", "password", "confirmPassword"]
+}

@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "uuid": { "type": "string", "format": "uuid" },
+    "name": { "type": "string", "example": "Default Banner 1" },
+    "url": {
+      "type": "string",
+      "format": "url",
+      "example": "/file/public/123e4567-e89b-12d3-a456-426614174000"
+    }
+  },
+  "required": ["uuid", "name", "url"]
+}

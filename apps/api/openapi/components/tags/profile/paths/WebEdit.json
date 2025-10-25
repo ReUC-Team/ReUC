@@ -1,0 +1,50 @@
+{
+  "patch": {
+    "summary": "(Web) Update current user profile",
+    "description": "Updates the profile information (user and outsider details) for the authenticated **\"outsider\"** user.",
+    "tags": ["Profile"],
+    "security": [
+      {
+        "BearerAuth": [],
+        "CsrfAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../payload/ProfileEdit.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Profile updated successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/EditSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "403": {
+        "$ref": "../../../responses/Error403.json"
+      },
+      "404": {
+        "$ref": "../../../responses/Error404.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

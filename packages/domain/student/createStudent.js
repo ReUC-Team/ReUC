@@ -18,7 +18,7 @@ export async function createStudent(uuidUser, universityId) {
 
     return await studentRepo.save(newStudent.toPrimitives());
   } catch (err) {
-    if (err instanceof InfrastructureError.ConflictError) {
+    if (err instanceof InfrastructureError.UniqueConstraintError) {
       const field = err.details?.field || "resource";
 
       throw new DomainError.ConflictError(

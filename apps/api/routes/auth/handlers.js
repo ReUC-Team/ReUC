@@ -16,6 +16,11 @@ export function registerHandler(isWeb = true) {
     });
 
     if (isWeb) {
+      /**
+       * @todo Here could be added another cookie no secure with the user preferences.
+       * instead of a string it could be and object.
+       * @example { theme: "light" | "dark", language: "en" | "es"}
+       */
       res.cookie("refreshToken", tokens.refreshToken, {
         httpOnly: true,
         secure: true,
@@ -33,7 +38,6 @@ export function registerHandler(isWeb = true) {
       success: true,
       data: { user, tokens },
     });
-    c;
   };
 }
 
@@ -80,7 +84,9 @@ export function logoutHandler(req, res) {
     sameSite: "Strict",
   });
 
-  res.status(200).json({ success: true, message: "Logout successful." });
+  res
+    .status(200)
+    .json({ success: true, data: {}, message: "Logout successful." });
 }
 
 /**
@@ -90,7 +96,7 @@ export function roleStatusHandler(req, res) {
   res.status(200).json({
     success: true,
     data: {
-      user: req.user,
+      user: req.user.uuid_user,
       role: req.role,
     },
   });
