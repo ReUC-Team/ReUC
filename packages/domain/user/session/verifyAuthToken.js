@@ -13,7 +13,7 @@ import * as DomainError from "../../errors/index.js";
  *
  * @throws {DomainError.AuthenticationError} If the token is invalid, expired, or if session details do not match.
  */
-export async function verifyAuthToken({ token, ip, userAgent, tokenConfig }) {
+export function verifyAuthToken({ token, ip, userAgent, tokenConfig }) {
   return verifyTokenAndSession({
     token,
     secret: tokenConfig.accessSecret,

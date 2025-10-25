@@ -15,7 +15,7 @@ export const adminRepo = {
    * Retrieves the schema for a given table name.
    * @param {string} table - The name of the database table.
    *
-   * @returns {object} The schema object.
+   * @returns {{ model: { field: { nameMapped: String, dataType: String, isNullable: Boolean } } }} The schema object.
    * @throws {NotFoundError} If the table with the given name is not found.
    */
   getTableSchema(table) {
@@ -88,7 +88,7 @@ export const adminRepo = {
    */
   async getLimitedTableRecords(
     table,
-    { query = {}, sort = { createdAt: "desc" }, page = 1, perPage = 50 }
+    { query = {}, sort = { createdAt: "desc" }, page = 1, perPage = 25 }
   ) {
     try {
       const model = _getModelNameFromTableName(table);

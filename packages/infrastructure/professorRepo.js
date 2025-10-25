@@ -6,7 +6,7 @@ export const professorRepo = {
    * Creates a new professor role.
    * @param {object} professor The core data and related IDs
    *
-   * @throws {InfrastructureError.ConflictError} If exist a constraint error (P2002).
+   * @throws {InfrastructureError.UniqueConstraintError} If exist a constraint error (P2002).
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
@@ -26,9 +26,9 @@ export const professorRepo = {
         if (err.code === "P2002") {
           const field = err.meta.target[0];
 
-          throw new InfrastructureError.ConflictError(
+          throw new InfrastructureError.UniqueConstraintError(
             `A professor with this ${field} already owns the role.`,
-            { details: { field } }
+            { details: { field, rule: "unique_constraint" } }
           );
         }
 

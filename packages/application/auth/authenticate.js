@@ -15,9 +15,9 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @throws {ApplicationError.AuthenticationError} If the token is invalid or mismatched.
  * @throws {ApplicationError.ApplicationError} - For other unexpected errors.
  */
-export async function authenticate({ token, ip, userAgent, tokenConfig }) {
+export function authenticate({ token, ip, userAgent, tokenConfig }) {
   try {
-    const decodedPayload = await verifyAuthToken({
+    const decodedPayload = verifyAuthToken({
       token,
       ip,
       userAgent,

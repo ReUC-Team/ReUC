@@ -15,11 +15,11 @@ const csrfProtection = csrf({ cookie: true });
 adminRouter.get(
   "/meta/tables/",
   asyncHandler(async (req, res, next) => {
-    const response = admin.getTableNames();
+    const { tables } = admin.getTableNames();
 
     res.status(200).json({
       success: true,
-      data: response.tables,
+      data: { tables },
     });
   })
 );
@@ -29,11 +29,11 @@ adminRouter.get(
   asyncHandler(async (req, res, next) => {
     const { table } = req.params;
 
-    const response = admin.getTableSchema({ table });
+    const { schema } = admin.getTableSchema({ table });
 
     return res.status(200).json({
       success: true,
-      data: response.schema,
+      data: { schema },
     });
   })
 );
@@ -45,7 +45,7 @@ adminRouter.post(
     const { table } = req.params;
     const { page, perPage, query, sort } = req.body;
 
-    const response = await admin.getLimitedTableRecords({
+    const { records } = await admin.getLimitedTableRecords({
       table,
       page,
       perPage,
@@ -55,7 +55,7 @@ adminRouter.post(
 
     return res.status(200).json({
       success: true,
-      data: response.records,
+      data: { records },
     });
   })
 );

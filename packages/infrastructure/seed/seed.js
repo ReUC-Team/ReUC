@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma/client.js";
+import { PrismaClient } from "@prisma/client";
 import { applicationSeedData } from "./application.seed.js";
 import { facultySeedData } from "./faculty.seed.js";
 import { fileSeedData } from "./file.seed.js";

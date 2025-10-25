@@ -1,0 +1,10 @@
+{
+  "name": "model",
+  "in": "path",
+  "required": true,
+  "description": "The target model the file is associated with (e.g., 'application', 'user').",
+  "schema": {
+    "type": "string",
+    "example": "APPLICATION"
+  }
+}

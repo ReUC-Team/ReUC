@@ -1,0 +1,27 @@
+{
+  "description": "Successful response containing metadata for application exploration filters.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "faculties": {
+                  "type": "array",
+                  "items": { "$ref": "../common/ObjectFaculty.json" }
+                }
+              },
+              "required": ["faculties"]
+            }
+          },
+          "required": ["metadata"]
+        }
+      }
+    }
+  ]
+}

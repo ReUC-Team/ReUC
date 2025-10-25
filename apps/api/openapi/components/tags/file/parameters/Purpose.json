@@ -1,0 +1,10 @@
+{
+  "name": "purpose",
+  "in": "path",
+  "required": true,
+  "description": "The purpose of the file within its model context (e.g., 'BANNER', 'AVATAR').",
+  "schema": {
+    "type": "string",
+    "example": "BANNER"
+  }
+}

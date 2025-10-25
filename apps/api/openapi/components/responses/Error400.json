@@ -1,0 +1,33 @@
+{
+  "description": "Bad Request - The server cannot process the request due to client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing). Often due to input validation failures.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "allOf": [
+          {
+            "$ref": "./data/ResponseError.json"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "example": "INPUT_VALIDATION_FAILED"
+                  },
+                  "details": {
+                    "allOf": [
+                      { "$ref": "./data/ObjectDetailsRequired.json" },
+                      { "$ref": "./data/ObjectDetailsExtras.json" }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

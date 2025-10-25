@@ -1,0 +1,50 @@
+{
+  "post": {
+    "summary": "(Mobile) Refresh access token",
+    "description": "Generates a new access token using the provided refresh token in the request body.",
+    "tags": ["Auth"],
+    "security": [
+      {
+        "ApiKeyAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "refreshToken": {
+                "type": "string",
+                "description": "The JWT Refresh Token."
+              }
+            },
+            "required": ["refreshToken"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Access token refreshed successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/RefreshSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

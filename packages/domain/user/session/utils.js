@@ -11,7 +11,7 @@ import * as DomainError from "../../errors/index.js";
  *
  * @throws {DomainError.AuthenticationError}
  */
-export async function verifyTokenAndSession({ token, secret, ip, userAgent }) {
+export function verifyTokenAndSession({ token, secret, ip, userAgent }) {
   if (!token) {
     throw new DomainError.AuthenticationError("Token is required.");
   }

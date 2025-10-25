@@ -1,0 +1,22 @@
+{
+  "description": "Successful response for updating the user profile (Web - Mobile).",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "$ref": "../common/ObjectProfile.json"
+            }
+          },
+          "required": ["profile"]
+        }
+      }
+    }
+  ]
+}

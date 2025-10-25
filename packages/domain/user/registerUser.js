@@ -83,7 +83,7 @@ export async function registerUser({ body, ip, userAgent, tokenConfig }) {
 
     return { user: userToReturn, accessToken, refreshToken };
   } catch (err) {
-    if (err instanceof InfrastructureError.ConflictError) {
+    if (err instanceof InfrastructureError.UniqueConstraintError) {
       const field = err.details?.field || "resource";
 
       throw new DomainError.ConflictError(

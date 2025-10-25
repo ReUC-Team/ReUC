@@ -1,0 +1,43 @@
+{
+  "post": {
+    "summary": "(Web) Login a user",
+    "description": "Authenticates a user with email and password, sets a secure httpOnly refresh token cookie, and returns user data with an access token.",
+    "tags": ["Auth"],
+    "security": [
+      {
+        "CsrfAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../payload/Login.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Ok - Login successful.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/WebLoginSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

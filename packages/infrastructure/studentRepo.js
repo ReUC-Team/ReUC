@@ -6,7 +6,7 @@ export const studentRepo = {
    * Creates a new student role.
    * @param {object} student The core data and related IDs
    *
-   * @throws {InfrastructureError.ConflictError} If exist a constraint error (P2002).
+   * @throws {InfrastructureError.UniqueConstraintError} If exist a constraint error (P2002).
    * @throws {InfrastructureError.DatabaseError} For unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For unexpected errors.
    */
@@ -26,9 +26,9 @@ export const studentRepo = {
         if (err.code === "P2002") {
           const field = err.meta.target[0];
 
-          throw new InfrastructureError.ConflictError(
+          throw new InfrastructureError.UniqueConstraintError(
             `A student with this ${field} already owns the role.`,
-            { details: { field } }
+            { details: { field, rule: "unique_constraint" } }
           );
         }
 

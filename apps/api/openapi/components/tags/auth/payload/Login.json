@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "description": "Payload for user login.",
+  "properties": {
+    "email": {
+      "type": "string",
+      "format": "email",
+      "example": "test@example.com"
+    },
+    "password": {
+      "type": "string",
+      "format": "password",
+      "example": "Password123"
+    }
+  },
+  "required": ["email", "password"]
+}

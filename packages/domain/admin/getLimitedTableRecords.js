@@ -36,7 +36,7 @@ export async function getLimitedTableRecords(
 
     return {
       records: tableRecords,
-      meta: {
+      metadata: {
         pagination: {
           page: Number(page),
           perPage: Number(perPage),

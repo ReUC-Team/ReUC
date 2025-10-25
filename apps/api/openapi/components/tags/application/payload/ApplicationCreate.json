@@ -1,0 +1,136 @@
+{
+  "type": "object",
+  "description": "Payload for creating a new application.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "example": "New University Project Initiative"
+    },
+    "shortDescription": {
+      "type": "string",
+      "example": "A brief summary of the project."
+    },
+    "description": {
+      "type": "string",
+      "example": "Detailed description covering the problem, solution, and impact."
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "example": "2025-12-31"
+    },
+    "projectType": {
+      "oneOf": [
+        {
+          "description": "Single ID",
+          "oneOf": [
+            {
+              "type": "string",
+              "example": "1"
+            },
+            {
+              "type": "integer",
+              "example": 1
+            }
+          ]
+        },
+        {
+          "description": "Array of IDs",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "integer" },
+              "example": [1, 3]
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["1", "3"]
+            }
+          ]
+        }
+      ],
+      "description": "Associated project type ID(s)."
+    },
+    "problemType": {
+      "oneOf": [
+        {
+          "description": "Single ID",
+          "oneOf": [
+            {
+              "type": "string",
+              "example": "5"
+            },
+            {
+              "type": "integer",
+              "example": 5
+            }
+          ]
+        },
+        {
+          "description": "Array of IDs",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "integer" },
+              "example": [5, 8]
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["5", "8"]
+            }
+          ]
+        }
+      ],
+      "description": "Associated problem type ID(s)."
+    },
+    "faculty": {
+      "oneOf": [
+        {
+          "description": "Single ID",
+          "oneOf": [
+            {
+              "type": "string",
+              "example": "2"
+            },
+            {
+              "type": "integer",
+              "example": 2
+            }
+          ]
+        },
+        {
+          "description": "Array of IDs",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "integer" },
+              "example": [2, 6]
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["2", "6"]
+            }
+          ]
+        }
+      ],
+      "description": "Associated faculty ID(s)."
+    },
+    "problemTypeOther": {
+      "type": "string",
+      "description": "User-defined problem type description if 'other' is selected in problemType.",
+      "nullable": true,
+      "example": "Specific issue related to campus logistics."
+    },
+    "defaultImage": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID of a pre-selected default banner image. Mutually exclusive with uploading a custom file.",
+      "nullable": true,
+      "example": "123e4567-e89b-12d3-a456-426614174000"
+    }
+  },
+  "required": ["title", "shortDescription", "description", "deadline"]
+}

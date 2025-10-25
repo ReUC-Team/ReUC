@@ -1,0 +1,33 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Get current user session",
+    "description": "Retrieves the authenticated user's session information (decoded token) and parsed role details.",
+    "tags": ["Auth"],
+    "security": [
+      {
+        "BearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Session details retrieved successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/MeSuccess.json"
+            }
+          }
+        }
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "403": {
+        "$ref": "../../../responses/Error403.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

@@ -31,7 +31,9 @@ export async function create({ uuidAuthor, body, file }) {
   validateCreationPayload(body, file);
 
   const { imageDefault, fileName, problemType, ...applicationData } = body;
-  applicationData.problemType = (problemType || []).filter((e) => e !== "otro");
+  applicationData.problemType = (problemType || []).filter(
+    (id) => id !== "otro"
+  );
 
   try {
     const newApplication = await createApplication({
@@ -42,9 +44,9 @@ export async function create({ uuidAuthor, body, file }) {
 
     return { application: newApplication };
   } catch (err) {
-    if (err instanceof DomainError.ConflictError)
-      throw new ApplicationError.ConflictError(
-        "The application could not be created because a related resource was not found.",
+    if (err instanceof DomainError.BusinessRuleError)
+      throw new ApplicationError.ValidationError(
+        "The request violates business rules.",
         { details: err.details, cause: err }
       );
 

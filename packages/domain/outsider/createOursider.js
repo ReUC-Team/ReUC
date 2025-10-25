@@ -16,7 +16,7 @@ export async function createOutsider(uuidUser) {
 
     return await outsiderRepo.save(newOutsider.toPrimitives());
   } catch (err) {
-    if (err instanceof InfrastructureError.ConflictError) {
+    if (err instanceof InfrastructureError.UniqueConstraintError) {
       const field = err.details?.field || "resource";
 
       throw new DomainError.ConflictError(

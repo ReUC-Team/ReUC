@@ -1,0 +1,27 @@
+{
+  "description": "Forbidden - The server understood the request but refuses to authorize it. Authentication may have succeeded, but the user lacks permission.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "allOf": [
+          {
+            "$ref": "./data/ResponseError.json"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "example": "AUTHORIZATION_FAILURE"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
