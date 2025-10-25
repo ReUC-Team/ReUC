@@ -61,7 +61,7 @@ export async function loginUser({
       expiresIn: tokenConfig.refreshExpiresIn,
     });
 
-    const { password, ...userToReturn } = user;
+    const { password: _, ...userToReturn } = user;
 
     return {
       user: userToReturn,
@@ -91,10 +91,10 @@ async function updateLastLogin(uuid_user, newIP) {
       lastLoginAt: new Date(),
       lastLoginIp: newIP,
     });
-  } catch (error) {
+  } catch (err) {
     console.error(
       `Domain error (updateLastLogin) with UUID ${uuid_user}:`,
-      error
+      err
     );
   }
 }
