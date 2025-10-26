@@ -9,19 +9,7 @@
       "content": {
         "multipart/form-data": {
           "schema": {
-            "allOf": [
-              { "$ref": "../payload/ApplicationCreate.json" },
-              {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "description": "Optional: Custom banner image file. Required if 'defaultImage' is not provided."
-                  }
-                }
-              }
-            ]
+            "allOf": [{ "$ref": "../payload/ApplicationCreate.json" }]
           }
         }
       }
