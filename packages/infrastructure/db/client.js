@@ -508,6 +508,12 @@ let fileServiceInstance;
   }
 })();
 
+/**
+ * Gets the File Service class created on app init.
+ * If service is not created sucessfully it throws error.
+ * @returns {FileService}
+ * @throws {Error}
+ */
 export const getFileService = () => {
   if (!fileServiceInstance)
     throw new Error("File Service has not been initialized.");

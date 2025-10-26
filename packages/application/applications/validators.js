@@ -1,4 +1,8 @@
-import { validateDate, validateString } from "../shared/validators.js";
+import {
+  validateDate,
+  validateString,
+  validateUuid,
+} from "../shared/validators.js";
 import { ValidationError } from "../errors/ValidationError.js";
 import { validateFile } from "@reuc/file-storage/shared/validations.js";
 
@@ -44,31 +48,28 @@ function _validateIdOrIdArray(value, fieldName) {
  * @param {string|string[]} [body.problemType] - A single ID or array of IDs for associated problem types.
  * @param {string|string[]} [body.faculty] - A single ID or array of IDs for associated faculties.
  * @param {string} [body.problemTypeOther] - A user-defined problem type if 'other' is selected.
- * @param {string} [body.defaultImage] - The UUID of a pre-selected default banner image.
- * @param {object} [file] - The uploaded file object from multer, required if `body.imageDefault` is not provided.
- * @param {string} [file.mimetype] - The file mimetype.
- * @param {number} [file.size] - The file size.
- * @param {Buffer} [file.buffer] - The image buffer.
+ * @param {string} [body.selectedBannerUuid] - The UUID of a pre-selected default banner image.
+ * @param {object} [customBannerFile] - The uploaded file banner from multer.
+ * @param {string} [customBannerFile.mimetype] - The file mimetype.
+ * @param {number} [customBannerFile.size] - The file size.
+ * @param {Buffer} [customBannerFile.buffer] - The image buffer.
+ * @param {Array<object>} [attachments] - The uploaded files attached from multer.
+ * @param {string} [attachments[].mimetype] - The file mimetype.
+ * @param {number} [attachments[].size] - The file size.
+ * @param {Buffer} [attachments[].buffer] - The image buffer.
  *
  * @throws {ValidationError} If the payload is invalid.
  */
-export function validateCreationPayload(body, file) {
+export function validateCreationPayload(body, customBannerFile, attachments) {
   const allErrors = [];
 
+  // ---- Body Validation ----
   allErrors.push(...validateString(body.title, "title", "title"));
   allErrors.push(
     ...validateString(body.shortDescription, "shortDescription", "prose")
   );
   allErrors.push(...validateString(body.description, "description", "prose"));
   allErrors.push(...validateDate(body.deadline, "deadline"));
-
-  if (!body.imageDefault && !file) {
-    allErrors.push({ field: "file", rule: "missing_required_field" });
-  }
-
-  if (!body.imageDefault && file) {
-    allErrors.push(...validateFile(file, "images"));
-  }
 
   if (body.projectType !== undefined) {
     allErrors.push(..._validateIdOrIdArray(body.projectType, "projectType"));
@@ -86,6 +87,38 @@ export function validateCreationPayload(body, file) {
     allErrors.push(
       ...validateString(body.problemTypeOther, "problemTypeOther", "prose")
     );
+  }
+
+  // --- Custom Banner File Validation ---
+  if (body.selectedBannerUuid && customBannerFile) {
+    // 1. ERROR: Both were provided
+    allErrors.push({
+      field: "customBannerFile",
+      rule: "ambiguous_input",
+    });
+  } else if (body.selectedBannerUuid) {
+    // 2. OK: Only UUID was provided
+    allErrors.push(
+      ...validateUuid(body.selectedBannerUuid, "selectedBannerUuid")
+    );
+  } else if (customBannerFile) {
+    // 3. OK: Only custom file was provided
+    allErrors.push(
+      ...validateFile(customBannerFile, "customBannerFile", "images")
+    );
+  } else {
+    // 4. ERROR: Neither was provided
+    allErrors.push({
+      field: "customBannerFile",
+      rule: "missing_required_field",
+    });
+  }
+
+  // --- Attachments Validation ---
+  if (attachments && attachments.length > 0) {
+    for (const file of attachments) {
+      allErrors.push(...validateFile(file, "attachments", "attachment_files"));
+    }
   }
 
   if (allErrors.length > 0) {

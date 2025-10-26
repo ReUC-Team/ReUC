@@ -3,10 +3,10 @@ import cookieParser from "cookie-parser";
 import csrf from "csurf";
 import cors from "cors";
 import path from "path";
-import fs from 'fs';
+import fs from "fs";
 import { fileURLToPath } from "url";
 import config from "./config/index.js";
-import errorHandler from "./middleware/errorHandler.js";
+import errorHandler from "./error/errorMiddleware.js";
 
 // ----- IMPORTING ROUTES -----
 

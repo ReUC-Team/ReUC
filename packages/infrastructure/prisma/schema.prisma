@@ -312,15 +312,15 @@ model File {
 
 model File_Link {
   file_link_id Int      @id @default(autoincrement())
+  uuidFile     String   @map("uuid_file")
   modelTarget  String   @map("model_target")
   uuidTarget   String   @map("uuid_target")
   purpose      String
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  uuidFile String @map("uuid_file")
-  file     File   @relation(fields: [uuidFile], references: [uuid_file])
+  file File @relation(fields: [uuidFile], references: [uuid_file])
 
-  @@unique([modelTarget, uuidTarget, purpose])
+  @@unique([modelTarget, uuidTarget, uuidFile, purpose])
   @@map("File_Links")
 }

@@ -9,10 +9,13 @@ import application from "@reuc/application/applications/index.js";
  * Handles the creation of a new application.
  */
 export async function createApplicationHandler(req, res) {
+  const { customBannerFile, attachments } = req.files;
+
   const { application: applicationData } = await application.create({
     uuidAuthor: req.role.uuid,
     body: req.body,
-    file: req.file, // checkout index.js for more details
+    customBannerFile: customBannerFile ? customBannerFile[0] : undefined,
+    attachments: attachments || [],
   });
 
   return res.status(201).json({
