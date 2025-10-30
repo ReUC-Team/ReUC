@@ -14,12 +14,58 @@ export const applicationRouter = express.Router();
 applicationRouter.use(authMiddleware);
 
 const csrfProtection = csurf({ cookie: true });
-/**
- * This will wrap all the files if multiple where added
- * I could use the `dest` to directly store the file
- * e.g const upload = multer({ dest: 'path/to/save/file/' });
- */
 const upload = multer();
+
+/**
+ * This enable the file(s) object on the `req`
+ *
+ * - If it is uploaded a single 1 file
+ * - If there is a single input file on the form
+ *
+ * Use the `single` method:
+ * e.g.:
+ * upload.single('fieldName')
+ * req.file
+ * - Hold the input 'fieldName` as a `MulterObject`. `req.file: Array<MulterObject>`
+ *
+ *
+ * - If it is uploaded more than 1 files
+ * - If there is a single input file on the form
+ *
+ * Use the `array` method:
+ * e.g.:
+ * upload.array('fieldName', 5 )
+ * - The second argument stand for the number of expected images
+ * req.files
+ * - Hold the input 'fieldName` as an array. `req.files: Array<MulterObject>`
+ *
+ *
+ * - If there is more than one input file on the form
+ *
+ * Use the `fields` method:
+ * e.g.:
+ * upload.fields([{ name: 'fieldName1', maxCount: 1 }, { name: 'fieldName2', maxCount: 8 }])
+ * req.files['fieldName1']
+ * - Hold the `1` file on `fieldName1` input as an array. `req.files['fieldName1'][0]: MulterObject`
+ * req.files['fieldName2']
+ * - Hold the `8` file on `fieldName2` input as an array. `req.files['fieldName2']: Array<MulterObject>`
+ *
+ *
+ * Defines the structure of a file object processed by Multer when
+ * using memoryStorage.
+ *
+ * @typedef {object} MulterFile
+ * @property {string} fieldname - Field name specified in the form (e.g., 'customBannerFile').
+ * @property {string} originalname - Original name of the file on the user's computer.
+ * @property {string} encoding - Encoding type of the file (e.g., '7bit').
+ * @property {string} mimetype - Mime type of the file (e.g., 'image/png').
+ * @property {number} size - Size of the file in bytes.
+ * @property {Buffer} buffer - A Buffer of the entire file (available with memoryStorage).
+ */
+export const fileUploadMiddleware = upload.fields([
+  { name: "customBannerFile", maxCount: 1 },
+  { name: "attachments", maxCount: 5 },
+]);
 
 applicationRouter.get(
   "/metadata/create",
@@ -29,32 +75,7 @@ applicationRouter.post(
   "/create",
   csrfProtection,
   requireRole("outsider"),
-  /**
-   * This enable me the file on the `req` object
-   * req.file // THIS HOLD THE IMAGE ON `file` FIELD
-   *
-   * If I upload more than 1 file to the form then I use array method
-   * e.g. upload.array('fieldName', 5 ) // 5 stand for the number of expected images
-   * req.files // HOLD THE IMAGES ON THE 'fieldName` FIELD AS AN ARRAY
-   *
-   * If there is more than one file field on the form use the fields method
-   * e.g. upload.fields([{ name: 'fieldName1', maxCount: 1 }, { name: 'fieldName2', maxCount: 8 }])
-   * req.files['fieldName1'] // HOLD THE `1` IMAGE ON THE `fieldName1` FIELD AS AN ARRAY
-   * req.files['fieldName2'] // HOLD THE `8` IMAGES ON THE `fieldName2` FIELD AS AN ARRAY
-   *
-   * What contains in the `req.file`, `req.files[0]` or `req.files['fieldName'][0]`
-   * Is an object with the following attributes
-   * - fieldname: Field name specified in the form
-   * - originalname: Name of the file on the user's computer
-   * - encoding: Encoding type of the file
-   * - mimetype: Mime type of the file
-   * - size: Size of the file in bytes
-   * - destination: The folder to which the file has been saved
-   * - filename: The name of the file within the destination
-   * - path: The full path to the uploaded file
-   * - buffer: A Buffer of the entire file
-   */
-  upload.single("file"),
+  fileUploadMiddleware,
   asyncHandler(createApplicationHandler)
 );
 applicationRouter.get(

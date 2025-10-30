@@ -10,18 +10,20 @@ export const applicationRepo = {
    * Orchestrates the creation of a new application, including handling
    * file uploads and complex relational data within a single transaction.
    * @param {object} application - The core application data and related IDs.
-   * @param {object} file - An object containing either a `customImage` to upload or a `defaultImage` to link.
+   * @param {object} banner - An object containing either a `customBanner` to upload or a `defaultBannerUuid` to link.
+   * @param {Array<object>} attachments - An array of attachment objects to upload.
    *
    * @throws {InfrastructureError.FileOperationError} If the file upload or processing fails.
    * @throws {InfrastructureError.ForeignKeyConstraintError} If exist a constraint error (P2003).
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
-  async save(application, file) {
-    let savedFileMeta = null;
+  async save(application, banner, attachments) {
+    let allSavedFileMetas = [];
 
     try {
-      savedFileMeta = await _handleFileUpload(file);
+      // 1. Handle all file uploads *before* the transaction.
+      allSavedFileMetas = await _handleFileUploads(banner, attachments);
     } catch (err) {
       if (err instanceof FileStorageError.FileStorageError)
         throw new InfrastructureError.FileOperationError(err.message, {
@@ -29,15 +31,24 @@ export const applicationRepo = {
           details: err.details,
         });
 
-      throw InfrastructureError.InfrastructureError(err.message, {
+      throw new InfrastructureError.InfrastructureError(err.message, {
         cause: err,
       });
     }
 
+    // Separate the metas for easier handling
+    const bannerMeta = allSavedFileMetas.find((m) => m.purpose === "BANNER");
+    const attachmentsMeta = allSavedFileMetas.filter(
+      (m) => m.purpose === "ATTACHMENT"
+    );
+
     try {
+      // 2. Build the main application data
       const createData = _buildApplicationCreateData(application);
 
+      // 3. Start the database transaction
       return await db.$transaction(async (tx) => {
+        // 3a. Create the application
         const newApplication = await tx.application.create({
           data: createData,
           select: {
@@ -50,13 +61,22 @@ export const applicationRepo = {
           },
         });
 
-        await _createFileLinksInTx(tx, file, savedFileMeta, newApplication);
+        // 3b. Create all file links (banner + attachments)
+        await _createFileLinksInTx(
+          tx,
+          banner,
+          bannerMeta,
+          attachmentsMeta,
+          newApplication
+        );
 
         return newApplication;
       });
     } catch (err) {
-      await _cleanupOrphanedFile(savedFileMeta);
+      // 4. If transaction fails, clean up *all* orphaned files.
+      await _cleanupOrphanedFiles(allSavedFileMetas);
 
+      // 5. Translate and re-throw database errors
       if (isPrismaError(err)) {
         if (err.code === "P2003") {
           const field = err.meta.constraint;
@@ -68,12 +88,15 @@ export const applicationRepo = {
         }
 
         throw new InfrastructureError.DatabaseError(
-          `Unexpected Database error while creating outsider: ${err.message}`,
+          `Unexpected Database error while creating application: ${err.message}`,
           { cause: err }
         );
       }
 
-      const context = JSON.stringify({ application, file });
+      if (err instanceof InfrastructureError.InfrastructureError) throw err;
+
+      // 6. Handle any other unexpected errors
+      const context = JSON.stringify({ application, banner, attachments });
       console.error(
         `Infrastructure error (applicationRepo.save) with CONTEXT ${context}:`,
         err
@@ -229,65 +252,143 @@ function _buildApplicationCreateData(application) {
 }
 
 /**
- * A private helper to handle the file upload logic.
- * @param {object} file - The file object, containing either a custom or default image.
+ * A private helper to handle uploading all files (banner + attachments).
+ * @param {object} banner - The banner object from the domain.
+ * @param {Array<object>} attachments - The attachments array from the domain.
+ * @returns {Promise<Array<object>>} A promise that resolves to an array of all saved file metadata.
  */
-async function _handleFileUpload(file) {
-  if (file?.customImage?.filePayload) {
-    const { filePayload, fileDescriptor } = file.customImage;
+async function _handleFileUploads(banner, attachments) {
+  const filesToUpload = [];
 
-    return await fileService.saveFile(filePayload.buffer, {
-      originalName: fileDescriptor.name,
-      mimetype: filePayload.mimetype,
-      targetModel: fileDescriptor.modelTarget,
-      purpose: fileDescriptor.purpose,
-      processorOptions: { format: "webp", quality: 70 },
+  // 1. Check for a custom banner to upload
+  if (banner?.customBanner?.filePayload) {
+    const { filePayload, fileDescriptor } = banner.customBanner;
+
+    filesToUpload.push({
+      buffer: filePayload.buffer,
+      descriptor: {
+        originalName: fileDescriptor.name,
+        mimetype: filePayload.mimetype,
+        targetModel: fileDescriptor.modelTarget,
+        purpose: fileDescriptor.purpose,
+        processorOptions: { format: "webp", quality: 70 },
+      },
     });
   }
 
-  return null;
+  // 2. Check for attachments to upload
+  if (attachments && attachments.length > 0) {
+    for (const attachment of attachments) {
+      const { filePayload, fileDescriptor } = attachment;
+
+      filesToUpload.push({
+        buffer: filePayload.buffer,
+        descriptor: {
+          originalName: fileDescriptor.name,
+          mimetype: filePayload.mimetype,
+          targetModel: fileDescriptor.modelTarget,
+          purpose: fileDescriptor.purpose,
+        },
+      });
+    }
+  }
+
+  // 3. Upload all files in parallel
+  if (filesToUpload.length > 0) {
+    return Promise.all(
+      filesToUpload.map((f) => fileService.saveFile(f.buffer, f.descriptor))
+    );
+  }
+
+  return [];
 }
 
 /**
  * A private helper to create file and link records within a transaction.
  * @param {object} tx - The Prisma transaction client.
- * @param {object} file - The original file object.
- * @param {object} savedFileMeta - Metadata from a newly uploaded file.
+ * @param {object} banner - The original domain banner object.
+ * @param {object} bannerMeta - Metadata from a *newly uploaded* banner.
+ * @param {Array<object>} attachmentsMeta - Metadata from *newly uploaded* attachments.
  * @param {object} newApplication - The newly created application record.
  */
-async function _createFileLinksInTx(tx, file, savedFileMeta, newApplication) {
-  // Case 1: A new file was uploaded. Create the File record and its Link.
-  if (savedFileMeta) {
+async function _createFileLinksInTx(
+  tx,
+  banner,
+  bannerMeta,
+  attachmentsMeta,
+  newApplication
+) {
+  // --- 1. Handle Banner Link ---
+  // Enforce 1:1 rule by deleting any existing BANNER link first.
+  await tx.file_Link.deleteMany({
+    where: {
+      modelTarget: "APPLICATION",
+      uuidTarget: newApplication.uuid_application,
+      purpose: "BANNER",
+    },
+  });
+
+  // Case 1a: A new custom banner was uploaded. Create File and Link.
+  if (bannerMeta) {
     await tx.file.create({
       data: {
-        ...savedFileMeta,
+        ...bannerMeta,
         File_Link: {
           create: {
-            modelTarget: savedFileMeta.modelTarget,
+            modelTarget: bannerMeta.modelTarget,
             uuidTarget: newApplication.uuid_application,
-            purpose: savedFileMeta.purpose,
+            purpose: bannerMeta.purpose,
           },
         },
       },
     });
-    return;
   }
-
-  // Case 2: A default image was chosen. Find the existing asset and create a new Link to it.
-  if (file?.defaultImage) {
-    const { name, modelTarget, purpose } = file.defaultImage;
+  // Case 1b: A default banner was chosen. Find existing asset and create new Link.
+  else if (banner?.defaultBannerUuid) {
     const existingAsset = await tx.file.findFirst({
-      where: { originalName: name, isAsset: true },
-      orderBy: { createdAt: "asc" },
+      where: {
+        uuid_file: banner.defaultBannerUuid.defaultBannerUuid,
+        isAsset: true,
+      },
     });
 
     if (existingAsset) {
       await tx.file_Link.create({
         data: {
-          modelTarget,
-          purpose,
+          modelTarget: banner.defaultBannerUuid.modelTarget,
+          purpose: banner.defaultBannerUuid.purpose,
           uuidTarget: newApplication.uuid_application,
           uuidFile: existingAsset.uuid_file,
+        },
+      });
+    } else {
+      throw new InfrastructureError.ForeignKeyConstraintError(
+        `An application with this defaultBannerUuid failed to create the application.`,
+        {
+          details: {
+            field: "defaultBannerUuid",
+            rule: "foreign_key_violation",
+          },
+        }
+      );
+    }
+  }
+
+  // --- 2. Handle Attachment Links ---
+  // Enforce 1:N rule by creating all the attachments and linking to the same application.
+  if (attachmentsMeta && attachmentsMeta.length > 0) {
+    // One-by-one to create both File and File_Link
+    for (const meta of attachmentsMeta) {
+      await tx.file.create({
+        data: {
+          ...meta,
+          File_Link: {
+            create: {
+              modelTarget: meta.modelTarget,
+              uuidTarget: newApplication.uuid_application,
+              purpose: meta.purpose,
+            },
+          },
         },
       });
     }
@@ -295,19 +396,30 @@ async function _createFileLinksInTx(tx, file, savedFileMeta, newApplication) {
 }
 
 /**
- * A private helper to clean up a file from storage if the DB transaction fails.
- * @param {object} savedFileMeta - Metadata of the file to delete.
+ * A private helper to clean up *all* files from storage if the DB transaction fails.
+ * @param {Array<object>} allSavedFileMetas - Array of metadata of all files to delete.
  */
-async function _cleanupOrphanedFile(savedFileMeta) {
-  if (savedFileMeta?.storedPath) {
-    try {
-      await fileService.deleteFile(savedFileMeta.storedPath);
-    } catch (err) {
-      console.error(
-        "Infrastructure Critical Error: Failed to delete orphaned file after DB transaction failed:",
-        err
-      );
-    }
+async function _cleanupOrphanedFiles(allSavedFileMetas) {
+  if (!allSavedFileMetas || allSavedFileMetas.length === 0) {
+    return;
+  }
+
+  // Delete all uploaded files in parallel
+  try {
+    await Promise.all(
+      allSavedFileMetas.map((meta) => {
+        if (meta?.storedPath) {
+          return fileService.deleteFile(meta.storedPath);
+        }
+
+        return Promise.resolve();
+      })
+    );
+  } catch (err) {
+    console.error(
+      "Infrastructure Critical Error: Failed to delete orphaned files after DB transaction failed:",
+      err
+    );
   }
 }
 

@@ -9,13 +9,19 @@ import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
  * @param {object} params
  * @param {string} params.uuidAuthor - The UUID of the outsider creating the application.
  * @param {object} params.application - The core data for the application.
- * @param {object} params.file - The file data for the banner.
+ * @param {object} params.banner - The banner file data.
+ * @param {Array<object>} params.attachments - The attachment files data.
  *
  * @throws {DomainError.ValidationError} If the input data is invalid.
  * @throws {DomainError.BusinessRuleError} If a invalid business rule.
  * @throws {DomainError.DomainError} For any unexpected errors.
  */
-export async function createApplication({ uuidAuthor, application, file }) {
+export async function createApplication({
+  uuidAuthor,
+  application,
+  banner,
+  attachments,
+}) {
   try {
     const newApplication = new Application({
       ...application,
@@ -26,11 +32,13 @@ export async function createApplication({ uuidAuthor, application, file }) {
       applicationProblemTypeOther: application.problemTypeOther,
     });
 
-    const filePayload = _prepareFilePayload(file);
+    const bannerPayload = _prepareBannerPayload(banner);
+    const attachmentsPayload = _prepareAttachmentsPayload(attachments);
 
     return await applicationRepo.save(
       newApplication.toPrimitives(),
-      filePayload
+      bannerPayload,
+      attachmentsPayload
     );
   } catch (err) {
     if (err instanceof InfrastructureError.ForeignKeyConstraintError) {
@@ -62,39 +70,78 @@ export async function createApplication({ uuidAuthor, application, file }) {
  * A private helper to create a FileDescriptor and prepare the payload for the repository.
  * @private
  */
-function _prepareFilePayload(file) {
-  if (!file || (!file.defaultImage && !file.customImage?.file?.buffer))
+function _prepareBannerPayload(banner) {
+  if (
+    !banner ||
+    (!banner.defaultBannerUuid && !banner.customBanner?.file?.buffer)
+  )
     return {};
 
   let descriptor;
   let payload;
 
-  if (file.defaultImage) {
+  if (banner.defaultBannerUuid) {
     descriptor = new FileDescriptor({
-      name: file.defaultImage,
+      defaultBannerUuid: banner.defaultBannerUuid,
       modelTarget: "APPLICATION",
       purpose: "BANNER",
       isDefault: true,
     });
   } else {
     descriptor = new FileDescriptor({
-      name: file.customImage.name,
+      name: banner.customBanner.name,
       modelTarget: "APPLICATION",
       purpose: "BANNER",
       isDefault: false,
     });
     payload = {
-      buffer: file.customImage.file.buffer,
-      mimetype: file.customImage.file.mimetype,
+      mimetype: banner.customBanner.file.mimetype,
+      buffer: banner.customBanner.file.buffer,
     };
   }
 
   const descriptorPrimitives = descriptor.toPrimitives();
 
   return {
-    customImage: payload
+    customBanner: payload
       ? { fileDescriptor: descriptorPrimitives, filePayload: payload }
       : undefined,
-    defaultImage: descriptor.isDefault ? descriptorPrimitives : undefined,
+    defaultBannerUuid: descriptor.isDefault ? descriptorPrimitives : undefined,
   };
+}
+
+/**
+ * Prepares the attachment payload for the repository.
+ * @private
+ */
+function _prepareAttachmentsPayload(attachments) {
+  if (!attachments || attachments.length === 0) {
+    return [];
+  }
+
+  const payloadArray = [];
+
+  for (const file of attachments) {
+    let descriptor;
+    let payload;
+
+    descriptor = new FileDescriptor({
+      name: file.name,
+      modelTarget: "APPLICATION",
+      purpose: "ATTACHMENT",
+    });
+    payload = {
+      mimetype: file.file.mimetype,
+      buffer: file.file.buffer,
+    };
+
+    let descriptorPrimitives = descriptor.toPrimitives();
+
+    payloadArray.push({
+      fileDescriptor: descriptorPrimitives,
+      filePayload: payload,
+    });
+  }
+
+  return payloadArray;
 }

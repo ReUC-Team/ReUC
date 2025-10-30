@@ -124,12 +124,27 @@
       "nullable": true,
       "example": "Specific issue related to campus logistics."
     },
-    "defaultImage": {
+    "selectedBannerUuid": {
       "type": "string",
       "format": "uuid",
       "description": "UUID of a pre-selected default banner image. Mutually exclusive with uploading a custom file.",
       "nullable": true,
       "example": "123e4567-e89b-12d3-a456-426614174000"
+    },
+    "customBannerFile": {
+      "type": "string",
+      "format": "binary",
+      "nullable": true,
+      "description": "**Optional**: A custom banner image for the application.\n - Max 1 file.\n - Required if `selectedBannerUuid` is not provided.\n - Allowed types: `image/jpeg`, `image/png`, `image/webp`."
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "binary"
+      },
+      "nullable": true,
+      "description": "**Optional**: Additional files for the application.\n - Max 5 files.\n - Allowed types: **images** (JPEG, PNG, WEBP), **PDF**, **Word** (.doc, .docx), **PowerPoint** (.ppt, .pptx), **Excel** (.xls, .xlsx), **ZIP archives**, and **plain text** (.txt)."
     }
   },
   "required": ["title", "shortDescription", "description", "deadline"]

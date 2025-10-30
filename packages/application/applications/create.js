@@ -12,25 +12,33 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @param {string} params.body.shortDescription - A brief, one-sentence summary.
  * @param {string} params.body.description - A detailed description of the application's problem and solution.
  * @param {string} params.body.deadline - The application deadline in 'YYYY-MM-DD' format.
- * @param {string|string[]} [params.body.projectType] - A single ID or array of IDs for associated project types.
- * @param {string|string[]} [params.body.problemType] - A single ID or array of IDs for associated problem types.
- * @param {string|string[]} [params.body.faculty] - A single ID or array of IDs for associated faculties.
+ * @param {string|Array<string>} [params.body.projectType] - A single ID or array of IDs for associated project types.
+ * @param {string|Array<string>} [params.body.problemType] - A single ID or array of IDs for associated problem types.
+ * @param {string|Array<string>} [params.body.faculty] - A single ID or array of IDs for associated faculties.
  * @param {string} [params.body.problemTypeOther] - A user-defined problem type if 'other' is selected.
- * @param {string} [params.body.defaultImage] - The UUID of a pre-selected default banner image.
- * @param {object} [params.file] - The uploaded file object from multer.
- * @param {string} [params.file.mimetype] - The file mimetype.
- * @param {number} [params.file.size] - The file size.
- * @param {Buffer} [params.file.buffer] - The image buffer.
- *
+ * @param {string} [params.body.selectedBannerUuid] - The UUID of a pre-selected default banner image.
+ * @param {object} [params.customBannerFile] - The uploaded file banner from multer.
+ * @param {string} [params.customBannerFile.mimetype] - The file mimetype.
+ * @param {number} [params.customBannerFile.size] - The file size.
+ * @param {Buffer} [params.customBannerFile.buffer] - The image buffer.
+ * @param {Array<object>} [params.attachments] - The uploaded files attached from multer.
+ * @param {string} [params.attachments[].mimetype] - The file mimetype.
+ * @param {number} [params.attachments[].size] - The file size.
+ * @param {Buffer} [params.attachments[].buffer] - The image buffer.
  *
  * @throws {ApplicationError.ValidationError} If the input data is invalid.
  * @throws {ApplicationError.ConflictError} If a conflict occurs (e.g., invalid foreign key).
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
-export async function create({ uuidAuthor, body, file }) {
-  validateCreationPayload(body, file);
+export async function create({
+  uuidAuthor,
+  body,
+  customBannerFile,
+  attachments,
+}) {
+  validateCreationPayload(body, customBannerFile, attachments);
 
-  const { imageDefault, fileName, problemType, ...applicationData } = body;
+  const { selectedBannerUuid, problemType, ...applicationData } = body;
   applicationData.problemType = (problemType || []).filter(
     (id) => id !== "otro"
   );
@@ -39,7 +47,8 @@ export async function create({ uuidAuthor, body, file }) {
     const newApplication = await createApplication({
       uuidAuthor,
       application: applicationData,
-      file: _prepareFilePayload({ imageDefault, fileName, file }),
+      banner: _prepareBannerPayload({ selectedBannerUuid, customBannerFile }),
+      attachments: _prepareAttachmentsPayload({ attachments }),
     });
 
     return { application: newApplication };
@@ -71,24 +80,49 @@ export async function create({ uuidAuthor, body, file }) {
 }
 
 /**
- * Prepares the file payload for the domain layer, distinguishing between
+ * Prepares the banner payload for the domain layer, distinguishing between
  * a default banner and a custom uploaded image.
  * @private
  */
-function _prepareFilePayload({ imageDefault, fileName, file }) {
-  if (imageDefault) {
-    return { defaultImage: imageDefault, customImage: undefined };
+function _prepareBannerPayload({ selectedBannerUuid, customBannerFile }) {
+  if (selectedBannerUuid) {
+    return { defaultBannerUuid: selectedBannerUuid, customBanner: undefined };
   }
 
   return {
-    defaultImage: undefined,
-    customImage: {
-      name: fileName || "application-banner-upload",
+    defaultBannerUuid: undefined,
+    customBanner: {
+      name: customBannerFile.fieldname || "application-banner-upload",
+      file: {
+        mimetype: customBannerFile.mimetype,
+        buffer: customBannerFile.buffer,
+        size: customBannerFile.size,
+      },
+    },
+  };
+}
+
+/**
+ * Prepares the attachment payload for the domain layer.
+ * @private
+ */
+function _prepareAttachmentsPayload({ attachments }) {
+  let attachmentsPayload = [];
+
+  if (!attachments || attachments.length === 0) {
+    return attachmentsPayload;
+  }
+
+  for (const [idx, file] of attachments.entries()) {
+    attachmentsPayload.push({
+      name: file.fieldname || `application-attachment${idx}-upload`,
       file: {
         mimetype: file.mimetype,
         buffer: file.buffer,
         size: file.size,
       },
-    },
-  };
+    });
+  }
+
+  return attachmentsPayload;
 }

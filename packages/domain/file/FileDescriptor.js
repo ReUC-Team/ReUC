@@ -3,19 +3,32 @@ import * as DomainError from "../errors/index.js";
 import { getFileRule } from "@reuc/file-storage/shared/ruleUtils.js";
 
 export class FileDescriptor extends BaseEntity {
-  static allowedFields = ["name", "modelTarget", "purpose", "isDefault"];
+  static allowedFields = [
+    "defaultBannerUuid",
+    "name",
+    "modelTarget",
+    "purpose",
+    "isDefault",
+  ];
 
   constructor(data) {
     super(data, FileDescriptor.allowedFields);
 
     const missingFields = [];
-    for (const field of ["name", "modelTarget", "purpose"]) {
+    for (const field of ["modelTarget", "purpose"]) {
       if (typeof this[field] !== "string" || this[field].trim() === "") {
         missingFields.push({
           field,
           rule: "missing_or_empty",
         });
       }
+    }
+
+    if (!this.name && !this.defaultBannerUuid) {
+      missingFields.push({
+        field: "defaultBannerUuid",
+        rule: "missing_or_empty",
+      });
     }
 
     if (missingFields.length > 0)

@@ -7,12 +7,13 @@ import {
  * Validates that a file's size is within the allowed limit for its type.
  * @param {object} file - The file object from the request (e.g., from multer).
  * @param {number} file.size - The size of the file in bytes.
- * @param {'images' | 'documents'} type - The category of file.
+ * @param {string} fieldName - The name of the field being validated (e.g., "firstName").
+ * @param {'images' | 'documents' | 'attachment_files'} type - The category of file.
  *
  * @returns {Array<object>} - A list with all the errors object.
  * @example [{ field: "firstName", rule: "missing_or_empty" }]
  */
-export function _validateFileSize(file, type = "images") {
+export function _validateFileSize(file, fieldName, type = "images") {
   const maxMB = MAX_FILE_SIZES_MB[type];
   if (!maxMB) {
     // This is a developer error, not a user error.
@@ -23,7 +24,7 @@ export function _validateFileSize(file, type = "images") {
   if (file.size > maxSizeInBytes) {
     return [
       {
-        field: "file",
+        field: fieldName,
         rule: "max_size_exceeded",
         received: file.size,
         max: maxSizeInBytes,
@@ -38,12 +39,13 @@ export function _validateFileSize(file, type = "images") {
  * Validates that a file's mimetype is in the allowed list for its type.
  * @param {object} file - The file object from the request.
  * @param {string} file.mimetype - The mimetype of the file.
- * @param {'images' | 'documents'} type - The category of file.
+ * @param {string} fieldName - The name of the field being validated (e.g., "firstName").
+ * @param {'images' | 'documents' | 'attachment_files'} type - The category of file.
  *
  * @returns {Array<object>} - A list with all the errors object.
  * @example [{ field: "firstName", rule: "missing_or_empty" }]
  */
-export function _validateMimeType(file, type = "images") {
+export function _validateMimeType(file, fieldName, type = "images") {
   const allowed = ALLOWED_MIME_TYPES[type];
   if (!allowed) {
     // This is a developer error, not a user error.
@@ -53,7 +55,7 @@ export function _validateMimeType(file, type = "images") {
   if (!allowed.includes(file.mimetype)) {
     return [
       {
-        field: "file",
+        field: fieldName,
         rule: "invalid_mimetype",
         received: file.mimetype,
         allowed,
@@ -68,13 +70,14 @@ export function _validateMimeType(file, type = "images") {
  * Validates that the file object contains a valid Buffer.
  * @param {object} file - The file object from the request.
  * @param {Buffer} file.buffer - The file data as a Buffer.
+ * @param {string} fieldName - The name of the field being validated (e.g., "firstName").
  *
  * @returns {Array<object>} - A list with all the errors object.
  * @example [{ field: "firstName", rule: "missing_or_empty" }]
  */
-export function validateBuffer(file) {
+export function _validateBuffer(file, fieldName) {
   if (!file?.buffer || !Buffer.isBuffer(file.buffer)) {
-    return [{ field: "file", rule: "missing_or_empty" }];
+    return [{ field: fieldName, rule: "missing_or_empty" }];
   }
 
   return [];
@@ -88,19 +91,20 @@ export function validateBuffer(file) {
  * @param {string} file.mimetype - The file mimetype.
  * @param {number} file.size - The file size.
  * @param {Buffer} file.buffer - The image buffer.
- * @param {'images' | 'documents'} type - The category of file, used to determine validation rules.
+ * @param {string} [fieldName] - The name of the field being validated (e.g., "firstName").
+ * @param {'images' | 'documents' | 'attachment_files'} [type] - The category of file, used to determine validation rules.
  *
  * @returns {Array<object>} An array of error objects. Returns an empty array if the file is valid.
  */
-export function validateFile(file, type = "images") {
-  const bufferErrors = _validateBuffer(file);
+export function validateFile(file, fieldName = "file", type = "images") {
+  const bufferErrors = _validateBuffer(file, fieldName);
   // If the buffer is invalid, we can't check size or mimetype, so we return early.
   if (bufferErrors.length > 0) {
     return bufferErrors;
   }
 
-  const mimetypeErrors = _validateMimeType(file, type);
-  const sizeErrors = _validateFileSize(file, type);
+  const mimetypeErrors = _validateMimeType(file, fieldName, type);
+  const sizeErrors = _validateFileSize(file, fieldName, type);
 
   return [...mimetypeErrors, ...sizeErrors];
 }
