@@ -45,7 +45,7 @@ export async function getExploreApplicationsHandler(req, res) {
   const { faculty } = req.params;
   const { page, perPage } = req.query;
 
-  const { applications } = await application.getExploreApplications({
+  const applications = await application.getExploreApplications({
     faculty,
     page,
     perPage,

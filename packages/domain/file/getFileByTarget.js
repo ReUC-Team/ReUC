@@ -11,13 +11,9 @@ import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
  * @throws {DomainError.NotFoundError} If no file link is found.
  * @throws {DomainError.DomainError} For any unexpected errors.
  */
-export async function getFileByModelTargetUuidTargetPurpose(
-  modelTarget,
-  uuidTarget,
-  purpose
-) {
+export async function getFileByTarget(modelTarget, uuidTarget, purpose) {
   try {
-    const file = await fileRepo.getFileByModelTargetUuidTargetPurpose(
+    const file = await fileRepo.getFileByTarget(
       modelTarget,
       uuidTarget,
       purpose
@@ -40,7 +36,7 @@ export async function getFileByModelTargetUuidTargetPurpose(
         { cause: err }
       );
 
-    console.error(`Domain error (getFileByModelTargetUuidTargetPurpose):`, err);
+    console.error(`Domain error (getFileByTarget):`, err);
     throw new DomainError.DomainError(
       "An unexpected error occurred while fetching the file link.",
       { cause: err }

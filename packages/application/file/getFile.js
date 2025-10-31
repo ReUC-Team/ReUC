@@ -1,6 +1,6 @@
 import { validateGetFileQuery } from "./validators.js";
 import * as ApplicationError from "../errors/index.js";
-import { getFileByModelTargetUuidTargetPurpose } from "@reuc/domain/file/getFileByModelTargetUuidTargetPurpose.js";
+import { getFileByTarget } from "@reuc/domain/file/getFileByTarget.js";
 import * as DomainError from "@reuc/domain/errors/index.js";
 
 /**
@@ -19,11 +19,7 @@ export async function getFile({ modelTarget, uuidTarget, purpose }) {
   validateGetFileQuery({ modelTarget, uuidTarget, purpose });
 
   try {
-    const fileData = await getFileByModelTargetUuidTargetPurpose(
-      modelTarget,
-      uuidTarget,
-      purpose
-    );
+    const fileData = await getFileByTarget(modelTarget, uuidTarget, purpose);
 
     return { file: fileData };
   } catch (err) {

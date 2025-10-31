@@ -126,58 +126,34 @@ export const applicationRepo = {
   }) {
     try {
       const where = await _buildGetLimitedWhereClause(faculty);
-      const select = {
-        uuid_application: true,
-        title: true,
-        shortDescription: true,
-      };
       const sort = { createdAt: "desc" };
       const skip = (page - 1) * perPage;
       const take = perPage;
 
-      // Step 1: Query the primary data
-      const [applicationsRaw, totalItems] = await _fetchApplicationsAndCount(
-        where,
-        { select, sort, skip, take }
-      );
+      const [applicationsRaw, totalItems] = await db.$transaction([
+        db.application.findMany({
+          where,
+          select: {
+            uuid_application: true,
+            title: true,
+            shortDescription: true,
+          },
+          orderBy: sort,
+          skip,
+          take,
+        }),
+        db.application.count({ where }),
+      ]);
 
       const queryParams = {};
       if (faculty) {
         queryParams.faculty = faculty;
       }
 
-      if (applicationsRaw.length === 0) {
-        return {
-          records: [],
-          metadata: {
-            pagination: {
-              page: Number(page),
-              perPage: Number(perPage),
-              totalPages: 0,
-              filteredItems: 0,
-            },
-            query: queryParams,
-            sort,
-          },
-        };
-      }
-
-      // Step 2: Query and prepare the related data
-      const applicationIds = applicationsRaw.map((app) => app.uuid_application);
-      const bannerMap = await _fetchAndMapBannerUrls(applicationIds);
-
-      // Step 3: Stitch the data together
-      const applicationsWithBanners = applicationsRaw.map((app) => ({
-        uuid_application: app.uuid_application,
-        title: app.title,
-        shortDescription: app.shortDescription,
-        bannerUrl: bannerMap.get(app.uuid_application) || null,
-      }));
-
       const totalPages = Math.ceil(totalItems / perPage);
 
       return {
-        records: applicationsWithBanners,
+        records: applicationsRaw,
         metadata: {
           pagination: {
             page: Number(page),
@@ -441,50 +417,6 @@ async function _buildGetLimitedWhereClause(facultyName) {
   }
 
   return where;
-}
-
-/**
- * A private helper to fetch the primary application data and total count.
- * @param {object} where - The Prisma `where` clause.
- * @param {object} pagination - An object with `skip` and `take` values.
- * @param {number} pagination.select - The selected fields that the query will return.
- * @param {number} pagination.sort - The sorted rule to how return the records.
- * @param {number} pagination.skip - The offset from where to start fetching.
- * @param {number} pagination.take - The limit of applications to fetch.
- */
-async function _fetchApplicationsAndCount(where, { select, sort, skip, take }) {
-  return db.$transaction([
-    db.application.findMany({
-      where,
-      select,
-      orderBy: sort,
-      skip,
-      take,
-    }),
-    db.application.count({ where }),
-  ]);
-}
-
-/**
- * A private helper to fetch banner links and return them as a lookup map.
- * @param {string[]} applicationIds - An array of application UUIDs.
- */
-async function _fetchAndMapBannerUrls(applicationIds) {
-  const bannerLinks = await db.file_Link.findMany({
-    where: {
-      modelTarget: "APPLICATION",
-      purpose: "BANNER",
-      uuidTarget: { in: applicationIds },
-    },
-    select: { uuidTarget: true, modelTarget: true, purpose: true },
-  });
-
-  return new Map(
-    bannerLinks.map((link) => [
-      link.uuidTarget,
-      `/${link.modelTarget}/${link.purpose}/${link.uuidTarget}`,
-    ])
-  );
 }
 
 /**
