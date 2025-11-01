@@ -3,7 +3,6 @@ import withReactContent from 'sweetalert2-react-content';
 
 const MySwal = withReactContent(Swal);
 
-
 const toastConfig = {
   toast: true,
   position: 'bottom-end',
@@ -70,18 +69,23 @@ export const Alerts = {
     });
   },
 
-  // Carga (loading)
+  // Carga (loading) con método close()
   loading: (message = 'Cargando...') => {
     MySwal.fire({
       title: message,
       allowOutsideClick: false,
+      allowEscapeKey: false, // Evitar cerrar con ESC
+      showConfirmButton: false, 
       didOpen: () => {
         MySwal.showLoading();
       },
       background: '#1a1a1a',
       color: '#ffffff'
     });
-    return MySwal; // Para poder cerrarlo después
+    
+    return {
+      close: () => MySwal.close()
+    };
   }
 };
 

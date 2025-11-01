@@ -31,7 +31,7 @@ export async function getExploreApplicationsMetadata() {
 
   return { success: true, data: bodyRes.data.metadata.faculties };
 }
-console.log(await getExploreApplicationsMetadata());
+// console.log(await getExploreApplicationsMetadata());
 
 export async function exploreApplications() {
   const res = await fetchWithAuthAndAutoRefresh(
@@ -68,7 +68,7 @@ export async function exploreApplications() {
 
   return { success: true, data: finalApplications };
 }
-console.log(await exploreApplications());
+// console.log(await exploreApplications());
 
 export async function getCreateMetadata() {
   const res = await fetchWithAuthAndAutoRefresh(
@@ -152,4 +152,4 @@ export async function getProfileStatus() {
 
   return { success: true, data: bodyRes.data };
 }
-console.log(await getProfileStatus());
+// console.log(await getProfileStatus());
