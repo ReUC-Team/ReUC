@@ -1,4 +1,4 @@
-import { STORAGE_CONFIG } from "@reuc/file-storage/constants/paths.js";
+import { STORAGE_CONFIG } from "@reuc/file-storage/config/storage.js";
 
 const path = STORAGE_CONFIG.local.basePath;
 

@@ -36,7 +36,7 @@ export async function register({ body, ip, userAgent, tokenConfig }) {
     });
 
     return { user, tokens: { accessToken, refreshToken } };
-  } catch (error) {
+  } catch (err) {
     if (err instanceof DomainError.ConflictError)
       throw new ApplicationError.ConflictError(
         "The registration could not be completed due to a conflict with an existing resource.",

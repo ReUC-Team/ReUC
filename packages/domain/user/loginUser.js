@@ -61,7 +61,7 @@ export async function loginUser({
       expiresIn: tokenConfig.refreshExpiresIn,
     });
 
-    const { password, ...userToReturn } = user;
+    const { password: userPassword, ...userToReturn } = user;
 
     return {
       user: userToReturn,

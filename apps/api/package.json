@@ -20,5 +20,8 @@
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.1",
     "multer": "^2.0.1"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }

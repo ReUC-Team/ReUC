@@ -33,7 +33,6 @@ export function registerHandler(isWeb = true) {
       success: true,
       data: { user, tokens },
     });
-    c;
   };
 }
 

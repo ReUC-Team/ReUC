@@ -38,7 +38,7 @@ export async function login({ data, ip, userAgent, tokenConfig }) {
     });
 
     return { user, tokens: { accessToken, refreshToken } };
-  } catch (error) {
+  } catch (err) {
     if (err instanceof DomainError.AuthenticationError)
       throw new ApplicationError.AuthenticationError(
         "Authentication failed. Please check your credentials.",
