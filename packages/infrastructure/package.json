@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "dotenv -e .env.test -- vitest run",
-    "db:seed": "node ./seed/seed.js"
+    "db:seed": "node ./seed/seed.js",
+    "db:migrate": "npx prisma migrate dev"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.0.0",

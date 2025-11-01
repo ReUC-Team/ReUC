@@ -20,8 +20,7 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @throws {ApplicationError.ApplicationError} For other unexpected domain errors.
  */
 export async function update({ uuidUser, body }) {
-  validateUuid(uuidUser, "uuidUser");
-  validateUpdatePayload(body);
+  validateUpdatePayload(uuidUser, body);
 
   try {
     const updatedUser = await updateUser({ uuidUser, body });

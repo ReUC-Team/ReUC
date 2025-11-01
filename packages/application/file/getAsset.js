@@ -14,7 +14,12 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
 export async function getAsset({ uuidFile }) {
-  validateUuid(uuidFile, "uuidFile");
+  const allErrors = validateUuid(uuidFile, "uuidFile");
+  if (allErrors.length > 0) {
+    throw new ApplicationError.ValidationError("Input validation failed.", {
+      details: allErrors,
+    });
+  }
 
   try {
     const assetData = await getAssetByUuid(uuidFile);
