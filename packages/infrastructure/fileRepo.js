@@ -73,22 +73,22 @@ export const fileRepo = {
     }
   },
   /**
-   * Gets a file record using its unique link attributes.
+   * Get file for a unique target UUID and specific purpose.
+   * The result will be the first record found.
    * @param {string} modelTarget - The name of the model.
    * @param {string} uuidTarget - The UUID of the model related.
    * @param {string} purpose - The purpose of the file linked to the model.
    *
    * @throws {DatabaseError} For other unexpected errors.
+   * @throws {InfrastructureError} For other unexpected errors.
    */
-  async getFileByModelTargetUuidTargetPurpose(
-    modelTarget,
-    uuidTarget,
-    purpose
-  ) {
+  async getFileByTarget(modelTarget, uuidTarget, purpose) {
     try {
-      const link = await db.file_Link.findUnique({
+      const link = await db.file_Link.findFirst({
         where: {
-          modelTarget_uuidTarget_purpose: { modelTarget, uuidTarget, purpose },
+          modelTarget,
+          uuidTarget,
+          purpose,
         },
         select: {
           file: {
@@ -113,11 +113,90 @@ export const fileRepo = {
 
       const context = JSON.stringify({ modelTarget, uuidTarget, purpose });
       console.error(
-        `Infrastructure error (fileRepo.getFileByModelTargetUuidTargetPurpose) with CONTEXT ${context} :`,
+        `Infrastructure error (fileRepo.getFileByTarget) with CONTEXT ${context} :`,
         err
       );
       throw new InfrastructureError(
         "Unexpected Infrastructure error while querying file link",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Gets file links for a list of target UUIDs and a specific purpose.
+   * @param {string} modelTarget - The model name (e.g., "APPLICATION").
+   * @param {string[]} targetUuids - An array of UUIDs (e.g., application UUIDs).
+   * @param {string} purpose - The purpose (e.g., "BANNER").
+   */
+  async getLinksByTargets(modelTarget, targetUuids, purpose) {
+    try {
+      return await db.file_Link.findMany({
+        where: {
+          modelTarget,
+          purpose,
+          uuidTarget: { in: targetUuids },
+        },
+        select: { uuidTarget: true, modelTarget: true, purpose: true },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new DatabaseError(
+          `Unexpected database error while querying file links: ${err.message}`,
+          { cause: err }
+        );
+
+      const context = JSON.stringify({ modelTarget, targetUuids, purpose });
+      console.error(
+        `Infrastructure error (fileRepo.getLinksByTargets) with CONTEXT ${context} :`,
+        err
+      );
+      throw new InfrastructureError(
+        "Unexpected Infrastructure error while querying file links",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Gets all file links, including nested file metadata (name, size, type),
+   * for a single target UUID.
+   * This is used to build the JSON response for a detailed view.
+   *
+   * @param {string} targetUuid - The UUID of the target (e.g., an application UUID).
+   *
+   * @throws {DatabaseError} For unexpected prisma errors.
+   * @throws {InfrastructureError} For other unexpected errors.
+   */
+  async getLinksAndMetadataByTarget(targetUuid) {
+    try {
+      return await db.file_Link.findMany({
+        where: { uuidTarget: targetUuid },
+        select: {
+          modelTarget: true,
+          purpose: true,
+          uuidTarget: true,
+          file: {
+            select: {
+              originalName: true,
+              fileSize: true,
+              mimetype: true,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new DatabaseError(
+          `Unexpected database error while querying file links with metadata: ${err.message}`,
+          { cause: err }
+        );
+
+      const context = JSON.stringify({ targetUuid });
+      console.error(
+        `Infrastructure error (fileRepo.getLinksAndMetadataByTarget) with CONTEXT ${context} :`,
+        err
+      );
+      throw new InfrastructureError(
+        "Unexpected Infrastructure error while querying file links",
         { cause: err }
       );
     }

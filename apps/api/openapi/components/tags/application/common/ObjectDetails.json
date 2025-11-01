@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "description": "The core information about the application.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "example": "New University Project Initiative"
+    },
+    "shortDescription": {
+      "type": "string",
+      "example": "A brief summary of the project."
+    },
+    "description": {
+      "type": "string",
+      "example": "A full, detailed description of the project's goals, scope, and expected outcomes."
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2026-01-15T23:59:59Z"
+    },
+    "projectTypes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "example": ["Investigation", "Social Service"]
+    },
+    "faculties": {
+      "type": "array",
+      "items": { "type": "string" },
+      "example": ["Engineering", "Medicine"]
+    },
+    "problemTypes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "example": ["Water Scarcity", "Public Health"]
+    }
+  }
+}

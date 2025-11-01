@@ -8,6 +8,7 @@ import {
   getCreationFormDataHandler,
   getExploreApplicationsHandler,
   getExploreFiltersHandler,
+  getDetailedApplicationHandler,
 } from "./handlers.js";
 
 export const applicationRouter = express.Router();
@@ -86,4 +87,9 @@ applicationRouter.get(
 applicationRouter.get(
   "/metadata/explore",
   asyncHandler(getExploreFiltersHandler)
+);
+applicationRouter.get(
+  "/:uuid",
+  requireRole(["admin", "professor"]),
+  asyncHandler(getDetailedApplicationHandler)
 );

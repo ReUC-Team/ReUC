@@ -2,6 +2,7 @@ import { create } from "./create.js";
 import { getCreationFormData } from "./getCreationFormData.js";
 import { getExploreApplications } from "./getExploreApplications.js";
 import { getExploreFilters } from "./getExploreFilters.js";
+import { getDetailedApplication } from "./getDetailedApplication.js";
 
 /**
  * The 'applications' entity in the application layer, grouping all applications
@@ -12,6 +13,7 @@ const applications = {
   getCreationFormData,
   getExploreApplications,
   getExploreFilters,
+  getDetailedApplication,
 };
 
 export default applications;

@@ -45,7 +45,7 @@ export async function getExploreApplicationsHandler(req, res) {
   const { faculty } = req.params;
   const { page, perPage } = req.query;
 
-  const { applications } = await application.getExploreApplications({
+  const applications = await application.getExploreApplications({
     faculty,
     page,
     perPage,
@@ -69,6 +69,22 @@ export async function getExploreFiltersHandler(req, res) {
     success: true,
     data: {
       metadata,
+    },
+  });
+}
+
+/**
+ * Handles fetching a single, detailed application by its UUID.
+ */
+export async function getDetailedApplicationHandler(req, res) {
+  const { uuid } = req.params;
+
+  const detailedApplication = await application.getDetailedApplication(uuid);
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      application: detailedApplication,
     },
   });
 }

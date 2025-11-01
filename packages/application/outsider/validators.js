@@ -1,5 +1,5 @@
 import { ValidationError } from "../errors/ValidationError.js";
-import { validateString } from "../shared/validators.js";
+import { validateString, validateUuid } from "../shared/validators.js";
 
 /**
  * Validates a phone number string for format constraints.
@@ -41,6 +41,7 @@ function validatePhone(phone) {
  * It iterates through the provided fields and applies the appropriate
  * validation function.
  *
+ * @param {string} uuidOutsider - The outsider uuid
  * @param {object} body - The request body payload.
  * @param {string} body.phoneNumber
  * @param {string} body.location
@@ -48,8 +49,10 @@ function validatePhone(phone) {
  *
  * @throws {ValidationError} If any part of the payload is invalid.
  */
-export function validateUpdatePayload(body) {
+export function validateUpdatePayload(uuidOutsider, body) {
   let allErrors = [];
+
+  allErrors.push(...validateUuid(uuidOutsider, "uuidOutsider"));
 
   if (body.phoneNumber !== undefined) {
     allErrors.push(...validatePhone(body.phoneNumber));

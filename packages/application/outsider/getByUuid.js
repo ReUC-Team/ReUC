@@ -14,7 +14,12 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @throws {ApplicationError.ApplicationError} - For other unexpected errors.
  */
 export async function getByUuid({ uuidOutsider }) {
-  validateUuid(uuidOutsider, "uuidOutsider");
+  const allErrors = validateUuid(uuidOutsider, "uuidOutsider");
+  if (allErrors.length > 0) {
+    throw new ApplicationError.ValidationError("Input validation failed.", {
+      details: allErrors,
+    });
+  }
 
   try {
     const outsider = await getOutsiderByUuid({ uuidOutsider });

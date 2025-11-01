@@ -1,0 +1,42 @@
+{
+  "description": "Successful retrieval of detailed application data.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "application": {
+              "type": "object",
+              "description": "The detailed application object.",
+              "properties": {
+                "author": {
+                  "$ref": "../common/ObjectAuthor.json"
+                },
+                "details": {
+                  "$ref": "../common/ObjectDetails.json"
+                },
+                "bannerUrl": {
+                  "type": "string",
+                  "format": "uri-relative",
+                  "description": "The relative URL path for the application's banner image. Null if no banner is set.",
+                  "example": "/APPLICATION/BANNER/123e4567-e89b-12d3-a456-426614174000",
+                  "nullable": true
+                },
+                "attachments": {
+                  "type": "array",
+                  "description": "A list of supplementary file attachments. Empty if no attachments.",
+                  "items": {
+                    "$ref": "../common/ObjectAttachment.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -179,6 +179,9 @@
     "/application/explore/{faculty}": {
       "$ref": "./components/tags/application/paths/Explore.json"
     },
+    "/application/{uuid}": {
+      "$ref": "./components/tags/application/paths/Get.json"
+    },
 
     "/admin/meta/tables": {
       "$ref": "./components/tags/admin/paths/MetadataTables.json"
