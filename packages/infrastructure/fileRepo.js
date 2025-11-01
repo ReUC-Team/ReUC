@@ -80,6 +80,7 @@ export const fileRepo = {
    * @param {string} purpose - The purpose of the file linked to the model.
    *
    * @throws {DatabaseError} For other unexpected errors.
+   * @throws {InfrastructureError} For other unexpected errors.
    */
   async getFileByTarget(modelTarget, uuidTarget, purpose) {
     try {
@@ -147,6 +148,51 @@ export const fileRepo = {
       const context = JSON.stringify({ modelTarget, targetUuids, purpose });
       console.error(
         `Infrastructure error (fileRepo.getLinksByTargets) with CONTEXT ${context} :`,
+        err
+      );
+      throw new InfrastructureError(
+        "Unexpected Infrastructure error while querying file links",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Gets all file links, including nested file metadata (name, size, type),
+   * for a single target UUID.
+   * This is used to build the JSON response for a detailed view.
+   *
+   * @param {string} targetUuid - The UUID of the target (e.g., an application UUID).
+   *
+   * @throws {DatabaseError} For unexpected prisma errors.
+   * @throws {InfrastructureError} For other unexpected errors.
+   */
+  async getLinksAndMetadataByTarget(targetUuid) {
+    try {
+      return await db.file_Link.findMany({
+        where: { uuidTarget: targetUuid },
+        select: {
+          modelTarget: true,
+          purpose: true,
+          uuidTarget: true,
+          file: {
+            select: {
+              originalName: true,
+              fileSize: true,
+              mimetype: true,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new DatabaseError(
+          `Unexpected database error while querying file links with metadata: ${err.message}`,
+          { cause: err }
+        );
+
+      const context = JSON.stringify({ targetUuid });
+      console.error(
+        `Infrastructure error (fileRepo.getLinksAndMetadataByTarget) with CONTEXT ${context} :`,
         err
       );
       throw new InfrastructureError(

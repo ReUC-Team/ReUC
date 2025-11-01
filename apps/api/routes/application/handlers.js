@@ -72,3 +72,19 @@ export async function getExploreFiltersHandler(req, res) {
     },
   });
 }
+
+/**
+ * Handles fetching a single, detailed application by its UUID.
+ */
+export async function getDetailedApplicationHandler(req, res) {
+  const { uuid } = req.params;
+
+  const detailedApplication = await application.getDetailedApplication(uuid);
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      application: detailedApplication,
+    },
+  });
+}

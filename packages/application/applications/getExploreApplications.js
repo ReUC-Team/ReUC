@@ -42,9 +42,13 @@ export async function getExploreApplications({ faculty, page, perPage }) {
     );
 
     // Step 3: Use the domain helper to apply business logic
-    const bannerMap = new Map(
-      bannerLinks.map((link) => [link.uuidTarget, buildFileUrl(link)])
-    );
+    const bannerMap = new Map();
+    for (const link of bannerLinks) {
+      // Only add the banner if this application ID hasn't been seen yet
+      if (!bannerMap.has(link.uuidTarget)) {
+        bannerMap.set(link.uuidTarget, buildFileUrl(link));
+      }
+    }
 
     // Step 4: Stitch the data together
     const applicationsWithBanners = applications.map((app) => ({

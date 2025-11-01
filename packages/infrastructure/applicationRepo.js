@@ -183,6 +183,89 @@ export const applicationRepo = {
       );
     }
   },
+  /**
+   * Retrieves a full detailed application, with application data, file_links BANNER and
+   * ATTACHMENT.
+   * @param {string} uuid - The UUID of the application to search for.
+   */
+  async getDetailedApplication(uuid) {
+    try {
+      const applicationData = await db.application.findUnique({
+        where: { uuid_application: uuid },
+        select: {
+          // --- User & Organization ---
+          outsider: {
+            select: {
+              user: {
+                select: {
+                  uuid_user: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                },
+              },
+              organizationName: true,
+              phoneNumber: true,
+              location: true,
+            },
+          },
+          // --- Application Details ---
+          title: true,
+          shortDescription: true,
+          description: true,
+          deadline: true,
+          // --- Related Types (Many-to-Many) ---
+          applicationProjectType: {
+            select: {
+              projectTypeId: {
+                select: {
+                  project_type_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          applicationFaculty: {
+            select: {
+              facultyTypeId: {
+                select: {
+                  faculty_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          applicationProblemType: {
+            select: {
+              problemTypeId: {
+                select: {
+                  problem_type_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return applicationData;
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while querying application details: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (applicationRepo.getDetailedApplication) with UUID ${uuid}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while quering application",
+        { cause: err }
+      );
+    }
+  },
 };
 
 /**
