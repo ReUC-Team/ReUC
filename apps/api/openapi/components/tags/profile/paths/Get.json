@@ -14,7 +14,7 @@
         "content": {
           "application/json": {
             "schema": {
-              "$ref": "../responses/GetSuccess.json"
+              "$ref": "../responses/GetProfileSuccess.json"
             }
           }
         }

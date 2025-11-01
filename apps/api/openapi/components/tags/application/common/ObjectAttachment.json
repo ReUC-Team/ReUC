@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "description": "A single file attachment.",
+  "properties": {
+    "url": {
+      "type": "string",
+      "format": "uri-relative",
+      "description": "The relative URL path to download the attachment.",
+      "example": "/APPLICATION/ATTACHMENT/123e4f...-426614174001"
+    },
+    "name": {
+      "type": "string",
+      "description": "The original uploaded name of the file.",
+      "example": "ProjectProposal.pdf"
+    },
+    "size": {
+      "type": "integer",
+      "description": "File size in bytes.",
+      "example": 1048576
+    },
+    "type": {
+      "type": "string",
+      "description": "The MIME type of the file.",
+      "example": "application/pdf"
+    }
+  }
+}
