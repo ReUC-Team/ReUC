@@ -83,10 +83,23 @@ export async function login(credentials) {
  * @throws {ApplicationError} Si falla el logout
  */
 export async function logout() {
-  // fetchWithAuth lanza excepciones automáticamente
-  const response = await fetchWithAuth(`${API_URL}/auth/logout`, {
-    method: "DELETE",
-  });
+  try {
+
+    // fetchWithAuth lanza excepciones automáticamente
+    const response = await fetchWithAuth(`${API_URL}/auth/logout`, {
+      method: "DELETE",
+    });
+    return response;
+  } finally {
+    sessionStorage.removeItem("accessToken");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
+    sessionStorage.removeItem("dashboardProfileModalShown");
+    sessionStorage.removeItem("profileModalShown");
+    
+    sessionStorage.clear();
+  }
 
   // Limpiar token local
   sessionStorage.removeItem("accessToken");

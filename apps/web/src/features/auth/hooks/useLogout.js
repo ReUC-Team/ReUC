@@ -22,7 +22,17 @@ const useLogout = () => {
       title: '¿Cerrar sesión?',
       text: '¿Estás seguro de que quieres salir?',
       confirmText: 'Sí, cerrar sesión',
-      cancelText: 'Cancelar'
+      cancelText: 'Cancelar',
+      buttonsStyling: false, 
+      // ✅ Personalización de colores
+      customClass: {
+        popup: 'bg-white',
+        title: 'text-gray-900',
+        htmlContainer: 'text-gray-600',
+        confirmButton: 'bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-lg',
+        cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium px-6 py-2.5 rounded-lg'
+      },
+      // Desactivar estilos por defecto
     });
 
     if (!result.isConfirmed) {

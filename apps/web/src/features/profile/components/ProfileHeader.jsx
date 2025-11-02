@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ProfileHeader = ({ onEdit, profile }) => {
+const ProfileHeader = ({ onEdit, profile, isOwnProfile }) => {
   const firstName = profile.firstName || "ReUC";
   const middleName = profile.middleName || "";
   const lastName = profile.lastName || "";
@@ -31,17 +31,22 @@ const ProfileHeader = ({ onEdit, profile }) => {
         </div>
       </div>
       <div className="flex gap-4 w-4/12">
-        <button
-          onClick={onEdit}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition w-6/12 font-bold"
-        >
-          Editar Perfil
-        </button>
-        <button
-          className="px-4 py-2 bg-lime-700 text-white hover:bg-lime-700 rounded-lg transition w-6/12 font-bold"
-        >
-          Contactar
-        </button>
+        {isOwnProfile ? (
+          // Botón para perfil propio
+          <button
+            onClick={onEdit}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition w-full font-bold"
+          >
+            Editar Perfil
+          </button>
+        ) : (
+          // Botón para perfil de otra persona
+          <button
+            className="px-4 py-2 bg-lime-700 text-white hover:bg-lime-800 rounded-lg transition w-full font-bold"
+          >
+            Contactar
+          </button>
+        )}
       </div>
     </div>
   );

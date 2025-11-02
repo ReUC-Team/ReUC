@@ -1,28 +1,34 @@
 import { useEffect, useState } from "react";
 import { getProfile } from "../profileService.js";
 import { Alerts } from "@/shared/alerts";
+import { AuthenticationError, getDisplayMessage } from "@/utils/errorHandler";
 
 export default function useGetProfile() {
   const [profile, setProfile] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
 
   useEffect(() => {
-    const fetchTables = async () => {
+    const fetchProfile = async () => {
       try {
-        const response = await getProfile();
+        const data = await getProfile();
+        setProfile(data.profile || {});
+      } catch (err) {
+        console.error("useGetProfile error:", err);
 
-        if (!response.success) {
+        if (err instanceof AuthenticationError) {
+          window.location.href = "/login";
           return;
         }
 
-        setProfile(response.data);
-      } catch (err) {
-        console.log("useGetProfile", err);
-        Alerts.error("Error inesperado al obtener los datos del perfil");
+        Alerts.error(getDisplayMessage(err));
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchTables();
+    fetchProfile();
   }, []);
 
-  return { profile };
+  return { profile, isLoading };
 }

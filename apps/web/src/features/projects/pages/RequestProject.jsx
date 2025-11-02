@@ -1,12 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import RequestProjectForm from '../components/RequestProjectForm';
 import useRequestProject from '../hooks/useRequestProject';
+import { useProfileStatus } from '@/features/profile/hooks/useProfileStatus';
+import ProfileIncompleteModal from '@/components/ProfileIncompleteModal';
+
 
 const RequestProject = () => {
   const { form, fieldErrors, handleChange, handleSubmit } = useRequestProject();
+  const { isComplete, isLoading } = useProfileStatus();
   const [showHelp, setShowHelp] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    // Mostrar modal si el perfil está incompleto
+    if (!isLoading && !isComplete) {
+      setShowModal(true);
+    }
+  }, [isLoading, isComplete]);
+
+  // Mostrar loading mientras se verifica el perfil
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lime-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Verificando perfil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
+    <>
+      <ProfileIncompleteModal 
+        isOpen={showModal} 
+        onClose={() => setShowModal(false)}
+        showCloseButton={false} // No permitir cerrar sin completar perfil
+      />
     <section className="flex flex-col items-center justify-start w-full min-h-screen p-10">
       <div className="flex items-center gap-3 mb-4">
         <h1 className="text-5xl font-bold">
@@ -51,6 +81,7 @@ const RequestProject = () => {
         handleSubmit={handleSubmit}
       />
     </section>
+    </>
   );
 };
 

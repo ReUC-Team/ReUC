@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Alerts } from "@/shared/alerts";
-import { putProfile } from "../profileService.js";
+import { updateProfile } from "../profileService.js";
+import { 
+  ValidationError, 
+  processFieldErrors, 
+  getDisplayMessage 
+} from "@/utils/errorHandler";
 
 const useEditProfile = (onClose, profile) => {
   const [form, setForm] = useState({
@@ -14,73 +19,61 @@ const useEditProfile = (onClose, profile) => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-
+  const [fieldErrors, setFieldErrors] = useState({});
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+
     setForm({
       ...form,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
-  const handlePhoneChange = (value) => {
-    console.log(value);
 
+  const handlePhoneChange = (value) => {
     setForm({ ...form, phoneNumber: value });
   };
-  const handleLocationChange = (selectedOption) => {
-    console.log(selectedOption);
 
+  const handleLocationChange = (selectedOption) => {
     setForm({ ...form, location: selectedOption.label });
   };
-
-  const validations = [
-    {
-      condition: !form.firstName.trim(),
-      message: "El nombre es obligatorio",
-    },
-    {
-      condition: !form.middleName.trim(),
-      message: "El primer apellido es obligatorio",
-    },
-    {
-      condition: !form.lastName.trim(),
-      message: "El segundo apellido es obligatorio",
-    },
-    {
-      condition: !form.phoneNumber.trim(),
-      message: "El número de teléfono es obligatorio",
-    },
-    {
-      condition: !form.location.trim(),
-      message: "La ubicación es obligatoria",
-    },
-  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setFieldErrors({});
 
     try {
-      const error = validations.find((v) => v.condition);
-      if (error) {
-        Alerts.error(error.message);
-        return;
-      }
+      await updateProfile(form);
 
-      const response = await putProfile(form);
-
-      if (!response.success) {
-        Alerts.error(response.err || "Error en el registro");
-        return;
-      }
-
-      Alerts.success("¡Registro exitoso!");
+      Alerts.success("¡Perfil actualizado correctamente!");
       onClose();
       navigate("/profile");
       window.location.reload();
-    } catch (err) {
-      Alerts.error(err.message || "Error en el servidor");
+
+    } catch (error) {
+      console.error("Edit profile error:", error);
+
+      if (error instanceof ValidationError) {
+        if (error.details && error.details.length > 0) {
+          const processedErrors = processFieldErrors(error.details);
+          setFieldErrors(processedErrors);
+          Alerts.error("Por favor revisa los campos marcados");
+        } else {
+          Alerts.error(getDisplayMessage(error));
+        }
+      } else {
+        Alerts.error(getDisplayMessage(error));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -88,6 +81,7 @@ const useEditProfile = (onClose, profile) => {
 
   return {
     form,
+    fieldErrors,
     handleChange,
     handlePhoneChange,
     handleLocationChange,
