@@ -1,161 +1,121 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createApplication } from "../projectsService.js";
+import { createErrorFromResponse, processFieldErrors, ValidationError, AuthenticationError } from "@/utils/errorHandler";
+import { Alerts } from "@/shared/alerts";
 
 export default function useRequestProject() {
+  const navigate = useNavigate();
+  const [fieldErrors, setFieldErrors] = useState({});
   const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    contactEmail: "",
-    company: "",
     title: "",
     shortDescription: "",
     description: "",
     deadline: "",
-
-    // cambio de imageFile a file
-    file: null,
-
-    // --- Campos convertidos a arrays para múltiples selecciones ---
+    selectedBannerUuid: "", // UUID del banner default
     projectType: [],
     faculty: [],
     problemType: [],
-    // form.projectType.join(',')
-
-    // --- Campos nuevos ---
-    problemTypeOther: "", // para descripción cuando "otro" está seleccionado
-    imageDefault: "", // para banner/miniatura por defecto
-    fileName: "", // para nombre del archivo subido
+    problemTypeOther: "",
   });
 
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
-    // Si el evento es sintético (creado por nosotros para las imágenes predeterminadas)
-    if (!e.target.type && e.target.name === "imageDefault") {
-      setForm((prev) => ({
-        ...prev,
-        imageDefault: e.target.value,
-        imageFile: null, // Con esto limpiamos cualquier archivo seleccionado anteriormente
-      }));
-      return;
-    }
-
-    const { name, value, type, files, checked } = e.target;
+    const { name, value, type, checked } = e.target;
 
     if (type === "checkbox" && Array.isArray(form[name])) {
       setForm((prev) => {
-        const prevArr = prev[name];
+        const currentArray = prev[name];
         return {
           ...prev,
           [name]: checked
-            ? [...prevArr, value]
-            : prevArr.filter((v) => v !== value),
+            ? [...currentArray, value]
+            : currentArray.filter((v) => v !== value),
         };
       });
       return;
     }
 
-    // Archivo subido
-    if (type === "file") {
-      if (files && files.length > 0) {
-        setForm((prev) => ({
-          ...prev,
-          file: files[0],
-          fileName: files[0].name,
-          imageDefault: "", // Se limpia cualquier imagen predeterminada seleccionada
-        }));
-      }
-      return;
-    }
-
-    // Selección de miniatura por defecto (simulate file selection)
-    if (name === "imageDefault") {
-      setForm((prev) => ({
-        ...prev,
-        imageDefault: value,
-        imageFile: null,
-      }));
-      return;
-    }
-
-    // Campos de texto / date / selects
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    // Campos de texto/date/hidden
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
+    setFieldErrors({}); // Limpiar errores previos
 
-    if (!form.name) {
-      setError("Debes poner nombre del solicitante del proyecto");
-      // setIsLoading(false);
-      return;
+    // Mostrar loading
+    Alerts.loading("Enviando solicitud...");
+
+    // Construir FormData
+    const fd = new FormData();
+    fd.append("title", form.title);
+    fd.append("shortDescription", form.shortDescription);
+    fd.append("description", form.description);
+    fd.append("deadline", form.deadline);
+
+    // Banner: UUID o archivo (exclusivo)
+    if (form.selectedBannerUuid) {
+      fd.append("selectedBannerUuid", form.selectedBannerUuid);
     }
-    if (!form.company) {
-      setError("El nombre de la compañía es obligatorio.");
-      return;
-    }
-    if (!form.title) {
-      setError("El título del proyecto es obligatorio.");
-      return;
-    }
-    if (form.projectType.length === 0) {
-      setError("Selecciona al menos un tipo de proyecto.");
-      return;
-    }
-    if (form.faculty.length === 0) {
-      setError("Selecciona al menos una facultad.");
-      return;
-    }
-    if (form.problemType.length === 0) {
-      setError("Selecciona al menos un tipo de problemática.");
-      return;
-    }
-    if (form.problemType.includes("otro") && !form.problemTypeOther) {
-      setError("Describe la problemática en 'Otro'.");
-      return;
-    }
-    if (!form.deadline) {
-      setError("Debes indicar la vigencia.");
-      return;
-    }
-    if (!form.phone && !form.contactEmail) {
-      setError("Debe haber al menos un medio de contacto (teléfono o email).");
-      return;
-    }
-    if (!form.shortDescription && !form.description) {
-      setError("Debe haber al menos una descripción.");
-      return;
+    const bannerInput = document.querySelector('input[name="customBannerFile"]');
+    if (bannerInput?.files?.[0]) {
+      fd.append("customBannerFile", bannerInput.files[0]);
     }
 
-    const payload = new FormData();
-    Object.entries(form).forEach(([key, val]) => {
-      if (Array.isArray(val)) {
-        val.forEach((v) => payload.append(key, v));
-      } else if (val instanceof File) {
-        payload.append(key, val); // actual uploaded file
-      } else if (val !== null && val !== undefined) {
-        payload.append(key, val);
-      }
-    });
+    // Arrays opcionales
+    form.projectType.forEach((id) => fd.append("projectType", id));
+    form.faculty.forEach((id) => fd.append("faculty", id));
+    form.problemType.forEach((id) => fd.append("problemType", id));
+    if (form.problemTypeOther) fd.append("problemTypeOther", form.problemTypeOther);
+
+    // Attachments
+    const attachmentsInput = document.querySelector('input[name="attachments"]');
+    if (attachmentsInput?.files) {
+      Array.from(attachmentsInput.files).forEach((file) => {
+        fd.append("attachments", file);
+      });
+    }
 
     try {
-      const response = await createApplication(payload);
-      if (!response.success) {
-        if (response.logout) navigate("/");
-        setError(response.err || "Error en el registro");
+      const res = await createApplication(fd);
+
+      if (!res.success) {
+        // Crear error tipado desde la respuesta del backend
+        const error = createErrorFromResponse(res.err);
+
+        // Manejar error de autenticación (401)
+        if (error instanceof AuthenticationError) {
+          Alerts.warning("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+          setTimeout(() => navigate("/login"), 3000);
+          return;
+        }
+
+        // Manejar errores de validación (400 con details)
+        if (error instanceof ValidationError && error.details?.length > 0) {
+          // Procesar errores por campo para mostrar en el formulario
+          const errors = processFieldErrors(error.details);
+          setFieldErrors(errors);
+
+          // Mostrar el primer error en el toast
+          const firstFieldError = Object.values(errors)[0];
+          Alerts.error(firstFieldError?.message || "Por favor, corrige los errores del formulario");
+          return;
+        }
+
+        // Otros errores (ConflictError, NotFoundError, etc.)
+        Alerts.error(error.message || "No se pudo crear la solicitud");
         return;
       }
-      navigate("/explore-projects/project-details");
+
+      // Éxito
+      Alerts.success("¡Tu proyecto ha sido enviado correctamente!");
+      setTimeout(() => navigate("/explore-projects"), 3000);
+
     } catch (err) {
-      setError(err.message || "Algo salió mal");
+      console.error("Error inesperado:", err);
+      Alerts.error("Ocurrió un problema inesperado. Por favor, intenta nuevamente.");
     }
   };
 
-  return { form, error, handleChange, handleSubmit };
+  return { form, fieldErrors, handleChange, handleSubmit };
 }

@@ -176,6 +176,7 @@ export const createErrorFromResponse = (errorData) => {
     
     // Autenticación
     'AUTHENTICATION_FAILED': AuthenticationError,
+    'AUTHENTICATION_FAILURE': AuthenticationError,
     'INVALID_CREDENTIALS': AuthenticationError,
     'TOKEN_EXPIRED': AuthenticationError,
     'TOKEN_INVALID': AuthenticationError,

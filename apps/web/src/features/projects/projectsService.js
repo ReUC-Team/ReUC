@@ -13,143 +13,141 @@ export async function getCSRFToken() {
 }
 
 export async function getExploreApplicationsMetadata() {
-  const res = await fetchWithAuthAndAutoRefresh(
+  const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/application/metadata/explore`,
     {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     }
   );
 
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    return { success: false, err: bodyRes.err };
+  // fetchWithAuthAndAutoRefresh ya retorna { success, data?, error? }
+  if (!response.success) {
+    return { success: false, err: response.error };
   }
 
-  return { success: true, data: bodyRes.data.metadata.faculties };
+  return { success: true, data: response.data.metadata };
 }
-// console.log(await getExploreApplicationsMetadata());
 
-export async function exploreApplications() {
-  const res = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/explore`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    return { success: false, err: bodyRes.err };
+export async function exploreApplications(facultyId = null, page = 1, limit = 9) {
+  let url = `${API_URL}/application/explore?page=${page}&limit=${limit}`;
+  if (facultyId) {
+    url += `&facultyId=${facultyId}`;
   }
 
-  const transformedBanners = bodyRes.data.applications.applications.map(
-    (app) => {
-      return {
-        uuid_application: app.uuid_application,
-        title: app.title,
-        shortDescription: app.shortDescription,
-        bannerUrl: `${API_URL}${app.bannerUrl}`,
-      };
-    }
-  );
+  const response = await fetchWithAuthAndAutoRefresh(url, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
 
-  const finalApplications = {
-    ...bodyRes.data.applications,
-    applications: transformedBanners,
-  };
+  if (!response.success) {
+    return { success: false, err: response.error };
+  }
 
-  return { success: true, data: finalApplications };
+  const applications = response.data.applications.map((app) => ({
+    ...app,
+    bannerUrl: app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+  }));
+
+  return { success: true, data: { ...response.data, applications } };
 }
-// console.log(await exploreApplications());
 
 export async function getCreateMetadata() {
-  const res = await fetchWithAuthAndAutoRefresh(
+  const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/application/metadata/create`,
     {
       method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
     }
   );
 
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    return { success: false, err: bodyRes.err };
+  // response ya es { success, data?, error? }
+  if (!response.success) {
+    return { success: false, err: response.error };
   }
 
-  const transformedBanners = bodyRes.data.metadata.defaultBanners.map(
-    (banner) => {
-      return {
-        name: banner.name,
-        uuid: banner.uuid,
-        url: `${API_URL}${banner.url}`,
-      };
-    }
-  );
+  // Convertir URLs de banners a absolutas
+  const metadata = response.data.metadata;
+  if (metadata.defaultBanners) {
+    metadata.defaultBanners = metadata.defaultBanners.map((banner) => ({
+      ...banner,
+      url: `${API_URL}${banner.url}`,
+    }));
+  }
 
-  const finalMetadata = {
-    ...bodyRes.data.metadata,
-    defaultBanners: transformedBanners,
-  };
-
-  return { success: true, data: finalMetadata };
+  return { success: true, data: metadata };
 }
 
-export async function createApplication(data) {
+export async function createApplication(formData) {
+  // Obtener CSRF token
   const csrfToken = await getCSRFToken();
 
-  const res = await fetchWithAuthAndAutoRefresh(
+  const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/application/create`,
     {
       method: "POST",
       headers: {
-        "X-CSRF-Token": csrfToken,
+        "csrf-token": csrfToken,
       },
-      body: data,
+      body: formData,
     }
   );
 
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    if (res.status === 403)
-      return { success: false, err: bodyRes.err, logout: true };
-
-    return { success: false, err: bodyRes.err, logout: false };
+  // response ya es { success, data?, error? }
+  if (!response.success) {
+    return {
+      success: false,
+      err: response.error,
+    };
   }
 
-  return { success: true, data: bodyRes.data.application };
+  return { success: true, data: response.data };
 }
 
 export async function getProfileStatus() {
-  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/profile/status`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/profile/status`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    const msg =
-      res.status !== 404
-        ? bodyRes.err
-        : "Hubo un problema al obtener los datos del perfil";
-
-    return { success: false, err: msg };
+  if (!response.success) {
+    return { success: false, err: response.error };
   }
 
-  return { success: true, data: bodyRes.data };
+  return { success: true, data: response.data };
 }
-// console.log(await getProfileStatus());
+
+export async function getApplicationDetails(uuid) {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/${uuid}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+
+  if (!response.success) {
+    return { success: false, err: response.error };
+  }
+
+  const app = response.data.application;
+
+  // Convertir URLs relativas a absolutas
+  const bannerUrl = app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null;
+  const attachments = (app.attachments || []).map((a) => ({
+    ...a,
+    url: `${API_URL}${a.url}`,
+  }));
+
+  return {
+    success: true,
+    data: {
+      ...app,
+      bannerUrl,
+      attachments,
+    },
+  };
+}
