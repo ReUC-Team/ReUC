@@ -100,16 +100,25 @@ export async function getCreateMetadata() {
 export async function createApplication(formData) {
   const csrfToken = await getCSRFToken();
 
+  console.log('📤 Creating application with FormData'); // DEBUG
+  console.log('🔑 CSRF Token:', csrfToken); // DEBUG
+
+  // ✅ NO establecer Content-Type cuando se envía FormData
+  // El navegador lo hará automáticamente con el boundary correcto
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/application/create`,
     {
       method: "POST",
       headers: {
         "csrf-token": csrfToken,
+        // ❌ NO agregar "Content-Type": "application/json"
+        // ❌ NO agregar "Content-Type": "multipart/form-data"
       },
-      body: formData,
+      body: formData, // ✅ Enviar FormData directamente
     }
   );
+
+  console.log('✅ Application created:', response.data); // DEBUG
 
   return response.data;
 }

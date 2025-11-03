@@ -13,6 +13,7 @@ const useEditProfile = (onClose, profile) => {
     firstName: profile?.firstName || "",
     middleName: profile?.middleName || "",
     lastName: profile?.lastName || "",
+    organizationName: profile?.organizationName || "",
     phoneNumber: profile?.phoneNumber || "",
     location: profile?.location || "",
     description: profile?.description || "",
@@ -25,6 +26,7 @@ const useEditProfile = (onClose, profile) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
+    // Limpiar error del campo cuando el usuario empieza a escribir
     if (fieldErrors[name]) {
       setFieldErrors(prev => {
         const newErrors = { ...prev };
@@ -40,10 +42,27 @@ const useEditProfile = (onClose, profile) => {
   };
 
   const handlePhoneChange = (value) => {
+    // Limpiar error del campo
+    if (fieldErrors.phoneNumber) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.phoneNumber;
+        return newErrors;
+      });
+    }
+    
     setForm({ ...form, phoneNumber: value });
   };
 
   const handleLocationChange = (selectedOption) => {
+    if (fieldErrors.location) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.location;
+        return newErrors;
+      });
+    }
+    
     setForm({ ...form, location: selectedOption.label });
   };
 
@@ -52,21 +71,31 @@ const useEditProfile = (onClose, profile) => {
     setIsLoading(true);
     setFieldErrors({});
 
+    console.log('📤 Submitting profile update:', form); // DEBUG
+
     try {
       await updateProfile(form);
 
+      console.log('✅ Profile updated successfully'); // DEBUG
+
       Alerts.success("¡Perfil actualizado correctamente!");
       onClose();
-      navigate("/profile");
-      window.location.reload();
+      
+      // Recargar la página para obtener los datos actualizados
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
 
     } catch (error) {
-      console.error("Edit profile error:", error);
+      console.error("❌ Edit profile error:", error);
 
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
           const processedErrors = processFieldErrors(error.details);
           setFieldErrors(processedErrors);
+          
+          console.log('📋 Field errors:', processedErrors); // DEBUG
+          
           Alerts.error("Por favor revisa los campos marcados");
         } else {
           Alerts.error(getDisplayMessage(error));
