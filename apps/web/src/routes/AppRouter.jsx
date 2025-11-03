@@ -46,9 +46,6 @@ const AppRouter = () => {
 
       {/* Rutas Dashboard (protegidas) */}
       <Route element={<DashboardLayout />}>
-        {/* TODO: Hay que hacer un request a la API para verificar
-            que en verdad el usuario este logeado (auyn no hay ruta
-            para eso en la API) */}
         {/* <Route path="/dashboard" element={<DashboardMain />} /> */}
         <Route path="/dashboard" element={<DashboardExternal />} />
         <Route path="/dashboard/student" element={<DashboardStudent />} />
@@ -57,6 +54,7 @@ const AppRouter = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/request-project" element={<RequestProject />} />
         <Route path="/explore-projects" element={<ExploreProjects />} />
+        <Route path="/project/:uuid" element={<ProjectDetails />} />
         <Route path="/explore-projects/project-details" element={<ProjectDetails />} />
         <Route path="/my-projects" element={<MyProjects />} />
         <Route path="/favorite-projects" element={<FavoriteProjects />} />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import projectImage from '@/assets/project2.webp'
 
-const ProjectCard = ({ title, description, image, isFavorite = false, onFavoriteToggle }) => {
+const ProjectCard = ({ uuid, title, description, image, isFavorite = false, onFavoriteToggle, onDetailsClick }) => {
   const [favorite, setFavorite] = useState(isFavorite);
 
   const handleFavoriteClick = () => {
@@ -8,12 +9,18 @@ const ProjectCard = ({ title, description, image, isFavorite = false, onFavorite
     setFavorite(newFavoriteState);
     
     if (onFavoriteToggle) {
-      onFavoriteToggle(newFavoriteState);
+      onFavoriteToggle(newFavoriteState, uuid);
+    }
+  };
+
+  const handleDetailsClick = () => {
+    if (onDetailsClick) {
+      onDetailsClick(uuid);
     }
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-md p-2 w-full relative">
+    <div className="bg-white rounded-3xl shadow-md p-2 w-full relative hover:shadow-xl transition-shadow duration-300">
       <button
         onClick={handleFavoriteClick}
         className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
@@ -35,20 +42,23 @@ const ProjectCard = ({ title, description, image, isFavorite = false, onFavorite
       </button>
 
       <img
-        src={image}
+        src={image || projectImage}
         alt={title}
         className="w-full h-52 object-cover rounded-xl mb-4"
+        onError={(e) => {
+          e.target.src = projectImage;
+        }}
       />
       
       <div className='p-3'>
-        <h3 className="font-bold text-xl mb-1">{title}</h3>
-        <p className="text-md text-gray-700 mb-4">{description}</p>
-        <a
-          href="/explore-projects/project-details"
+        <h3 className="font-bold text-xl mb-1 line-clamp-2">{title}</h3>
+        <p className="text-md text-gray-700 mb-4 line-clamp-3">{description}</p>
+        <button
+          onClick={handleDetailsClick}
           className="inline-block bg-lime-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-lime-700 transition"
         >
           Ver detalles
-        </a>
+        </button>
       </div>
     </div>
   );
