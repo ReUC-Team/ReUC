@@ -1,0 +1,10 @@
+{
+  "name": "uuid",
+  "in": "path",
+  "required": true,
+  "description": "The unique identifier (UUID) of the resource.",
+  "schema": {
+    "type": "string",
+    "format": "uuid"
+  }
+}

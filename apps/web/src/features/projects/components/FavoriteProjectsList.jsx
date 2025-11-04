@@ -19,10 +19,6 @@ const FavoriteProjectsList = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-11/12 mb-10">
         <ProjectCard image={projectImage} title='Aplicacion movil para cocina' description='Aplicacion movil de recetario para los estudiantes de la carrera de gastronomia' />
         <ProjectCard image={projectImage} title='Aplicacion movil para cocina' description='Aplicacion movil de recetario para los estudiantes de la carrera de gastronomia' />
-        <ProjectCard image={projectImage} title='Aplicacion movil para cocina' description='Aplicacion movil de recetario para los estudiantes de la carrera de gastronomia' />
-        <ProjectCard image={projectImage} title='Aplicacion movil para cocina' description='Aplicacion movil de recetario para los estudiantes de la carrera de gastronomia' />
-        <ProjectCard image={projectImage} title='Aplicacion movil para cocina' description='Aplicacion movil de recetario para los estudiantes de la carrera de gastronomia' />
-        <ProjectCard image={projectImage} title='Aplicacion movil para cocina' description='Aplicacion movil de recetario para los estudiantes de la carrera de gastronomia' />
       </div>
     </div>
   );

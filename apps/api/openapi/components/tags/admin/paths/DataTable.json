@@ -1,0 +1,32 @@
+{
+  "post": {
+    "summary": "Fetch table records",
+    "description": "Retrieves a paginated, filtered, and sorted list of records from a specified table. Requires CSRF protection.",
+    "tags": ["Admin"],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
+    "parameters": [{ "$ref": "../common/ParameterTable.json" }],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": { "$ref": "../payload/DataTable.json" }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Paginated list of records.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/DataTableSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

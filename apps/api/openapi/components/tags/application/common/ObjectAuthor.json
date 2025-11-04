@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "description": "The application author's contact information.",
+  "properties": {
+    "uuid_user": {
+      "type": "string",
+      "format": "uuid",
+      "example": "a1b2c3d4-e89b-12d3-a456-42661417400a"
+    },
+    "fullName": {
+      "type": "string",
+      "example": "Dr. Jane Doe"
+    },
+    "organizationName": {
+      "type": "string",
+      "example": "University Research Department"
+    },
+    "phoneNumber": {
+      "type": "string",
+      "example": "+1-555-123-4567"
+    },
+    "location": {
+      "type": "string",
+      "example": "Building A, Room 101"
+    }
+  }
+}

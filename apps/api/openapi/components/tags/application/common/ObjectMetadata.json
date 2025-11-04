@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "faculties": {
+      "type": "array",
+      "items": { "$ref": "../common/ObjectFaculty.json" }
+    },
+    "projectTypes": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/ObjectProjectType.json"
+      }
+    },
+    "problemTypes": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/ObjectProblemType.json"
+      }
+    },
+    "defaultBanners": {
+      "type": "array",
+      "items": {
+        "$ref": "../common/ObjectDefaultBanner.json"
+      }
+    }
+  },
+  "required": ["faculties", "projectTypes", "problemTypes", "defaultBanners"]
+}

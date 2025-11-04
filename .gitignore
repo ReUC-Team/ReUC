@@ -52,3 +52,6 @@ apps/mobile/.DS_Store
 # Misc
 *.swp
 *.swo
+
+# For local not to be commited files.
+*.local.js

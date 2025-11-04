@@ -1,0 +1,32 @@
+{
+  "get": {
+    "summary": "Get a public asset file",
+    "description": "Retrieves and streams a publicly accessible file (like default application banners) identified by its UUID.",
+    "tags": ["File"],
+    "parameters": [
+      {
+        "$ref": "../parameters/Uuid.json"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "The requested file content.",
+        "content": {
+          "*/*": {
+            "schema": {
+              "type": "string",
+              "format": "binary",
+              "description": "The raw file content. Content-Type and Content-Length headers will indicate the specific file type and size."
+            }
+          }
+        }
+      },
+      "404": {
+        "$ref": "../../../responses/Error404.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

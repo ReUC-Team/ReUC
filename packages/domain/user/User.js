@@ -1,31 +1,7 @@
-export class User {
-  constructor({
-    uuid_user = undefined,
-    email,
-    password,
-    studentId = undefined,
-    firstName = undefined,
-    middleName = undefined,
-    lastName = undefined,
-    status = undefined,
-    lastLoginIp = undefined,
-    lastLoginAt = undefined,
-  }) {
-    this.email = email.toLowerCase();
-    this.password = password;
+import { BaseEntity } from "../shared/BaseEntity.js";
+import * as DomainError from "../errors/index.js";
 
-    if (status != undefined && typeof status != "number")
-      throw new Error("Status must be a number");
-
-    this.uuid_user = uuid_user;
-    this.firstName = firstName;
-    this.middleName = middleName;
-    this.lastName = lastName;
-    this.status = status;
-    this.lastLoginIp = lastLoginIp;
-    this.lastLoginAt = lastLoginAt;
-  }
-
+export class User extends BaseEntity {
   static allowedFields = [
     "uuid_user",
     "email",
@@ -38,15 +14,20 @@ export class User {
     "lastLoginAt",
   ];
 
-  toPrimitives() {
-    const userPrimitive = {};
+  constructor(data) {
+    super(data, User.allowedFields);
 
-    for (const key of User.allowedFields) {
-      if (this[key] !== undefined) {
-        userPrimitive[key] = this[key];
-      }
+    if (this.email) this.email = this.email.toLowerCase();
+
+    if (this.status !== undefined && typeof this.status !== "number") {
+      throw new DomainError.ValidationError("User status must be a number.", {
+        details: {
+          field: "status",
+          rule: "invalid_format",
+          received: typeof this.status,
+          allowed: "number",
+        },
+      });
     }
-
-    return userPrimitive;
   }
 }

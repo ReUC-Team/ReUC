@@ -80,15 +80,10 @@ export default function Sidebar() {
                             Miembros
                         </Link>
                     </li>
-
-                    <li className={`flex items-center gap-4 ${isDark ? 'text-white' : ''} ${largeText ? 'text-2xl' : ''} ${dyslexiaFont ? 'font-dyslexia' : ''}`}>
-                        <svg className={`text-4xl ${isDark ? 'text-white' : ''}`} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8z"/></svg>
-                        Documentos
-                    </li>
-                    <li className={`flex items-center gap-4 ${isDark ? 'text-white' : ''} ${largeText ? 'text-2xl' : ''} ${dyslexiaFont ? 'font-dyslexia' : ''}`}>
+                    {/* <li className={`flex items-center gap-4 ${isDark ? 'text-white' : ''} ${largeText ? 'text-2xl' : ''} ${dyslexiaFont ? 'font-dyslexia' : ''}`}>
                         <svg className={`text-4xl ${isDark ? 'text-white' : ''}`} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 22a2.98 2.98 0 0 0 2.818-2H9.182A2.98 2.98 0 0 0 12 22m7-7.414V10c0-3.217-2.185-5.927-5.145-6.742C13.562 2.52 12.846 2 12 2s-1.562.52-1.855 1.258C7.185 4.074 5 6.783 5 10v4.586l-1.707 1.707A1 1 0 0 0 3 17v1a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-1a1 1 0 0 0-.293-.707z"/></svg>
                         Notificaciones
-                    </li>
+                    </li> */}
 
                     <li className="flex flex-col items-start w-full">
                         <button
@@ -129,9 +124,14 @@ export default function Sidebar() {
                         <svg className={`text-4xl ${isDark ? 'text-white' : ''}`} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48"><defs><mask id="IconifyId196504e5616b92da57"><g fill="none"><path fill="#fff" stroke="#fff" strokeLinejoin="round" strokeWidth="4" d="M24 44a19.94 19.94 0 0 0 14.142-5.858A19.94 19.94 0 0 0 44 24a19.94 19.94 0 0 0-5.858-14.142A19.94 19.94 0 0 0 24 4A19.94 19.94 0 0 0 9.858 9.858A19.94 19.94 0 0 0 4 24a19.94 19.94 0 0 0 5.858 14.142A19.94 19.94 0 0 0 24 44Z"/><path stroke="#000" strokeLinecap="round" strokeLinejoin="round" strokeWidth="4" d="M24 28.625v-4a6 6 0 1 0-6-6"/><path fill="#000" fillRule="evenodd" d="M24 37.625a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5" clipRule="evenodd"/></g></mask></defs><path fill="currentColor" d="M0 0h48v48H0z" mask="url(#IconifyId196504e5616b92da57)"/></svg>
                         Ayuda
                     </li>
-                    <li className={`flex items-center gap-4 ${isDark ? 'text-white' : ''} ${largeText ? 'text-2xl' : ''} ${dyslexiaFont ? 'font-dyslexia' : ''}`}>
-                        <svg className={`text-4xl ${isDark ? 'text-white' : ''}`} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m9.25 22l-.4-3.2q-.325-.125-.612-.3t-.563-.375L4.7 19.375l-2.75-4.75l2.575-1.95Q4.5 12.5 4.5 12.338v-.675q0-.163.025-.338L1.95 9.375l2.75-4.75l2.975 1.25q.275-.2.575-.375t.6-.3l.4-3.2h5.5l.4 3.2q.325.125.613.3t.562.375l2.975-1.25l2.75 4.75l-2.575 1.95q.025.175.025.338v.674q0 .163-.05.338l2.575 1.95l-2.75 4.75l-2.95-1.25q-.275.2-.575.375t-.6.3l-.4 3.2zm2.8-6.5q1.45 0 2.475-1.025T15.55 12t-1.025-2.475T12.05 8.5q-1.475 0-2.488 1.025T8.55 12t1.013 2.475T12.05 15.5"/></svg>
+                     <li className="flex items-center gap-4">
+                        <Link 
+                            to="/settings" 
+                            className={`flex items-center gap-4 ${isDark ? 'text-white' : ''} ${largeText ? 'text-2xl' : ''} ${dyslexiaFont ? 'font-dyslexia' : ''}`}
+                        >
+                            <svg className={`text-4xl ${isDark ? 'text-white' : ''}`} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="m9.25 22l-.4-3.2q-.325-.125-.612-.3t-.563-.375L4.7 19.375l-2.75-4.75l2.575-1.95Q4.5 12.5 4.5 12.338v-.675q0-.163.025-.338L1.95 9.375l2.75-4.75l2.975 1.25q.275-.2.575-.375t.6-.3l.4-3.2h5.5l.4 3.2q.325.125.613.3t.562.375l2.975-1.25l2.75 4.75l-2.575 1.95q.025.175.025.338v.674q0 .163-.05.338l2.575 1.95l-2.75 4.75l-2.95-1.25q-.275.2-.575.375t-.6.3l-.4 3.2zm2.8-6.5q1.45 0 2.475-1.025T15.55 12t-1.025-2.475T12.05 8.5q-1.475 0-2.488 1.025T8.55 12t1.013 2.475T12.05 15.5"/></svg>
                         Configuración
+                        </Link>
                     </li>
                 </ul>
             </nav>

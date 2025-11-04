@@ -21,6 +21,8 @@ import MyProjects from '@/features/projects/pages/MyProjects';
 import FavoriteProjects from '@/features/projects/pages/FavoriteProjects';
 // MEMBERS
 import Members from '@/features/members/pages/Members'
+//SETTINGS
+import Settings from '@/features/settings/pages/Settings'
 // LAYOUTS
 import PlainLayout from '@/layouts/PlainLayout'
 import AuthLayout from '@/layouts/AuthLayout'
@@ -59,6 +61,7 @@ const AppRouter = () => {
         <Route path="/my-projects" element={<MyProjects />} />
         <Route path="/favorite-projects" element={<FavoriteProjects />} />
         <Route path="/members" element={<Members />} />
+        <Route path="/settings" element={<Settings />} />
         {/* HAY QUE MANEJARLA LAS URL CON SLUGS: */}
         {/* <Link to={`/explore-projects/${project.slug}`}>Ver detalles</Link> */}
         {/* <Route path="/explore-projects/:slug" element={ProjectDetails} /> */}

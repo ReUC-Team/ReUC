@@ -1,0 +1,10 @@
+{
+  "name": "faculty",
+  "in": "path",
+  "required": false,
+  "description": "Optional: Filter applications by faculty name. If omitted, returns applications from all faculties.",
+  "schema": {
+    "type": "string",
+    "example": "FIE"
+  }
+}

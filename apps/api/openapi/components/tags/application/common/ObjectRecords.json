@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "description": "Summary details for an application listing.",
+  "properties": {
+    "uuid_application": { "type": "string", "format": "uuid" },
+    "title": {
+      "type": "string",
+      "example": "New University Project Initiative"
+    },
+    "shortDescription": {
+      "type": "string",
+      "example": "A brief summary of the project."
+    },
+    "bannerUrl": {
+      "type": "string",
+      "format": "url",
+      "example": "/file/APPLICATION/BANNER/123e4567-e89b-12d3-a456-426614174000",
+      "description": "URL to the application's banner image."
+    }
+  },
+  "required": ["uuid_application", "title", "shortDescription", "bannerUrl"]
+}

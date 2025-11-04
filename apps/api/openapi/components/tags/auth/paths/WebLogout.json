@@ -1,0 +1,23 @@
+{
+  "delete": {
+    "summary": "(Web) Log out user",
+    "description": "Clears the httpOnly refresh token cookie to log the user out.",
+    "tags": ["Auth"],
+    "security": [],
+    "responses": {
+      "200": {
+        "description": "Logout successful.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/LogoutSuccess.json"
+            }
+          }
+        }
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

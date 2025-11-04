@@ -1,0 +1,41 @@
+{
+  "description": "Defines the successful response body for fetching the current user's session.",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "description": "The user universal unique identifier (UUID v4).",
+              "type": "string",
+              "format": "uuid",
+              "example": "123e4567-e89b-12d3-a456-426614174000"
+            },
+            "role": {
+              "description": "Parsed role details.",
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "outsider"
+                },
+                "uuid": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "123e4567-e89b-12d3-a456-426614174000"
+                }
+              },
+              "required": ["name", "uuid"]
+            }
+          },
+          "required": ["user", "role"]
+        }
+      }
+    }
+  ]
+}

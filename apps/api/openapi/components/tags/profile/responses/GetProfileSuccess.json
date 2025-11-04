@@ -1,0 +1,22 @@
+{
+  "description": "Successful response for fetching the user profile.",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "$ref": "../common/ObjectProfile.json"
+            }
+          },
+          "required": ["profile"]
+        }
+      }
+    }
+  ]
+}

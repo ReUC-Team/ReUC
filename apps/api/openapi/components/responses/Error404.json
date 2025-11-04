@@ -1,0 +1,27 @@
+{
+  "description": "Not Found - The server cannot find the requested resource.",
+  "content": {
+    "application/json": {
+      "schema": {
+        "allOf": [
+          {
+            "$ref": "./data/ResponseError.json"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "example": "RESOURCE_NOT_FOUND"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

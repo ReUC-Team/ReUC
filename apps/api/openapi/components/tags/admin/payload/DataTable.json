@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "page": {
+      "$ref": "../../common/parameters/Page.json#/PageParam/schema"
+    },
+    "perPage": {
+      "$ref": "../../common/parameters/PerPage.json#/PerPageParam/schema"
+    },
+    "query": {
+      "type": "object",
+      "description": "Prisma 'where' clause object for filtering records.",
+      "additionalProperties": true,
+      "nullable": true,
+      "example": { "email": { "contains": "@example.com" } }
+    },
+    "sort": {
+      "type": "object",
+      "description": "Prisma 'orderBy' clause object for sorting records.",
+      "additionalProperties": {
+        "type": "string",
+        "enum": ["asc", "desc"]
+      },
+      "nullable": true,
+      "example": { "createdAt": "desc" }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "description": "Conflict - The request could not be completed due to a conflict with the current state of the resource (e.g., duplicate unique field).",
+  "content": {
+    "application/json": {
+      "schema": {
+        "allOf": [
+          {
+            "$ref": "./data/ResponseError.json"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "example": "RESOURCE_CONFLICT"
+                  },
+                  "details": {
+                    "allOf": [{ "$ref": "./data/ObjectDetailsRequired.json" }]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

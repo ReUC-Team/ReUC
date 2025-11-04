@@ -1,0 +1,36 @@
+{
+  "description": "Successful response for checking the profile completion status.",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "object",
+              "properties": {
+                "isComplete": {
+                  "type": "boolean",
+                  "description": "Indicates if the profile is complete.",
+                  "example": true
+                },
+                "missing": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "A list of missing required field names (human-readable). Empty if complete.",
+                  "example": []
+                }
+              },
+              "required": ["isComplete", "missing"]
+            }
+          },
+          "required": ["status"]
+        }
+      }
+    }
+  ]
+}

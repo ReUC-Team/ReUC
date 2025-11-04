@@ -1,0 +1,43 @@
+{
+  "post": {
+    "summary": "(Web) Register a new user",
+    "description": "Creates a new user account, sets a secure httpOnly refresh token cookie, and returns user data with an access token.",
+    "tags": ["Auth"],
+    "security": [
+      {
+        "CsrfAuth": []
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "../payload/Register.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Created - User registered successfully, a new resource was created as a result.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/WebRegisterSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "409": {
+        "$ref": "../../../responses/Error409.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

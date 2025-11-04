@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@reuc/web/*": ["apps/web/*"],
       "@reuc/presentation/*": ["apps/api/*"],
       "@reuc/application/*": ["packages/application/*"],
       "@reuc/domain/*": ["packages/domain/*"],
-      "@reuc/infrastructure/*": ["packages/infrastructure/*"]
+      "@reuc/infrastructure/*": ["packages/infrastructure/*"],
+      "@reuc/file-storage/*": ["packages/file-storage/*"]
     },
     "module": "ESNext",
     "moduleResolution": "node"

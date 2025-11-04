@@ -1,0 +1,6 @@
+{
+  "type": "http",
+  "scheme": "bearer",
+  "bearerFormat": "JWT",
+  "description": "JWT Bearer token required for all authenticated routes. Provide as 'Authorization: Bearer <token>'."
+}

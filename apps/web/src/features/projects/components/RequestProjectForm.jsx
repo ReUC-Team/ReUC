@@ -1,79 +1,68 @@
-import React, { useState, useRef } from 'react'
-import defaultBanner1 from '@/assets/banners/tecnologia.jpg'
-import defaultBanner2 from '@/assets/banners/medio-ambiente.png'
-import defaultBanner3 from '@/assets/banners/vida-marina.jpg'
+import React, { useState, useRef, useEffect } from 'react'
 import pdfIcon from '@/assets/icons/pdf.png'
 import docIcon from '@/assets/icons/doc.png'
 import zipIcon from '@/assets/icons/zip.png'
-
-const PROJECT_TYPES = [
-  { key: 'tesis', label: 'Tesis' },
-  { key: 'servicio', label: 'Servicio Social Constitucional' },
-  { key: 'proyecto-integrador', label: 'Proyectos Integradores' },
-  { key: 'practicas-profesionales', label: 'Prácticas Profesionales' },
-  { key: 'proyecto-investigacion', label: 'Proyectos de Investigación' },
-]
-
-const FACULTIES = [
-  { key: 'FIE', label: 'FIE' },
-  { key: 'FACIMAR', label: 'FACIMAR' },
-  { key: 'FECAM', label: 'FECAM' },
-  { key: 'EDUC', label: 'EDUC' },
-]
-
-const PROBLEM_TYPES = [
-  { key: 'ambiental', label: 'Ambiental' },
-  { key: 'tecnologica', label: 'Tecnológica' },
-  { key: 'social', label: 'Social' },
-  { key: 'logistica', label: 'Logística' },
-  { key: 'otro', label: 'Otro' },
-]
-
-const DEFAULT_BANNERS = [defaultBanner1, defaultBanner2, defaultBanner3]
+import useFormProjectMetadata from "../hooks/useFormProjectMetadata"
 
 export default function RequestProjectForm({ form, handleChange, handleSubmit }) {
   const [showInfo, setShowInfo] = useState(false)
   const [selectedDefaultImage, setSelectedDefaultImage] = useState(null)
   const [selectedFile, setSelectedFile] = useState(null)
+  const [selectedFilePreview, setSelectedFilePreview] = useState(null);
   const fileInputRef = useRef(null)
 
+  
+  const { faculties, projectTypes, problemTypes, defaultBanners } = useFormProjectMetadata()
+  const extendedProblemTypes = [...problemTypes, { problem_type_id: "otro", name: "Otro" }];
+  
+  
   // Función para manejar la selección de imagen predeterminada
-  const handleDefaultImageSelect = (src) => {
-    setSelectedDefaultImage(src)
+  const handleDefaultImageSelect = (banner) => {
+    setSelectedDefaultImage(banner.url)
     
     // Crear un evento sintético para simular el cambio en el formulario
     handleChange({
       target: { 
         name: 'imageDefault', 
-        value: src, 
+        value: banner.url, 
         type: 'text' 
       },
     })
     
-    // Resetear el input de archivo para evitar conflictos
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
+    // limpiar archivo local si existía
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setSelectedFile(null);
+    if (selectedFilePreview) {
+      URL.revokeObjectURL(selectedFilePreview);
+      setSelectedFilePreview(null);
     }
-  }
+};
 
-  // Función para manejar cambios en el input de archivo
+  // cuando seleccionan archivo desde input
   const handleFileInputChange = (e) => {
-    // Resetear la imagen predeterminada si se selecciona un archivo
     if (e.target.files && e.target.files.length > 0) {
-      setSelectedDefaultImage(null)
-      setSelectedFile(e.target.files[0])
+      const file = e.target.files[0];
+
+      // revoke previous preview
+      if (selectedFilePreview) URL.revokeObjectURL(selectedFilePreview);
+
+      const preview = file.type.startsWith("image/") ? URL.createObjectURL(file) : null;
+      setSelectedFilePreview(preview);
+
+      setSelectedDefaultImage(null);
+      setSelectedFile(file);
+
+      // pasar evento al handler original para que actualice form
+      handleChange(e);
     }
-    
-    // Pasar el evento al manejador de cambios original
-    handleChange(e)
-  }
+  };
   
   // Obtener el icono adecuado según el tipo de archivo
   const getFileIcon = (file) => {
     if (!file) return null
     
     if (file.type.startsWith('image/')) {
-      return URL.createObjectURL(file)
+      return selectedFilePreview
     } else if (file.type === 'application/pdf') {
       return pdfIcon
     } else if (file.type === 'application/msword' || 
@@ -97,6 +86,15 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
     const baseName = file.name.substring(0, file.name.lastIndexOf('.'))
     return baseName.substring(0, 16) + '...' + '.' + extension
   }
+
+// limpiar preview en unmount
+useEffect(() => {
+  return () => {
+    if (selectedFilePreview) URL.revokeObjectURL(selectedFilePreview);
+  };
+}, [selectedFilePreview]);
+
+
 
   return (
     <form
@@ -236,16 +234,16 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
             </div>
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PROJECT_TYPES.map(({ key, label }) => (
-              <label key={key} className="inline-flex items-center gap-2">
+            {projectTypes.map(({ project_type_id, name }) => (
+              <label key={project_type_id} className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="projectType"
-                  value={key}
-                  checked={form.projectType.includes(key)}
+                  value={project_type_id}
+                  checked={form.projectType.includes(String(project_type_id))}
                   onChange={handleChange}
                 />
-                <span className="text-gray-700">{label}</span>
+                <span className="text-gray-700">{name}</span>
               </label>
             ))}
           </div>
@@ -257,16 +255,16 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
             Facultad sugerida <span className="text-sm text-gray-500">(sugerido)</span>
           </label>
           <div className="flex flex-wrap gap-4">
-            {FACULTIES.map(({ key, label }) => (
-              <label key={key} className="inline-flex items-center gap-2">
+            {faculties.map(({ faculty_id, name }) => (
+              <label key={faculty_id} className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="faculty"
-                  value={key}
-                  checked={form.faculty.includes(key)}
+                  value={faculty_id}
+                  checked={form.faculty.includes(String(faculty_id))}
                   onChange={handleChange}
                 />
-                <span className="text-gray-700">{label}</span>
+                <span className="text-gray-700">{name}</span>
               </label>
             ))}
           </div>
@@ -277,16 +275,16 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
             Tipo de problemática <span className="text-sm text-gray-500">(sugerido)</span>
           </label>
           <div className="flex flex-wrap gap-4">
-            {PROBLEM_TYPES.map(({ key, label }) => (
-              <label key={key} className="inline-flex items-center gap-2">
+            {extendedProblemTypes.map(({ problem_type_id, name }) => (
+              <label key={problem_type_id} className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="problemType"
-                  value={key}
-                  checked={form.problemType.includes(key)}
+                  value={problem_type_id}
+                  checked={form.problemType.includes(String(problem_type_id))}
                   onChange={handleChange}
                 />
-                <span className="text-gray-700">{label}</span>
+                <span className="text-gray-700">{name}</span>
               </label>
             ))}
           </div>
@@ -391,18 +389,18 @@ export default function RequestProjectForm({ form, handleChange, handleSubmit })
           <div className="mt-4">
             <p className="text-gray-700 text-sm mb-2">O selecciona una imagen predeterminada para el banner:</p>
             <div className="flex gap-4">
-              {DEFAULT_BANNERS.map((src, index) => (
-                <div key={index} className="flex flex-col items-center">
+              {defaultBanners.map((banner, index) => (
+                <div key={banner.uuid || index} className="flex flex-col items-center">
                   <img
-                    src={src}
-                    alt={`Banner predeterminado ${index + 1}`}
-                    onClick={() => handleDefaultImageSelect(src)}
+                    src={banner.url}
+                    alt={banner.originalName}
+                    onClick={() => handleDefaultImageSelect(banner)}
                     className={`w-20 h-12 object-cover cursor-pointer rounded-lg border-2 transition-all ${
-                      selectedDefaultImage === src ? 'border-lime-600 shadow-md' : 'border-transparent hover:border-gray-300'
+                      selectedDefaultImage === banner.url ? 'border-lime-600 shadow-md' : 'border-transparent hover:border-gray-300'
                     }`}
                   />
                   <span className="text-xs mt-1 text-gray-500">
-                    {selectedDefaultImage === src ? 'Seleccionado' : `Opción ${index + 1}`}
+                    {selectedDefaultImage === banner.url ? 'Seleccionado' : `Opción ${index + 1}`}
                   </span>
                 </div>
               ))}

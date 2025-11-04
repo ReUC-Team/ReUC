@@ -1,0 +1,13 @@
+{
+  "PageParam": {
+    "name": "page",
+    "in": "query",
+    "description": "The page number for pagination.",
+    "required": false,
+    "schema": {
+      "type": "integer",
+      "default": 1,
+      "minimum": 1
+    }
+  }
+}

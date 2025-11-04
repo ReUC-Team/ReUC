@@ -1,0 +1,23 @@
+{
+  "description": "Defines the successful response body for refreshing an access token.",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "accessToken": {
+              "type": "string",
+              "description": "The new JWT Access Token to make requests on protected resources."
+            }
+          },
+          "required": ["accessToken"]
+        }
+      }
+    }
+  ]
+}

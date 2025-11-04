@@ -1,16 +1,11 @@
 // apps/mobile/src/features/auth/services/authServiceNative.ts
 
 // url de env
+import { Platform } from "react-native";
 import { API_URL } from '@env'
 import { showError } from '../utils/toast'
 
-async function getCSRFToken(): Promise<string> {
-  const res = await fetch(`${API_URL}/csrf-token`, {
-    credentials: 'include',
-  })
-  const body = await res.json()
-  return body.csrfToken
-}
+const userAgent = `ReUC/1.0 (${Platform.OS})`
 
 export interface RegisterData {
   email: string
@@ -21,13 +16,11 @@ export interface RegisterData {
 }
 
 export async function register(data: RegisterData) {
-  const csrfToken = await getCSRFToken()
-
-  const res = await fetch(`${API_URL}/auth/register`, {
+  const res = await fetch(`${API_URL}/mobile/auth/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-Token': csrfToken,
+      "User-Agent": userAgent,
     },
     credentials: 'include',
     body: JSON.stringify(data),
@@ -48,13 +41,11 @@ export async function register(data: RegisterData) {
 }
 
 export async function login(email: string, password: string) {
-  const csrfToken = await getCSRFToken()
-
-  const res = await fetch(`${API_URL}/auth/login`, {
+  const res = await fetch(`${API_URL}/mobile/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'X-CSRF-Token': csrfToken,
+      "User-Agent": userAgent,
     },
     credentials: 'include',
     body: JSON.stringify({ email, password }),

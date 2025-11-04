@@ -1,30 +1,7 @@
-export class Student {
-  constructor({
-    uuid_student = undefined,
-    uuidUser,
-    universityId,
-    averageGrade = undefined,
-    enrollmentYear = undefined,
-    status = undefined,
-  }) {
-    this.uuidUser = uuidUser;
+import { BaseEntity } from "../shared/BaseEntity.js";
+import * as DomainError from "../errors/index.js";
 
-    if (universityId.length !== 8)
-      throw new Error(
-        "University ID must be exactly 8 characters long and consist of numbers."
-      );
-
-    this.universityId = universityId;
-
-    if (status != undefined && typeof status != "number")
-      throw new Error("Status must be a number");
-
-    this.uuid_student = uuid_student;
-    this.averageGrade = averageGrade;
-    this.enrollmentYear = enrollmentYear;
-    this.status = status;
-  }
-
+export class Student extends BaseEntity {
   static allowedFields = [
     "uuid_student",
     "uuidUser",
@@ -34,15 +11,35 @@ export class Student {
     "status",
   ];
 
-  toPrimitives() {
-    const primitive = {};
+  constructor(data) {
+    super(data, Student.allowedFields);
 
-    for (const key of Student.allowedFields) {
-      if (this[key] !== undefined) {
-        primitive[key] = this[key];
-      }
+    if (this.universityId && this.universityId.length !== 8) {
+      throw new DomainError.ValidationError(
+        "University ID must be exactly 8 characters long.",
+        {
+          details: {
+            field: "universityId",
+            rule: "invalid_length",
+            received: this.universityId.length,
+            allowed: 8,
+          },
+        }
+      );
     }
 
-    return primitive;
+    if (this.status !== undefined && typeof this.status !== "number") {
+      throw new DomainError.ValidationError(
+        "Student status must be a number.",
+        {
+          details: {
+            field: "status",
+            rule: "invalid_format",
+            received: typeof this.status,
+            allowed: "number",
+          },
+        }
+      );
+    }
   }
 }

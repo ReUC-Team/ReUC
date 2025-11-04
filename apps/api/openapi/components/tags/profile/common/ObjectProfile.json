@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "description": "Outsider information.\nAll properties are required but can be returned empty.",
+  "properties": {
+    "firstName": {
+      "type": "string",
+      "example": "Jane",
+      "nullable": true
+    },
+    "middleName": {
+      "type": "string",
+      "nullable": true
+    },
+    "lastName": {
+      "type": "string",
+      "example": "Doe",
+      "nullable": true
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "user_status_id": {
+          "type": "integer",
+          "example": 1
+        },
+        "name": {
+          "type": "string",
+          "example": "verified"
+        }
+      },
+      "description": "User status object",
+      "nullable": true
+    },
+    "organizationName": {
+      "type": "string",
+      "example": "John & Johonson",
+      "nullable": true
+    },
+    "phoneNumber": {
+      "type": "string",
+      "example": "+946544527848",
+      "nullable": true
+    },
+    "location": {
+      "type": "string",
+      "example": "Space Station",
+      "nullable": true
+    }
+  },
+  "required": [
+    "firstName",
+    "middleName",
+    "lastName",
+    "status",
+    "organizationName",
+    "phoneNumber",
+    "location"
+  ]
+}

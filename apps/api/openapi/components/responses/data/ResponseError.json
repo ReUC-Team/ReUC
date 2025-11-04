@@ -1,0 +1,13 @@
+{
+  "type": "object",
+  "properties": {
+    "success": {
+      "type": "boolean",
+      "example": false
+    },
+    "error": {
+      "$ref": "./ObjectError.json"
+    }
+  },
+  "required": ["success", "error"]
+}

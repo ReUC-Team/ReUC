@@ -1,7 +1,7 @@
 import ProjectStats from '../components/FacultyProjectStats'
 import ProjectList from '../components/PendingRequests'
 import Projects from '../../shared/components/Projects'
-import UploadedDocuments from '../components/UploadedDocuments'
+import UploadedLinks from '../components/UploadedLinks'
 import LinkedStudents from '../components/LinkedStudents'
 // import Timeline from '@/features/dashboards/dashboard/components/Timeline'
 
@@ -38,7 +38,7 @@ const DashboardFaculty = () => {
             onViewDeliverables={(project) => console.log('Ver entregables del proyecto:', project)}
           />
         <div className="grid gap-4">
-          <UploadedDocuments />
+          <UploadedLinks />
         </div>
       </div>
     </div>

@@ -1,0 +1,36 @@
+{
+  "description": "Defines the successful response body for mobile user registration (201 Created).",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "user": {
+              "$ref": "../common/ObjectUser.json"
+            },
+            "tokens": {
+              "type": "object",
+              "properties": {
+                "accessToken": {
+                  "type": "string",
+                  "description": "JWT Access Token to make requests on protected resources."
+                },
+                "refreshToken": {
+                  "type": "string",
+                  "description": "JWT Access Token for renewing the session (Access Token)."
+                }
+              },
+              "required": ["accessToken", "refreshToken"]
+            }
+          },
+          "required": ["user", "tokens"]
+        }
+      }
+    }
+  ]
+}

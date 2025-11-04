@@ -1,72 +1,105 @@
-export class Application {
-  constructor({
-    // ===TEMP
-    outsiderName,
-    phone = undefined,
-    email = undefined,
-    // ===END TEMP
-    uuid_application = undefined,
-    uuidUser,
-    name,
-    topicInterest,
-    projectType,
-    estimatedTime,
-    description = undefined,
-    extendedDescription = undefined,
-    visibility,
-  }) {
-    this.outsiderName = outsiderName;
-    this.uuidUser = uuidUser;
-    this.name = name;
-    this.topicInterest = topicInterest;
-    this.projectType = projectType;
-    this.estimatedTime = new Date(estimatedTime);
-    this.visibility = visibility;
+import { BaseEntity } from "../shared/BaseEntity.js";
+import * as DomainError from "../errors/index.js";
 
-    if (typeof phone == "undefined" && typeof email == "undefined")
-      throw new Error(
-        "At least one contact method (phone or email) must be provided."
-      );
-
-    if (
-      typeof description == "undefined" &&
-      typeof extendedDescription == "undefined"
-    )
-      throw new Error(
-        "At least one description (description or extendedDescription) must be provided."
-      );
-
-    this.uuid_application = uuid_application;
-    this.phone = phone;
-    this.email = email;
-    this.description = description;
-    this.extendedDescription = extendedDescription;
-  }
-
+export class Application extends BaseEntity {
   static allowedFields = [
-    "outsiderName",
-    "uuidUser",
-    "name",
-    "topicInterest",
-    "projectType",
-    "estimatedTime",
-    "visibility",
     "uuid_application",
-    "phone",
-    "email",
+    "uuidOutsider",
+    "title",
+    "shortDescription",
     "description",
-    "extendedDescription",
+    "deadline",
+    "visibility",
+    "applicationProjectType",
+    "applicationFaculty",
+    "applicationProblemType",
+    "applicationCustomProblemType",
   ];
 
-  toPrimitives() {
-    const primitive = {};
+  constructor(data) {
+    super(data, Application.allowedFields);
 
-    for (const key of Application.allowedFields) {
-      if (this[key] !== undefined) {
-        primitive[key] = this[key];
+    const requiredFields = [
+      "uuidOutsider",
+      "title",
+      "shortDescription",
+      "description",
+      "deadline",
+    ];
+    const missingFields = [];
+    for (const field of requiredFields) {
+      const value = this[field];
+      if (typeof value !== "string" || value.trim() === "") {
+        missingFields.push({
+          field,
+          rule: "missing_or_empty",
+        });
       }
     }
 
-    return primitive;
+    if (missingFields.length > 0)
+      throw new DomainError.ValidationError(
+        "Required application fields were missing.",
+        { details: missingFields }
+      );
+
+    this.deadline = new Date(this.deadline);
+    if (isNaN(this.deadline.getTime())) {
+      throw new DomainError.ValidationError("Deadline must be a valid date.", {
+        details: {
+          field: "deadline",
+          rule: "invalid_format",
+          expected: "YYYY-MM-DD",
+        },
+      });
+    }
+
+    this.applicationProjectType = this._parseAndValidateNumberArray(
+      this.applicationProjectType,
+      "Project Type"
+    );
+    this.applicationFaculty = this._parseAndValidateNumberArray(
+      this.applicationFaculty,
+      "Faculty"
+    );
+    this.applicationProblemType = this._parseAndValidateNumberArray(
+      this.applicationProblemType,
+      "Problem Type"
+    );
+    this.applicationCustomProblemType = this._normalizeString(
+      this.applicationCustomProblemType
+    );
+  }
+
+  _parseAndValidateNumberArray(input = [], fieldName = "Unknown") {
+    const normalized = Array.isArray(input)
+      ? input
+      : [input].filter((i) => i !== null && i !== undefined);
+
+    return normalized.map((val) => {
+      const num = Number(val);
+
+      if (isNaN(num)) {
+        throw new DomainError.ValidationError(
+          `Field '${fieldName}' contains an invalid non-numeric value.`,
+          {
+            details: {
+              field: fieldName,
+              rule: "invalid_characters",
+            },
+          }
+        );
+      }
+
+      return num;
+    });
+  }
+
+  _normalizeString(value) {
+    if (value === undefined || value === null || String(value).trim() === "") {
+      return undefined;
+    }
+
+    return String(value).trim().toLowerCase();
   }
 }

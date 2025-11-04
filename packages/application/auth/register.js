@@ -1,42 +1,64 @@
-import {
-  validateEmail,
-  validatePassword,
-  validatePasswordConfirm,
-} from "./validators.js";
-import { validateUniversityId } from "../shared/validators.js";
-import { ValidationError } from "../errors/ValidationError.js";
+import * as ApplicationError from "../errors/index.js";
+import { validateRegisterPayload } from "./validators.js";
 import { registerUser } from "@reuc/domain/user/registerUser.js";
-import { ConflictError } from "@reuc/domain/errors/ConflictError.js";
+import * as DomainError from "@reuc/domain/errors/index.js";
 
-export async function register({ body, ip, userAgent }) {
+/**
+ * Handles the user registration process.
+ *
+ * @param {object} params
+ * @param {object} params.body - The registration body data.
+ * @param {string} params.body.email
+ * @param {string} params.body.password
+ * @param {string} params.body.confirmPassword
+ * @param {string} [params.body.universityId] - University ID provided by the university, required if the email ends with `@ucol.mx`
+ * @param {string} params.ip - The user's IP address.
+ * @param {string} params.userAgent - The user's user agent.
+ * @param {object} params.tokenConfig - Configuration for generating JWTs.
+ * @param {string} params.tokenConfig.accessSecret
+ * @param {string} params.tokenConfig.accessExpiresIn
+ * @param {string} params.tokenConfig.refreshSecret
+ * @param {string} params.tokenConfig.refreshExpiresIn
+ *
+ * @throws {ApplicationError.ValidationError} If input validation fails.
+ * @throws {ApplicationError.ConflictError} If the email already exists.
+ * @throws {ApplicationError.ApplicationError} - For other unexpected errors.
+ */
+export async function register({ body, ip, userAgent, tokenConfig }) {
+  validateRegisterPayload(body);
+
   try {
-    const emailError = validateEmail(body.email);
-    if (emailError) throw new ValidationError(emailError);
+    const { user, accessToken, refreshToken } = await registerUser({
+      body,
+      ip,
+      userAgent,
+      tokenConfig,
+    });
 
-    const passwordError = validatePassword(body.password);
-    if (passwordError) throw new ValidationError(passwordError);
+    return { user, tokens: { accessToken, refreshToken } };
+  } catch (err) {
+    if (err instanceof DomainError.ConflictError)
+      throw new ApplicationError.ConflictError(
+        "The registration could not be completed due to a conflict with an existing resource.",
+        { cause: err, details: err.details }
+      );
 
-    const passConfirmError = validatePasswordConfirm(
-      body.password,
-      body.confirmPassword
+    if (err instanceof DomainError.ValidationError)
+      throw new ApplicationError.ValidationError("The user data is invalid.", {
+        details: err.details,
+        cause: err,
+      });
+
+    if (err instanceof DomainError.DomainError)
+      throw new ApplicationError.ApplicationError(
+        "The request could not be processed due to a server error.",
+        { cause: err }
+      );
+
+    console.error(`Application Error (auth.register):`, err);
+    throw new ApplicationError.ApplicationError(
+      "An unexpected error occurred during registration.",
+      { cause: err }
     );
-    if (passConfirmError) throw new ValidationError(passConfirmError);
-
-    if (body.email.endsWith("@ucol.mx")) {
-      const universityIdError = validateUniversityId(body.universityId);
-      if (universityIdError) throw new ValidationError(universityIdError);
-    }
-
-    const resUsrObj = await registerUser({ body: body, ip, userAgent });
-
-    const { password, ...safeUser } = resUsrObj.user;
-    const accessToken = resUsrObj.accessToken;
-    const refreshToken = resUsrObj.refreshToken;
-
-    return { user: safeUser, tokens: { accessToken, refreshToken } };
-  } catch (error) {
-    if (error instanceof ConflictError)
-      throw new ValidationError(error.message);
-    throw error;
   }
 }

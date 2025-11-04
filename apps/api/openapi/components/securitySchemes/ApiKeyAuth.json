@@ -1,0 +1,6 @@
+{
+  "type": "apiKey",
+  "name": "X-API-Key",
+  "in": "header",
+  "description": "Shared secret API key required for all mobile-specific endpoints."
+}

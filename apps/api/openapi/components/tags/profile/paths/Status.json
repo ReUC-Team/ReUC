@@ -1,0 +1,39 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Check profile completion status",
+    "description": "Checks if the authenticated **\"outsider\"** user's profile has all required fields filled.",
+    "tags": ["Profile"],
+    "security": [
+      {
+        "BearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Profile status retrieved successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/StatusSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "403": {
+        "$ref": "../../../responses/Error403.json"
+      },
+      "404": {
+        "$ref": "../../../responses/Error404.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ReUC API",
+    "version": "1.0.0",
+    "description": "API documentation for ReUC, detailing web and mobile endpoints."
+  },
+  "servers": [
+    {
+      "url": "http://0.0.0.0:3000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "$ref": "./components/securitySchemes/BearerAuth.json"
+      },
+      "ApiKeyAuth": {
+        "$ref": "./components/securitySchemes/ApiKeyAuth.json"
+      },
+      "CsrfAuth": {
+        "$ref": "./components/securitySchemes/CsrfAuth.json"
+      }
+    },
+
+    "schemas": {
+      "RegisterPayload": {
+        "$ref": "./components/tags/auth/payload/Register.json"
+      },
+      "LoginPayload": {
+        "$ref": "./components/tags/auth/payload/Login.json"
+      },
+      "ApplicationCreatePayload": {
+        "$ref": "./components/tags/application/payload/ApplicationCreate.json"
+      },
+      "ProfileEditPayload": {
+        "$ref": "./components/tags/profile/payload/ProfileEdit.json"
+      },
+      "DataTablePayload": {
+        "$ref": "./components/tags/admin/payload/DataTable.json"
+      },
+
+      "ObjectDetailsRequired": {
+        "$ref": "./components/responses/data/ObjectDetailsRequired.json"
+      },
+      "ObjectDetailsExtras": {
+        "$ref": "./components/responses/data/ObjectDetailsExtras.json"
+      },
+      "ObjectError": {
+        "$ref": "./components/responses/data/ObjectError.json"
+      },
+      "ObjectUser": {
+        "$ref": "./components/tags/auth/common/ObjectUser.json"
+      },
+      "ObjectProfile": {
+        "$ref": "./components/tags/profile/common/ObjectProfile.json"
+      },
+      "ObjectFaculty": {
+        "$ref": "./components/tags/application/common/ObjectFaculty.json"
+      },
+      "ObjectApplication": {
+        "$ref": "./components/tags/application/common/ObjectRecords.json"
+      },
+
+      "ResponseRecordsPaginated": {
+        "$ref": "./components/tags/common/Objects/RecordsPaginated.json"
+      },
+
+      "ResponseError": {
+        "$ref": "./components/responses/data/ResponseError.json"
+      },
+      "ResponseSuccess": {
+        "$ref": "./components/responses/data/ResponseSuccess.json"
+      }
+    },
+    "responses": {
+      "Error400": {
+        "$ref": "./components/responses/Error400.json"
+      },
+      "Error401": {
+        "$ref": "./components/responses/Error401.json"
+      },
+      "Error403": {
+        "$ref": "./components/responses/Error403.json"
+      },
+      "Error404": {
+        "$ref": "./components/responses/Error404.json"
+      },
+      "Error409": {
+        "$ref": "./components/responses/Error409.json"
+      },
+      "Error500": {
+        "$ref": "./components/responses/Error500.json"
+      }
+    }
+  },
+  "security": [],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Endpoints for user authentication (register, login, refresh, logout, session status).\n\n**Note for Mobile Clients:** There is no dedicated `/mobile/auth/logout` endpoint. Mobile clients should handle logout locally by securely discarding the stored access and refresh tokens."
+    },
+    {
+      "name": "Profile",
+      "description": "User profile management"
+    },
+    {
+      "name": "Application",
+      "description": "Application management"
+    },
+    {
+      "name": "Admin",
+      "description": "Administrative endpoints"
+    },
+    {
+      "name": "File",
+      "description": "File serving endpoints"
+    }
+  ],
+
+  "paths": {
+    "/auth/register": {
+      "$ref": "./components/tags/auth/paths/WebRegister.json"
+    },
+    "/mobile/auth/register": {
+      "$ref": "./components/tags/auth/paths/MobileRegister.json"
+    },
+    "/auth/login": {
+      "$ref": "./components/tags/auth/paths/WebLogin.json"
+    },
+    "/mobile/auth/login": {
+      "$ref": "./components/tags/auth/paths/MobileLogin.json"
+    },
+    "/auth/refresh": {
+      "$ref": "./components/tags/auth/paths/WebRefresh.json"
+    },
+    "/mobile/auth/refresh": {
+      "$ref": "./components/tags/auth/paths/MobileRefresh.json"
+    },
+    "/auth/logout": {
+      "$ref": "./components/tags/auth/paths/WebLogout.json"
+    },
+    "/auth/me": {
+      "$ref": "./components/tags/auth/paths/Me.json"
+    },
+
+    "/profile/get": {
+      "$ref": "./components/tags/profile/paths/Get.json"
+    },
+    "/profile/status": {
+      "$ref": "./components/tags/profile/paths/Status.json"
+    },
+    "/profile/edit": {
+      "$ref": "./components/tags/profile/paths/WebEdit.json"
+    },
+    "/mobile/profile/edit": {
+      "$ref": "./components/tags/profile/paths/MobileEdit.json"
+    },
+
+    "/file/public/{uuid}": {
+      "$ref": "./components/tags/file/paths/GetPublicAsset.json"
+    },
+    "/file/{model}/{purpose}/{uuidmodel}": {
+      "$ref": "./components/tags/file/paths/GetFile.json"
+    },
+
+    "/application/metadata/create": {
+      "$ref": "./components/tags/application/paths/MetadataCreate.json"
+    },
+    "/application/create": {
+      "$ref": "./components/tags/application/paths/WebCreate.json"
+    },
+    "/mobile/application/create": {
+      "$ref": "./components/tags/application/paths/MobileCreate.json"
+    },
+    "/application/metadata/explore": {
+      "$ref": "./components/tags/application/paths/MetadataExplore.json"
+    },
+    "/application/explore/{faculty}": {
+      "$ref": "./components/tags/application/paths/Explore.json"
+    },
+    "/application/{uuid}": {
+      "$ref": "./components/tags/application/paths/Get.json"
+    },
+
+    "/admin/meta/tables": {
+      "$ref": "./components/tags/admin/paths/MetadataTables.json"
+    },
+    "/admin/tables/{table}/fields": {
+      "$ref": "./components/tags/admin/paths/MetadataTableFields.json"
+    },
+    "/admin/data/{table}": {
+      "$ref": "./components/tags/admin/paths/DataTable.json"
+    }
+  }
+}

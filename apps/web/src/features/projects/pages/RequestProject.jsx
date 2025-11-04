@@ -26,7 +26,19 @@ const RequestProject = () => {
         <div className="max-w-4xl w-full bg-green-100 border border-green-300 text-sm text-green-800 p-4 rounded mb-8">
           <p className="mb-2 font-semibold">Recomendaciones para llenar el formulario:</p>
           <ul className="list-disc pl-5 space-y-1">
-          </ul>
+  <li><strong>Nombre del solicitante:</strong> Ingresa el nombre completo de la persona que representa la empresa o institución.</li>
+  <li><strong>Teléfono y correo de contacto:</strong> Debes proporcionar al menos uno de los dos medios de contacto. Preferiblemente ambos para facilitar la comunicación.</li>
+  <li><strong>Empresa:</strong> Indica el nombre completo de la organización que solicita el proyecto. Si es un proyecto personal, puedes escribir "Independiente".</li>
+  <li><strong>Título del proyecto:</strong> Sé claro y conciso. Usa un título que describa en pocas palabras el propósito del proyecto.</li>
+  <li><strong>Descripción corta:</strong> Esta aparecerá en las tarjetas del sistema. Resume en 1 o 2 líneas de qué trata el proyecto.</li>
+  <li><strong>Descripción detallada:</strong> Explica a fondo qué problema se busca resolver, qué se espera lograr y cualquier otro detalle relevante.</li>
+  <li><strong>Tipo de proyecto (sugerido):</strong> Marca una o más opciones dependiendo del enfoque que consideras adecuado: Tesis, Servicio Social, Proyecto Integrador, etc.</li>
+  <li><strong>Facultad sugerida (sugerido):</strong> Elige la(s) facultad(es) que crees que tienen el perfil ideal para desarrollar tu proyecto. Por ejemplo: FIE, FACIMAR, etc.</li>
+  <li><strong>Tipo de problemática:</strong> Selecciona el tipo de reto que se busca resolver: tecnológico, ambiental, logístico, etc. Si no está en la lista, elige "Otro" y describe el problema.</li>
+  <li><strong>Vigencia:</strong> Fecha límite estimada para que el proyecto esté resuelto o implementado. Esta puede cambiar más adelante, pero es útil para la planeación inicial.</li>
+  <li><strong>Miniatura o banner:</strong> Puedes subir una imagen representativa o seleccionar una predeterminada. Esta imagen se mostrará en el sistema como portada del proyecto.</li>
+</ul>
+
         </div>
       )}
       

@@ -1,0 +1,38 @@
+{
+  "post": {
+    "summary": "(Web) Refresh access token",
+    "description": "Generates a new access token using the httpOnly refresh token cookie.",
+    "tags": ["Auth"],
+    "security": [],
+    "parameters": [
+      {
+        "name": "refreshToken",
+        "in": "cookie",
+        "required": true,
+        "description": "The httpOnly refresh token cookie.",
+        "schema": { "type": "string" }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Access token refreshed successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/RefreshSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

@@ -5,18 +5,26 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "TZ=UTC node index.js"
+    "dev": "TZ=UTC node index.js",
+    "docs:build": "redocly build-docs ./openapi/openapi.json -o ./docs/index.html"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.7.1",
   "dependencies": {
+    "@reuc/application": "workspace:*",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
-    "@reuc/application": "workspace:*"
+    "express-rate-limit": "^7.5.1",
+    "multer": "^2.0.1"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.8.0",
+    "ajv": "^8.17.1",
+    "react": "19.1.0"
   }
 }
