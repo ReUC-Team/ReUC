@@ -13,6 +13,7 @@ import {
   Image,
 } from 'react-native'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native' // ⬅️ IMPORTA useNavigation
 import { useThemedStyles } from '../hooks/useThemedStyles'
 import { createLeftSidebarStyles } from '../styles/components/header/LeftSidebar.styles'
 
@@ -34,7 +35,7 @@ const menuItems: MenuItem[] = [
   { icon: 'list-outline',      iconType: 'ionicons', label: 'Solicitar un proyecto', screen: 'RequestProject' },
   { icon: 'search-outline',    iconType: 'ionicons', label: 'Explorar proyectos',    screen: 'ExploreProjects' },
   { icon: 'folder-outline',    iconType: 'ionicons', label: 'Mis proyectos',         screen: 'MyProjects', hasSubmenu: true },
-  { icon: 'star-outline',      iconType: 'ionicons', label: 'Mis favoritos',         screen: 'MyFavorites', hasSubmenu: true },
+  { icon: 'star-outline',      iconType: 'ionicons', label: 'Mis favoritos',         screen: 'FavoriteProjects', hasSubmenu: true },
   { icon: 'people-outline',    iconType: 'ionicons', label: 'Miembros',              screen: 'Members',     hasSubmenu: true },
   { icon: 'document-text-outline', iconType: 'ionicons', label: 'Documentos',        screen: 'Documents' },
   { icon: 'notifications-outline', iconType: 'ionicons', label: 'Notificaciones',    screen: 'Notifications' },
@@ -42,6 +43,7 @@ const menuItems: MenuItem[] = [
 
 export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
   const styles = useThemedStyles(createLeftSidebarStyles)
+  const navigation = useNavigation<any>() // ⬅️ USA useNavigation
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').width)).current
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
 
@@ -92,7 +94,12 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
     if (item.hasSubmenu) {
       toggleSubmenu(item.screen)
     } else {
-      onNavigate?.(item.screen)
+      // ⬇️ USA navigation.navigate EN LUGAR DE SOLO onNavigate
+      if (onNavigate) {
+        onNavigate(item.screen)
+      } else {
+        navigation.navigate(item.screen) // ⬅️ Navega directamente
+      }
       onClose()
     }
   }
@@ -104,7 +111,7 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
         { title: 'Proyecto Beta', avatar: require('../assets/avatar.png') },
         { title: 'Proyecto Gamma', avatar: require('../assets/avatar.png') },
       ],
-      MyFavorites: [
+      FavoriteProjects: [
         { title: 'Proyecto Alpha', avatar: require('../assets/avatar.png') },
         { title: 'Proyecto Beta', avatar: require('../assets/avatar.png') },
         { title: 'Proyecto Gamma', avatar: require('../assets/avatar.png') },
@@ -123,7 +130,12 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
         key={index}
         style={styles.submenuItem}
         onPress={() => {
-          onNavigate?.(`${parentScreen}/${subItem.title}`)
+          // ⬇️ USA navigation.navigate
+          if (onNavigate) {
+            onNavigate(`${parentScreen}/${subItem.title}`)
+          } else {
+            navigation.navigate(parentScreen) // ⬅️ Navega a la pantalla principal
+          }
           onClose()
         }}
       >
