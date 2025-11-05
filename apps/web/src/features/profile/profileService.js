@@ -12,48 +12,61 @@ export async function getCSRFToken() {
   return csrfToken;
 }
 
-export async function putProfile(data) {
-  const csrfToken = await getCSRFToken();
+/**
+ * Verifica si el perfil del usuario está completo
+ * @returns {Promise<{isComplete: boolean}>}
+ * @throws {AuthenticationError|ApplicationError}
+ */
+export async function getProfileStatus() {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/profile/status`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 
-  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/profile/edit`, {
-    method: "PATCH",
-    headers: {
-      "X-CSRF-Token": csrfToken,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    const msg =
-      res.status !== 422 ? bodyRes.err : "Hubo un problema al editar el perfil";
-
-    return { success: false, err: msg };
-  }
-
-  return { success: true, data: {} };
+  // fetchWithAuthAndAutoRefresh ya parsea y lanza errores
+  return response.data;
 }
 
+/**
+ * Obtiene los datos del perfil del usuario autenticado
+ * @returns {Promise<{profile: object}>}
+ * @throws {AuthenticationError|NotFoundError|ApplicationError}
+ */
 export async function getProfile() {
-  const res = await fetchWithAuthAndAutoRefresh(`${API_URL}/profile/get`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/profile/get`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 
-  const bodyRes = await res.json();
+  return response.data;
+}
 
-  if (!res.ok) {
-    const msg =
-      res.status !== 422
-        ? bodyRes.err
-        : "Hubo un problema al obtener los datos del perfil";
+/**
+ * Actualiza el perfil del usuario
+ * @param {object} data - Datos del perfil a actualizar
+ * @returns {Promise<{profile: object}>}
+ * @throws {ValidationError|AuthenticationError|ApplicationError}
+ */
+export async function updateProfile(data) {
+  const csrfToken = await getCSRFToken();
 
-    return { success: false, err: msg };
-  }
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/profile/edit`,
+    {
+      method: "PATCH",
+      headers: {
+        "X-CSRF-Token": csrfToken,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
-  return { success: true, data: bodyRes.data };
+  return response.data;
 }

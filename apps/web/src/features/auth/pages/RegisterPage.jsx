@@ -1,4 +1,3 @@
-// src/features/auth/pages/RegisterPage.jsx
 import React from "react";
 import AuthForm from "../components/AuthForm";
 import AuthInput from "../components/AuthInput";
@@ -6,12 +5,10 @@ import Checkbox from "../components/Checkbox";
 import SubmitBtn from "../components/SubmitBtn";
 import AltLink from "../components/AltLink";
 import useRegister from "../hooks/useRegister";
-import useLogout from "../hooks/useLogout";
 import registerImage from "@/assets/register-image.png";
 
 const RegisterPage = () => {
-  const { form, handleChange, handleSubmit, isLoading } = useRegister();
-  const { error } = useLogout();
+  const { form, handleChange, handleSubmit, isLoading, fieldErrors } = useRegister(); // Obtener fieldErrors
   const showUniversityField = form.email.includes("@ucol.mx");
 
   return (
@@ -28,25 +25,26 @@ const RegisterPage = () => {
           </p>
         </div>
 
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-            {error}
-          </div>
-        )}
         <AuthForm onSubmit={handleSubmit}>
           <AuthInput
             label="Correo electrónico"
             name="email"
+            type="email"
             value={form.email}
             onChange={handleChange}
+            error={fieldErrors.email}
+            placeholder="ejemplo@ucol.mx"
           />
 
           {showUniversityField && (
             <AuthInput
               label="Número de cuenta (8 alumnos / 4 maestros)"
               name="universityId"
+              type="text"
               value={form.universityId}
               onChange={handleChange}
+              error={fieldErrors.universityId}
+              placeholder="12345678"
             />
           )}
 
@@ -56,6 +54,8 @@ const RegisterPage = () => {
             type="password"
             value={form.password}
             onChange={handleChange}
+            error={fieldErrors.password}
+            placeholder="••••••••"
           />
 
           <AuthInput
@@ -64,6 +64,8 @@ const RegisterPage = () => {
             type="password"
             value={form.confirmPassword}
             onChange={handleChange}
+            error={fieldErrors.confirmPassword}
+            placeholder="••••••••"
           />
 
           <div className="mt-4">

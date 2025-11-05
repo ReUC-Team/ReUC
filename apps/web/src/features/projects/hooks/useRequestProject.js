@@ -1,161 +1,255 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createApplication } from "../projectsService.js";
+import { ValidationError, processFieldErrors, getDisplayMessage } from "@/utils/errorHandler";
+import { Alerts } from "@/shared/alerts";
 
 export default function useRequestProject() {
+  const navigate = useNavigate();
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
   const [form, setForm] = useState({
-    name: "",
-    phone: "",
-    contactEmail: "",
-    company: "",
     title: "",
     shortDescription: "",
     description: "",
     deadline: "",
-
-    // cambio de imageFile a file
-    file: null,
-
-    // --- Campos convertidos a arrays para múltiples selecciones ---
-    projectType: [],
-    faculty: [],
+    selectedBannerUuid: "",
+    customBannerFile: null,
+    customBannerName: "",
+    projectType: [], 
+    faculty: [], 
     problemType: [],
-    // form.projectType.join(',')
-
-    // --- Campos nuevos ---
-    problemTypeOther: "", // para descripción cuando "otro" está seleccionado
-    imageDefault: "", // para banner/miniatura por defecto
-    fileName: "", // para nombre del archivo subido
+    problemTypeOther: "",
+    attachments: [],
   });
 
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
-    // Si el evento es sintético (creado por nosotros para las imágenes predeterminadas)
-    if (!e.target.type && e.target.name === "imageDefault") {
-      setForm((prev) => ({
-        ...prev,
-        imageDefault: e.target.value,
-        imageFile: null, // Con esto limpiamos cualquier archivo seleccionado anteriormente
-      }));
-      return;
+    const { name, value, type, checked, files } = e.target;
+
+    // Limpiar error del campo cuando el usuario interactúa
+    if (fieldErrors[name]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
     }
 
-    const { name, value, type, files, checked } = e.target;
+    // MANEJO DE CHECKBOXES (projectType, faculty, problemType)
+    if (type === "checkbox") {
+      if (name === "projectType" || name === "faculty" || name === "problemType") {
+        setForm(prevForm => {
+          const currentArray = prevForm[name] || [];
+          
+          if (checked) {
+            // Agregar valor si está checkeado
+            return {
+              ...prevForm,
+              [name]: [...currentArray, value]
+            };
+          } else {
+            // Remover valor si está desmarcado
+            return {
+              ...prevForm,
+              [name]: currentArray.filter(item => item !== value)
+            };
+          }
+        });
+        return; // salir de la función aquí
+      }
+    }
 
-    if (type === "checkbox" && Array.isArray(form[name])) {
-      setForm((prev) => {
-        const prevArr = prev[name];
-        return {
-          ...prev,
-          [name]: checked
-            ? [...prevArr, value]
-            : prevArr.filter((v) => v !== value),
-        };
+    // Manejo de archivos de banner
+    if (name === "customBannerFile" && files?.[0]) {
+      setForm({
+        ...form,
+        customBannerFile: files[0],
+        customBannerName: files[0].name,
+        selectedBannerUuid: "", // Limpiar UUID si se sube archivo
       });
       return;
-    }
-
-    // Archivo subido
-    if (type === "file") {
-      if (files && files.length > 0) {
-        setForm((prev) => ({
-          ...prev,
-          file: files[0],
-          fileName: files[0].name,
-          imageDefault: "", // Se limpia cualquier imagen predeterminada seleccionada
-        }));
-      }
+    } 
+    
+    // Manejo de archivos adjuntos
+    if (name === "attachments" && files) {
+      setForm({
+        ...form,
+        attachments: Array.from(files),
+      });
       return;
-    }
-
-    // Selección de miniatura por defecto (simulate file selection)
-    if (name === "imageDefault") {
-      setForm((prev) => ({
-        ...prev,
-        imageDefault: value,
-        imageFile: null,
-      }));
-      return;
-    }
-
-    // Campos de texto / date / selects
-    setForm((prev) => ({
-      ...prev,
+    } 
+    
+    // Campos de texto normales
+    setForm({
+      ...form,
       [name]: value,
+    });
+  };
+
+  // Manejo de banner predefinido (llamado desde RequestProjectForm)
+  const handleBannerSelection = (uuid) => {
+    setForm({
+      ...form,
+      selectedBannerUuid: uuid,
+      customBannerFile: null,
+      customBannerName: "",
+    });
+
+    // Limpiar error de banner
+    if (fieldErrors.banner) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.banner;
+        return newErrors;
+      });
+    }
+  };
+
+  // Remover archivo adjunto (llamado desde RequestProjectForm)
+  const handleRemoveAttachment = (index) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      attachments: prevForm.attachments.filter((_, i) => i !== index),
     }));
+  };
+
+  // Validación del formulario
+  const validateForm = () => {
+    const errors = {};
+
+    if (!form.title?.trim()) {
+      errors.title = "El título es requerido";
+    }
+
+    if (!form.shortDescription?.trim()) {
+      errors.shortDescription = "La descripción corta es requerida";
+    }
+
+    if (!form.description?.trim()) {
+      errors.description = "La descripción detallada es requerida";
+    }
+
+    if (!form.deadline) {
+      errors.deadline = "La fecha límite es requerida";
+    }
+
+    if (!form.selectedBannerUuid && !form.customBannerFile) {
+      errors.banner = "Debes seleccionar o subir un banner";
+    }
+
+    // Validar que los arrays tengan al menos un elemento (si son requeridos)
+    // Según el formulario, estos son opcionales, así que no validamos
+
+    return errors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
 
-    if (!form.name) {
-      setError("Debes poner nombre del solicitante del proyecto");
-      // setIsLoading(false);
-      return;
-    }
-    if (!form.company) {
-      setError("El nombre de la compañía es obligatorio.");
-      return;
-    }
-    if (!form.title) {
-      setError("El título del proyecto es obligatorio.");
-      return;
-    }
-    if (form.projectType.length === 0) {
-      setError("Selecciona al menos un tipo de proyecto.");
-      return;
-    }
-    if (form.faculty.length === 0) {
-      setError("Selecciona al menos una facultad.");
-      return;
-    }
-    if (form.problemType.length === 0) {
-      setError("Selecciona al menos un tipo de problemática.");
-      return;
-    }
-    if (form.problemType.includes("otro") && !form.problemTypeOther) {
-      setError("Describe la problemática en 'Otro'.");
-      return;
-    }
-    if (!form.deadline) {
-      setError("Debes indicar la vigencia.");
-      return;
-    }
-    if (!form.phone && !form.contactEmail) {
-      setError("Debe haber al menos un medio de contacto (teléfono o email).");
-      return;
-    }
-    if (!form.shortDescription && !form.description) {
-      setError("Debe haber al menos una descripción.");
+    // Validar formulario
+    const errors = validateForm();
+    
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      Alerts.error("Por favor completa todos los campos requeridos");
       return;
     }
 
-    const payload = new FormData();
-    Object.entries(form).forEach(([key, val]) => {
-      if (Array.isArray(val)) {
-        val.forEach((v) => payload.append(key, v));
-      } else if (val instanceof File) {
-        payload.append(key, val); // actual uploaded file
-      } else if (val !== null && val !== undefined) {
-        payload.append(key, val);
-      }
-    });
+    setIsLoading(true);
+    setFieldErrors({});
 
     try {
-      const response = await createApplication(payload);
-      if (!response.success) {
-        if (response.logout) navigate("/");
-        setError(response.err || "Error en el registro");
-        return;
+      // Construir FormData
+      const formData = new FormData();
+
+      // Campos básicos
+      formData.append("title", form.title);
+      formData.append("shortDescription", form.shortDescription);
+      formData.append("description", form.description);
+      formData.append("deadline", form.deadline);
+
+      // Banner (UUID o archivo, exclusivo)
+      if (form.selectedBannerUuid) {
+        formData.append("selectedBannerUuid", form.selectedBannerUuid);
+      } else if (form.customBannerFile) {
+        formData.append("customBannerFile", form.customBannerFile);
       }
-      navigate("/explore-projects/project-details");
-    } catch (err) {
-      setError(err.message || "Algo salió mal");
+
+      // Enviar cada ID individualmente con []
+      // Solo enviar si hay elementos
+      if (form.projectType && form.projectType.length > 0) {
+        form.projectType.forEach(id => {
+          formData.append("projectType[]", id);
+        });
+      }
+
+      if (form.faculty && form.faculty.length > 0) {
+        form.faculty.forEach(id => {
+          formData.append("faculty[]", id);
+        });
+      }
+
+      if (form.problemType && form.problemType.length > 0) {
+        form.problemType.forEach(id => {
+          formData.append("problemType[]", id);
+        });
+      }
+
+      // Tipo de problemática "Otro"
+      if (form.problemTypeOther?.trim()) {
+        formData.append("problemTypeOther", form.problemTypeOther);
+      }
+
+      // Archivos adjuntos
+      if (form.attachments && form.attachments.length > 0) {
+        form.attachments.forEach((file) => {
+          formData.append("attachments", file);
+        });
+      }
+
+      for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}:`, value instanceof File ? `File: ${value.name}` : value);
+      }
+
+      // Enviar al backend
+      const response = await createApplication(formData);
+
+      Alerts.success("¡Tu proyecto ha sido enviado correctamente!");
+      
+      setTimeout(() => {
+        navigate("/explore-projects");
+      }, 2000);
+
+    } catch (error) {
+
+      // Manejo de errores de validación
+      if (error instanceof ValidationError) {
+        if (error.details && error.details.length > 0) {
+          const processedErrors = processFieldErrors(error.details);
+          setFieldErrors(processedErrors);
+          
+          Alerts.error("Por favor revisa los campos marcados");
+        } else {
+          Alerts.error(getDisplayMessage(error));
+        }
+      } 
+      // Otros errores
+      else {
+        Alerts.error(getDisplayMessage(error));
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return { form, error, handleChange, handleSubmit };
+  return {
+    form,
+    fieldErrors,
+    isLoading,
+    handleChange,
+    handleBannerSelection,
+    handleRemoveAttachment,
+    handleSubmit,
+  };
 }
