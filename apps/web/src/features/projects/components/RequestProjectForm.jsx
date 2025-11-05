@@ -4,35 +4,34 @@ import docIcon from '@/assets/icons/doc.png'
 import zipIcon from '@/assets/icons/zip.png'
 import useFormProjectMetadata from "../hooks/useFormProjectMetadata"
 
-export default function RequestProjectForm({ form, fieldErrors, handleChange, handleSubmit }) {
+export default function RequestProjectForm({ 
+  form, 
+  fieldErrors, 
+  isLoading, 
+  handleChange, 
+  handleBannerSelection,
+  handleRemoveAttachment,
+  handleSubmit 
+}) {
   const [showInfo, setShowInfo] = useState(false)
-  
-  // Estados para banner
-  const [selectedDefaultBannerUuid, setSelectedDefaultBannerUuid] = useState(null)
-  const [customBannerFile, setCustomBannerFile] = useState(null)
-  const [customBannerPreview, setCustomBannerPreview] = useState(null)
   const bannerInputRef = useRef(null)
-  
-  // Estados para attachments
-  const [attachments, setAttachments] = useState([])
   const attachmentsInputRef = useRef(null)
 
   const { faculties, projectTypes, problemTypes, defaultBanners } = useFormProjectMetadata()
   const extendedProblemTypes = [...problemTypes, { problem_type_id: "otro", name: "Otro" }]
 
+  // Usar el estado del hook padre (form.customBannerFile, form.attachments)
+  const customBannerPreview = form.customBannerFile 
+    ? URL.createObjectURL(form.customBannerFile) 
+    : null;
+
   // ========== BANNER HANDLERS ==========
   const handleDefaultBannerSelect = (banner) => {
     // Limpiar banner custom
     if (bannerInputRef.current) bannerInputRef.current.value = ""
-    if (customBannerPreview) URL.revokeObjectURL(customBannerPreview)
-    setCustomBannerFile(null)
-    setCustomBannerPreview(null)
-
-    // Guardar UUID del banner default
-    setSelectedDefaultBannerUuid(banner.uuid)
-    handleChange({
-      target: { name: "selectedBannerUuid", value: banner.uuid, type: "text" }
-    })
+    
+    // Usar handleBannerSelection del hook
+    handleBannerSelection(banner.uuid)
   }
 
   const handleCustomBannerChange = (e) => {
@@ -46,19 +45,14 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
         return
       }
 
-      // Limpiar banner default
-      setSelectedDefaultBannerUuid(null)
+      // Pasar al hook usando handleChange
       handleChange({
-        target: { name: "selectedBannerUuid", value: "", type: "text" }
+        target: { 
+          name: "customBannerFile", 
+          files: [file],
+          type: "file"
+        }
       })
-
-      // Limpiar preview anterior
-      if (customBannerPreview) URL.revokeObjectURL(customBannerPreview)
-
-      // Crear preview
-      const preview = URL.createObjectURL(file)
-      setCustomBannerPreview(preview)
-      setCustomBannerFile(file)
     }
   }
 
@@ -74,18 +68,25 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
         return
       }
 
-      setAttachments(files)
+      // Pasar al hook usando handleChange
+      handleChange({
+        target: {
+          name: "attachments",
+          files: files,
+          type: "file"
+        }
+      })
     }
   }
 
   const removeAttachment = (index) => {
-    const newAttachments = attachments.filter((_, i) => i !== index)
-    setAttachments(newAttachments)
+    // Usar handleRemoveAttachment del hook
+    handleRemoveAttachment(index)
     
-    // Actualizar el input file
+    // Actualizar el input file para reflejar el cambio
     if (attachmentsInputRef.current) {
       const dt = new DataTransfer()
-      newAttachments.forEach(file => dt.items.add(file))
+      form.attachments.filter((_, i) => i !== index).forEach(file => dt.items.add(file))
       attachmentsInputRef.current.files = dt.files
     }
   }
@@ -116,14 +117,14 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
   useEffect(() => {
     return () => {
       if (customBannerPreview) URL.revokeObjectURL(customBannerPreview)
-      attachments.forEach(file => {
+      form.attachments?.forEach(file => {
         if (file.type.startsWith('image/')) {
           const url = URL.createObjectURL(file)
           URL.revokeObjectURL(url)
         }
       })
     }
-  }, [customBannerPreview, attachments])
+  }, [customBannerPreview, form.attachments])
 
   return (
     <form
@@ -147,7 +148,7 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
             required
           />
           {fieldErrors?.title && (
-            <p className="mt-1 text-sm text-red-600">{fieldErrors.title.message}</p>
+            <p className="mt-1 text-sm text-red-600">{fieldErrors.title}</p>
           )}
         </div>
 
@@ -166,7 +167,7 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
             required
           />
           {fieldErrors?.shortDescription && (
-            <p className="mt-1 text-sm text-red-600">{fieldErrors.shortDescription.message}</p>
+            <p className="mt-1 text-sm text-red-600">{fieldErrors.shortDescription}</p>
           )}
         </div>
 
@@ -186,7 +187,7 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
             required
           />
           {fieldErrors?.description && (
-            <p className="mt-1 text-sm text-red-600">{fieldErrors.description.message}</p>
+            <p className="mt-1 text-sm text-red-600">{fieldErrors.description}</p>
           )}
         </div>
       </fieldset>
@@ -298,7 +299,7 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
             required
           />
           {fieldErrors?.deadline && (
-            <p className="mt-1 text-sm text-red-600">{fieldErrors.deadline.message}</p>
+            <p className="mt-1 text-sm text-red-600">{fieldErrors.deadline}</p>
           )}
         </div>
       </fieldset>
@@ -310,16 +311,16 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
         </label>
 
         {/* Preview del banner custom */}
-        {customBannerFile && customBannerPreview && (
+        {form.customBannerFile && customBannerPreview && (
           <div className="relative w-full h-40 border-2 border-lime-600 rounded-lg overflow-hidden">
             <img src={customBannerPreview} alt="Banner custom" className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={() => {
                 if (bannerInputRef.current) bannerInputRef.current.value = ''
-                if (customBannerPreview) URL.revokeObjectURL(customBannerPreview)
-                setCustomBannerFile(null)
-                setCustomBannerPreview(null)
+                handleChange({
+                  target: { name: "customBannerFile", value: null, type: "file" }
+                })
               }}
               className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
             >
@@ -338,13 +339,11 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
           type="file"
           accept="image/jpeg,image/png,image/webp"
           className={`w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-lime-500 ${
-            fieldErrors?.customBannerFile || fieldErrors?.selectedBannerUuid ? 'border-red-500' : 'border-gray-300'
+            fieldErrors?.banner ? 'border-red-500' : 'border-gray-300'
           }`}
         />
-        {(fieldErrors?.customBannerFile || fieldErrors?.selectedBannerUuid) && (
-          <p className="text-sm text-red-600">
-            {fieldErrors?.customBannerFile?.message || fieldErrors?.selectedBannerUuid?.message}
-          </p>
+        {fieldErrors?.banner && (
+          <p className="text-sm text-red-600">{fieldErrors.banner}</p>
         )}
 
         {/* Banners predeterminados */}
@@ -358,21 +357,18 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
                   alt={banner.name}
                   onClick={() => handleDefaultBannerSelect(banner)}
                   className={`w-24 h-16 object-cover cursor-pointer rounded-lg border-2 transition-all ${
-                    selectedDefaultBannerUuid === banner.uuid 
+                    form.selectedBannerUuid === banner.uuid 
                       ? 'border-lime-600 shadow-md' 
                       : 'border-transparent hover:border-gray-300'
                   }`}
                 />
                 <span className="text-xs mt-1 text-gray-500">
-                  {selectedDefaultBannerUuid === banner.uuid ? '✓ Seleccionado' : banner.name}
+                  {form.selectedBannerUuid === banner.uuid ? '✓ Seleccionado' : banner.name}
                 </span>
               </div>
             ))}
           </div>
         </div>
-
-        {/* Hidden input para UUID del banner default */}
-        <input type="hidden" name="selectedBannerUuid" value={selectedDefaultBannerUuid || ''} />
       </fieldset>
 
       {/* 5. Archivos adjuntos (múltiples) */}
@@ -382,9 +378,9 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
         </label>
 
         {/* Lista de attachments */}
-        {attachments.length > 0 && (
+        {form.attachments && form.attachments.length > 0 && (
           <div className="space-y-2">
-            {attachments.map((file, index) => (
+            {form.attachments.map((file, index) => (
               <div key={index} className="flex items-center p-2 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-gray-100 rounded">
                   {getFileIcon(file) ? (
@@ -433,7 +429,7 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
           Formatos permitidos: Imágenes, PDF, Word, PowerPoint, Excel, ZIP, TXT
         </p>
         {fieldErrors?.attachments && (
-          <p className="text-sm text-red-600">{fieldErrors.attachments.message}</p>
+          <p className="text-sm text-red-600">{fieldErrors.attachments}</p>
         )}
       </fieldset>
 
@@ -441,17 +437,11 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
       <div className="flex justify-end gap-4 pt-6">
         <button
           type="reset"
-          className="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 transition"
+          disabled={isLoading}
+          className="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50"
           onClick={() => {
-            // Limpiar banner
-            setSelectedDefaultBannerUuid(null)
-            setCustomBannerFile(null)
-            if (customBannerPreview) URL.revokeObjectURL(customBannerPreview)
-            setCustomBannerPreview(null)
+            // Limpiar inputs
             if (bannerInputRef.current) bannerInputRef.current.value = ''
-
-            // Limpiar attachments
-            setAttachments([])
             if (attachmentsInputRef.current) attachmentsInputRef.current.value = ''
           }}
         >
@@ -459,9 +449,13 @@ export default function RequestProjectForm({ form, fieldErrors, handleChange, ha
         </button>
         <button
           type="submit"
-          className="px-6 py-3 rounded-lg bg-lime-600 hover:bg-lime-700 text-white transition"
+          disabled={isLoading}
+          className="px-6 py-3 rounded-lg bg-lime-600 hover:bg-lime-700 text-white transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Enviar solicitud
+          {isLoading && (
+            <span className="inline-block h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          )}
+          {isLoading ? 'Enviando...' : 'Enviar solicitud'}
         </button>
       </div>
     </form>

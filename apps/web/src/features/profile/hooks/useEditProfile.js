@@ -71,12 +71,10 @@ const useEditProfile = (onClose, profile) => {
     setIsLoading(true);
     setFieldErrors({});
 
-    console.log('📤 Submitting profile update:', form); // DEBUG
 
     try {
       await updateProfile(form);
 
-      console.log('✅ Profile updated successfully'); // DEBUG
 
       Alerts.success("¡Perfil actualizado correctamente!");
       onClose();
@@ -87,14 +85,12 @@ const useEditProfile = (onClose, profile) => {
       }, 500);
 
     } catch (error) {
-      console.error("❌ Edit profile error:", error);
 
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
           const processedErrors = processFieldErrors(error.details);
           setFieldErrors(processedErrors);
           
-          console.log('📋 Field errors:', processedErrors); // DEBUG
           
           Alerts.error("Por favor revisa los campos marcados");
         } else {

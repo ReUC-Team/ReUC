@@ -17,16 +17,21 @@ export async function fetchWithAuth(url, options = {}) {
   const accessToken = sessionStorage.getItem("accessToken");
 
   const headers = {
-    'Content-Type': 'application/json',
     ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
     ...(options.headers || {})
   };
+
+  // Si el body es FormData, NO agregar Content-Type
+  // El navegador lo establecerá automáticamente con el boundary correcto
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   try {
     const response = await fetch(url, {
       ...options,
       headers,
-      credentials: "include", // Para cookies (CSRF, refresh token)
+      credentials: "include",
     });
 
     // Parsear respuesta antes de validar status
@@ -54,7 +59,6 @@ export async function fetchWithAuth(url, options = {}) {
       });
     }
 
-    // Respuesta exitosa - retornar los datos
     return bodyData;
 
   } catch (error) {
@@ -92,7 +96,7 @@ export async function fetchWithAuthAndAutoRefresh(url, options = {}) {
         // Intentar refrescar el token
         const refreshRes = await fetch(`${API_URL}/auth/refresh`, {
           method: "POST",
-          credentials: "include", // Cookie con refresh token
+          credentials: "include",
           headers: {
             'Content-Type': 'application/json'
           }
@@ -110,7 +114,6 @@ export async function fetchWithAuthAndAutoRefresh(url, options = {}) {
         }
 
         const refreshData = await refreshRes.json();
-        
         // Guardar nuevo token
         sessionStorage.setItem("accessToken", refreshData.accessToken);
 
