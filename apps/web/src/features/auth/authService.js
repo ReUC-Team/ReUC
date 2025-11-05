@@ -1,5 +1,12 @@
+import { fetchWithAuth } from "@/lib/api/client";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
+/**
+ * Obtiene CSRF token para operaciones POST/PUT/DELETE
+ * 
+ * @returns {Promise<string>} CSRF token
+ */
 export async function getCSRFToken() {
   const res = await fetch(`${API_URL}/csrf-token`, {
     credentials: "include",
@@ -10,82 +17,92 @@ export async function getCSRFToken() {
   return csrfToken;
 }
 
+/**
+ * Servicio de registro
+ * Ahora LANZA excepciones estructuradas en lugar de retornar { success, err }
+ * 
+ * @param {object} data - Datos del formulario de registro
+ * @returns {Promise<object>} Datos del usuario registrado
+ * @throws {ValidationError|ConflictError|ApplicationError} Errores estructurados
+ */
 export async function register(data) {
   const csrfToken = await getCSRFToken();
 
-  const res = await fetch(`${API_URL}/auth/register`, {
+  // fetchWithAuth lanza excepciones automáticamente
+  const response = await fetchWithAuth(`${API_URL}/auth/register`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       "X-CSRF-Token": csrfToken,
     },
-    credentials: "include",
     body: JSON.stringify(data),
   });
 
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    const msg =
-      res.status === 429
-        ? "Demasiadas solicitudes en un corto período de tiempo. Por favor, espera antes de intentar nuevamente."
-        : res.status === 422
-        ? bodyRes.err || "Error en los datos proporcionados para el registro."
-        : "Ocurrió un problema inesperado durante el registro.";
-
-    return { success: false, err: msg };
-  }
-
-  const { accessToken, user } = bodyRes.data;
+  // Si llegamos aquí, la petición fue exitosa
+  const { accessToken, user } = response.data;
+  
+  // Guardar token
   sessionStorage.setItem("accessToken", accessToken);
 
-  return { success: true, data: user };
+  return { user, accessToken };
 }
 
-export async function login(data) {
+/**
+ * Servicio de login
+ * Ahora LANZA excepciones estructuradas en lugar de retornar { success, err }
+ * 
+ * @param {object} credentials - { email, password }
+ * @returns {Promise<object>} Datos del usuario autenticado
+ * @throws {AuthenticationError|ValidationError|ApplicationError} Errores estructurados
+ */
+export async function login(credentials) {
   const csrfToken = await getCSRFToken();
 
-  const res = await fetch(`${API_URL}/auth/login`, {
+  // fetchWithAuth lanza excepciones automáticamente
+  const response = await fetchWithAuth(`${API_URL}/auth/login`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
       "X-CSRF-Token": csrfToken,
     },
-    credentials: "include",
-    body: JSON.stringify(data),
+    body: JSON.stringify(credentials),
   });
 
-  const bodyRes = await res.json();
-
-  if (!res.ok) {
-    const msg =
-      res.status === 429
-        ? "Demasiadas solicitudes en un corto período de tiempo. Por favor, espera antes de intentar nuevamente."
-        : res.status === 422
-        ? bodyRes.err || "Error en los datos proporcionados para el registro."
-        : "Ocurrió un problema inesperado durante el registro.";
-
-    return { success: false, err: msg };
-  }
-
-  const { accessToken, user } = bodyRes.data;
+  // Si llegamos aquí, la petición fue exitosa
+  const { accessToken, user } = response.data;
+  
+  // Guardar token
   sessionStorage.setItem("accessToken", accessToken);
 
-  return { success: true, data: user };
+  return { user, accessToken };
 }
 
+/**
+ * Servicio de logout
+ * Ahora LANZA excepciones en lugar de retornar { success, err }
+ * 
+ * @returns {Promise<object>} Mensaje de confirmación
+ * @throws {ApplicationError} Si falla el logout
+ */
 export async function logout() {
-  const res = await fetch(`${API_URL}/auth/logout`, {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
+  try {
 
-  const bodyRes = await res.json();
+    // fetchWithAuth lanza excepciones automáticamente
+    const response = await fetchWithAuth(`${API_URL}/auth/logout`, {
+      method: "DELETE",
+    });
+    return response;
+  } finally {
+    sessionStorage.removeItem("accessToken");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
 
-  if (!res.ok) return { success: false, err: bodyRes.err };
+    sessionStorage.removeItem("dashboardProfileModalShown");
+    sessionStorage.removeItem("profileModalShown");
+    
+    sessionStorage.clear();
+  }
 
-  return { success: true, message: bodyRes.message };
+  // Limpiar token local
+  sessionStorage.removeItem("accessToken");
+
+  return response;
 }

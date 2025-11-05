@@ -1,14 +1,30 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import LogoUDC from '@/assets/logo-udc.png';
-import avatar from '@/assets/avatar.png';
 import NotificacionDropdown from './NotificationDropdown';
 import MessageDropdown from './MessageDropdown';
+import useGetProfile from '@/features/profile/hooks/useGetProfile';
 
 export default function Header() {
   const [showNotifications, setShowNotifications] = useState(false)
   const [showMessage, setShowMessage] = useState(false)
 
+  const { profile } = useGetProfile();
+
+  const generateAvatarFromName = (firstName, middleName, lastName) => {
+    if (!firstName && !middleName && !lastName) return 'U';
+    
+    const first = firstName?.[0]?.toUpperCase() || '';
+    const last = lastName?.[0]?.toUpperCase() || '';
+    
+    return first + last || first || 'U';
+  };
+
+  const avatarInitials = generateAvatarFromName(
+    profile.firstName,
+    profile.middleName,
+    profile.lastName
+  );
 
   return (
     <>
@@ -46,13 +62,13 @@ export default function Header() {
           <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-red-600 rounded-full top-0 -end-0">2</div>
         </button> 
         
-        <Link to="/profile">
-          <img
-            src={avatar}
-            alt="Usuario"
-            className="w-12 h-auto rounded-full object-cover"
-            />
-        </Link>
+          <Link 
+            to="/profile"
+            className="w-12 h-12 bg-gradient-to-br from-lime-400 to-lime-600 rounded-full flex items-center justify-center text-white font-bold text-lg hover:opacity-90 transition"
+            title={`${profile.firstName || ''} ${profile.middleName || ''} ${profile.lastName || ''}`.trim() || 'Mi perfil'}
+          >
+            {avatarInitials}
+          </Link>
       </div>
     </header>
     {showNotifications && <NotificacionDropdown />}

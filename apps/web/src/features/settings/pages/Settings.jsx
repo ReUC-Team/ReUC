@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import useLogout from '@/features/auth/hooks/useLogout';
 
 const Settings = () => {
   const [activeSection, setActiveSection] = useState('general');
@@ -12,6 +13,7 @@ const Settings = () => {
     analyticalCookies: true
   });
   const [language, setLanguage] = useState('Español');
+  const { handleLogout, isLoading: isLoggingOut } = useLogout();
 
   // SVG Icons
   const UserIcon = () => (
@@ -53,6 +55,11 @@ const Settings = () => {
   const ChevronRightIcon = () => (
     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
       <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    </svg>
+  );
+    const LogoutIcon = () => (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
     </svg>
   );
 
@@ -129,6 +136,14 @@ const Settings = () => {
     }
   ];
 
+  const accountSections = [
+    {
+      id: 'logout',
+      title: 'Cerrar Sesión',
+      icon: <LogoutIcon />
+    }
+  ];
+
   const ToggleSwitch = ({ value, onChange }) => (
     <button
       onClick={() => onChange(!value)}
@@ -169,7 +184,7 @@ const Settings = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-5">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -222,6 +237,26 @@ const Settings = () => {
                   ))}
                 </nav>
               </div>
+
+              <div className="border-t p-4 border-gray-200">
+                <h3 className="font-semibold mb-4">Cuenta</h3>
+                <nav className="space-y-2">
+                  {accountSections.map(section => (
+                    <button
+                      key={section.id}
+                      onClick={() => setActiveSection(section.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
+                        activeSection === section.id
+                          ? 'bg-red-50 text-red-700'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {section.icon}
+                      <span>{section.title}</span>
+                    </button>
+                  ))}
+                </nav>
+              </div>
             </div>
           </div>
 
@@ -249,6 +284,55 @@ const Settings = () => {
               {activeSection === 'terms' && <TermsOfService />}
               {activeSection === 'privacy-policy' && <PrivacyPolicy />}
               {activeSection === 'help' && <HelpSupport />}
+              {activeSection === 'logout' && (
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-6">
+                    <LogoutIcon />
+                    <h2 className="text-xl font-semibold">Cerrar Sesión</h2>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div className="bg-red-100 border border-red-200 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-red-700 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        <div>
+                          <h3 className="font-semibold text-red-800 mb-1">
+                            ¿Estás seguro?
+                          </h3>
+                          <p className="text-sm text-red-700">
+                            Al cerrar sesión, deberás ingresar tus credenciales nuevamente para acceder a tu cuenta.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <button
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="w-full bg-red-700 text-white px-6 py-3 rounded-lg hover:bg-red-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                      >
+                        {isLoggingOut ? (
+                          <>
+                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Cerrando sesión...
+                          </>
+                        ) : (
+                          <>
+                            <LogoutIcon />
+                            Cerrar Sesión
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

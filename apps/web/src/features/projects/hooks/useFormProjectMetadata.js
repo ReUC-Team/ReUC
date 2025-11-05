@@ -6,30 +6,39 @@ export default function useFormProjectMetadata() {
   const [projectTypes, setProjectType] = useState([]);
   const [problemTypes, setProblemType] = useState([]);
   const [defaultBanners, setDefaultBanners] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        const response = await getCreateMetadata();
+        setIsLoading(true);
 
-        if (!response.success) {
-          console.error(
-            response.err || "Error al obtener la metadata para el formulario"
-          );
-          return;
-        }
+        const metadata = await getCreateMetadata();
 
-        setFaculty(response.data.faculties);
-        setProjectType(response.data.projectTypes);
-        setProblemType(response.data.problemTypes);
-        setDefaultBanners(response.data.defaultBanners);
+
+        setFaculty(metadata.faculties || []);
+        setProjectType(metadata.projectTypes || []);
+        setProblemType(metadata.problemTypes || []);
+        setDefaultBanners(metadata.defaultBanners || []);
+
       } catch (err) {
-        console.error("useFormProjectMetadata", err);
+        console.error("Error al obtener la metadata para el formulario:", err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchMetadata();
   }, []);
 
-  return { faculties, projectTypes, problemTypes, defaultBanners };
+  return { 
+    faculties, 
+    projectTypes, 
+    problemTypes, 
+    defaultBanners,
+    isLoading,
+    error
+  };
 }
