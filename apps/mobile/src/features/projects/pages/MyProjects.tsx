@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import ProjectsList from '../components/ProjectsList';
-import { styles } from '../../../styles/screens/MyProjects.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createMyProjectsStyles } from '../../../styles/screens/MyProjects.styles';
 
 const mockProjects = [
   {
@@ -13,6 +14,8 @@ const mockProjects = [
 ];
 
 const MyProjects = () => {
+  const styles = useThemedStyles(createMyProjectsStyles);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>

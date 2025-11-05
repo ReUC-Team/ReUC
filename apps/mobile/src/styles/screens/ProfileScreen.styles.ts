@@ -1,9 +1,10 @@
 import { StyleSheet } from 'react-native';
-import { palette } from '../theme/colors';
+import { ColorPalette } from '../theme/colors';
 
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: palette.surface,
-  },
-});
+export const createProfileScreenStyles = (palette: ColorPalette) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: palette.surface,
+    },
+  });

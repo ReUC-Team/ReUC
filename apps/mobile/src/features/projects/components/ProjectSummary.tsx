@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { styles } from '../../../styles/components/projects/ProjectSummary.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createProjectSummaryStyles } from '../../../styles/components/projects/ProjectSummary.styles';
 
 interface ProjectSummaryProps {
   title: string;
@@ -8,6 +9,8 @@ interface ProjectSummaryProps {
 }
 
 const ProjectSummary: React.FC<ProjectSummaryProps> = ({ title, description }) => {
+  const styles = useThemedStyles(createProjectSummaryStyles);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>

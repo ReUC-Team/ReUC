@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { styles } from '../../../styles/components/projects/RequestProjectForm.styles';
-import { useThemedPalette } from '../../../hooks/useThemedStyles';
+import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles';
+import { createRequestProjectFormStyles } from '../../../styles/components/projects/RequestProjectForm.styles';
 
 const PROJECT_TYPES = [
   { key: 'tesis', label: 'Tesis' },
@@ -31,15 +31,22 @@ interface RequestProjectFormProps {
   form: any;
   handleChange: (name: string, value: any) => void;
   handleSubmit: () => void;
+  showHelp: boolean;
+  setShowHelp: (show: boolean) => void;
+  error: string | null;
 }
 
 const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
   form,
   handleChange,
   handleSubmit,
+  showHelp,
+  setShowHelp,
+  error,
 }) => {
-  const [showInfo, setShowInfo] = useState(false);
+  const styles = useThemedStyles(createRequestProjectFormStyles);
   const palette = useThemedPalette();
+  const [showInfo, setShowInfo] = useState(false);
 
   const handleCheckboxChange = (fieldName: string, value: string) => {
     const currentValues = form[fieldName] || [];
@@ -50,7 +57,34 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header dentro del scroll - se ocultará al bajar */}
+      <View style={styles.headerInScroll}>
+        <Text style={styles.titleInScroll}>
+          Solicitar un <Text style={styles.titleAccentInScroll}>proyecto</Text>
+        </Text>
+        <TouchableOpacity onPress={() => setShowHelp(!showHelp)}>
+          <Ionicons name="information-circle-outline" size={28} color="#4E4E4E" />
+        </TouchableOpacity>
+      </View>
+
+      {showHelp && (
+        <View style={styles.helpBox}>
+          <Text style={styles.helpTitle}>Recomendaciones para llenar el formulario:</Text>
+          <Text style={styles.helpText}>
+            • Proporciona información clara y detallada{'\n'}
+            • Selecciona todas las opciones que apliquen{'\n'}
+            • Asegúrate de incluir medios de contacto válidos
+          </Text>
+        </View>
+      )}
+
+      {error && (
+        <View style={styles.errorBox}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
+
       <View style={styles.form}>
         {/* Información del solicitante */}
         <View style={styles.section}>

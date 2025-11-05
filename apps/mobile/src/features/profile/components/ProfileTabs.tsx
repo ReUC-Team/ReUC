@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { styles } from '../../../styles/components/profile/ProfileTabs.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createProfileTabsStyles } from '../../../styles/components/profile/ProfileTabs.styles';
 
 interface Tab {
   id: string;
@@ -22,6 +23,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   tabs = defaultTabs,
   onTabChange 
 }) => {
+  const styles = useThemedStyles(createProfileTabsStyles);
   const [activeTab, setActiveTab] = useState(tabs[0].id);
 
   const handleTabPress = (tabId: string) => {

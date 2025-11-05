@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Image, Text, TouchableOpacity } from 'react-native';
-import { styles } from '../../../styles/components/profile/ProfileHeader.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createProfileHeaderStyles } from '../../../styles/components/profile/ProfileHeader.styles';
 
 interface ProfileHeaderProps {
   imageUrl?: string;
@@ -17,6 +18,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onEditPress,
   onContactPress,
 }) => {
+  const styles = useThemedStyles(createProfileHeaderStyles);
+
   return (
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
