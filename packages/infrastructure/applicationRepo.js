@@ -285,13 +285,19 @@ function _buildApplicationCreateData(application) {
   const createData = {
     ...applicationData,
     applicationProjectType: {
-      create: applicationProjectType.map((id) => ({ project_type_id: id })),
+      create: applicationProjectType.map((id) => ({
+        projectTypeId: { connect: { project_type_id: id } },
+      })),
     },
     applicationFaculty: {
-      create: applicationFaculty.map((id) => ({ faculty_id: id })),
+      create: applicationFaculty.map((id) => ({
+        facultyTypeId: { connect: { faculty_id: id } },
+      })),
     },
     applicationProblemType: {
-      create: applicationProblemType.map((id) => ({ problem_type_id: id })),
+      create: applicationProblemType.map((id) => ({
+        problemTypeId: { connect: { problem_type_id: id } },
+      })),
     },
   };
 
@@ -389,14 +395,22 @@ async function _createFileLinksInTx(
 
   // Case 1a: A new custom banner was uploaded. Create File and Link.
   if (bannerMeta) {
+    const {
+      storage: _1,
+      modelTarget: bannerModelTarget,
+      uuidTarget: _2,
+      purpose: bannerPurpose,
+      ...bannerData
+    } = bannerMeta;
+
     await tx.file.create({
       data: {
-        ...bannerMeta,
+        ...bannerData,
         File_Link: {
           create: {
-            modelTarget: bannerMeta.modelTarget,
+            modelTarget: bannerModelTarget,
             uuidTarget: newApplication.uuid_application,
-            purpose: bannerMeta.purpose,
+            purpose: bannerPurpose,
           },
         },
       },
@@ -438,14 +452,22 @@ async function _createFileLinksInTx(
   if (attachmentsMeta && attachmentsMeta.length > 0) {
     // One-by-one to create both File and File_Link
     for (const meta of attachmentsMeta) {
+      const {
+        storage: _1,
+        modelTarget: attachmentModelTarget,
+        uuidTarget: _2,
+        purpose: attachmentPurpose,
+        ...attachmentData
+      } = meta;
+
       await tx.file.create({
         data: {
-          ...meta,
+          ...attachmentData,
           File_Link: {
             create: {
-              modelTarget: meta.modelTarget,
+              modelTarget: attachmentModelTarget,
               uuidTarget: newApplication.uuid_application,
-              purpose: meta.purpose,
+              purpose: attachmentPurpose,
             },
           },
         },
