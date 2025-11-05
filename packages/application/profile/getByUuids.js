@@ -25,10 +25,11 @@ export async function getByUuids({ uuidUser, uuidOutsider }) {
         firstName: userData.firstName,
         middleName: userData.middleName,
         lastName: userData.lastName,
-        status: userData.userStatus,
+        status: userData.userStatus?.name || null,
         organizationName: outsiderData.organizationName,
         phoneNumber: outsiderData.phoneNumber,
         location: outsiderData.location,
+        description: outsiderData.description || null,
       },
     };
   } catch (err) {

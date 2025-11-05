@@ -36,10 +36,11 @@ export async function update({ uuidUser, uuidOutsider, body }) {
         firstName: updatedUser.firstName,
         middleName: updatedUser.middleName,
         lastName: updatedUser.lastName,
-        status: updatedUser.userStatus.name,
+        status: updatedUser.userStatus?.name || null, // se hizo nulleable
         organizationName: updatedOutsider.organizationName,
         phoneNumber: updatedOutsider.phoneNumber,
         location: updatedOutsider.location,
+        description: updatedOutsider.description || null,
       },
     };
   } catch (err) {

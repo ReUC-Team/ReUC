@@ -90,6 +90,6 @@ applicationRouter.get(
 );
 applicationRouter.get(
   "/:uuid",
-  requireRole(["admin", "professor"]),
+  requireRole(["admin", "professor", "outsider"]),
   asyncHandler(getDetailedApplicationHandler)
 );
