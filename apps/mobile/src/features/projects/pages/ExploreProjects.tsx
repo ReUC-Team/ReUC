@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import ProjectsList from '../components/ProjectsList';
-import { styles } from '../../../styles/screens/ExploreProjects.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createExploreProjectsStyles } from '../../../styles/screens/ExploreProjects.styles';
 
 const TAGS = ['FIE', 'FECAM', 'FACIMAR', 'EDUC'];
 
@@ -18,10 +19,10 @@ const mockProjects = [
     description: 'Plataforma para administrar procesos académicos',
     image: require('../../../../../web/src/assets/project2.webp'),
   },
-  // Agrega más proyectos según necesites
 ];
 
 const ExploreProjects = () => {
+  const styles = useThemedStyles(createExploreProjectsStyles);
   const [selectedTag, setSelectedTag] = useState('');
 
   return (

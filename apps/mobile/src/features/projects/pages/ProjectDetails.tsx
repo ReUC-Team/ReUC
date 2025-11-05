@@ -3,9 +3,12 @@ import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import ProjectImage from '../components/ProjectImage';
 import ProjectSummary from '../components/ProjectSummary';
 import ProjectInfoCard from '../components/ProjectInfoCard';
-import { styles } from '../../../styles/screens/ProjectDetails.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createProjectDetailsStyles } from '../../../styles/screens/ProjectDetails.styles';
 
 const ProjectDetails = () => {
+  const styles = useThemedStyles(createProjectDetailsStyles);
+
   const applicantInfo = [
     { label: 'Nombre del solicitante', value: 'Jose Joshua Rodriguez' },
     { label: 'Teléfono de contacto', value: '+52 314 166 9964' },

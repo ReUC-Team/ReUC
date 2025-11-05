@@ -3,9 +3,11 @@ import { ScrollView, View } from 'react-native';
 import ProfileHeader from '../components/ProfileHeader';
 import ProfileTabs from '../components/ProfileTabs';
 import ProfileInfo from '../components/ProfileInfo';
-import { styles } from '../../../styles/screens/ProfileScreen.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createProfileScreenStyles } from '../../../styles/screens/ProfileScreen.styles';
 
 const ProfileScreen = () => {
+  const styles = useThemedStyles(createProfileScreenStyles);
   const [activeTab, setActiveTab] = useState('overview');
 
   const handleEditPress = () => {

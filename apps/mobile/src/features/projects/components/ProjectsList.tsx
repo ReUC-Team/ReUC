@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, TextInput, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ProjectCard from './ProjectCard';
-import { styles } from '../../../styles/components/projects/ProjectsList.styles';
-import { useThemedPalette } from '../../../hooks/useThemedStyles';
+import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles';
+import { createProjectsListStyles } from '../../../styles/components/projects/ProjectsList.styles';
 
 interface Project {
   id: string;
@@ -21,8 +21,9 @@ const ProjectsList: React.FC<ProjectsListProps> = ({
   projects,
   showSearch = true,
 }) => {
-  const [search, setSearch] = useState('');
+  const styles = useThemedStyles(createProjectsListStyles);
   const palette = useThemedPalette();
+  const [search, setSearch] = useState('');
 
   const filteredProjects = projects.filter((project) =>
     project.title.toLowerCase().includes(search.toLowerCase())

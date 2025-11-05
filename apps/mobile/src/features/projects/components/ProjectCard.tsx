@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { styles } from '../../../styles/components/projects/ProjectCard.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createProjectCardStyles } from '../../../styles/components/projects/ProjectCard.styles';
 
 interface ProjectCardProps {
   title: string;
@@ -19,6 +20,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   isFavorite = false,
   onFavoriteToggle,
 }) => {
+  const styles = useThemedStyles(createProjectCardStyles);
   const [favorite, setFavorite] = useState(isFavorite);
   const navigation = useNavigation<any>();
 

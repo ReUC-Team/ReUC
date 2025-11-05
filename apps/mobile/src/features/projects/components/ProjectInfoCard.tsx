@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
-import { styles } from '../../../styles/components/projects/ProjectInfoCard.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createProjectInfoCardStyles } from '../../../styles/components/projects/ProjectInfoCard.styles';
 
 interface InfoItem {
   label: string;
@@ -13,6 +14,8 @@ interface ProjectInfoCardProps {
 }
 
 const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ title, items }) => {
+  const styles = useThemedStyles(createProjectInfoCardStyles);
+
   return (
     <View style={styles.container}>
       {title && <Text style={styles.title}>{title}</Text>}

@@ -1,11 +1,11 @@
 // apps/mobile/src/features/auth/services/authServiceNative.ts
 
-// url de env
 import { Platform } from "react-native";
 import { API_URL } from '@env'
 import { showError } from '../utils/toast'
 
 const userAgent = `ReUC/1.0 (${Platform.OS})`
+const MOBILE_API_KEY = 'dev_mobile_key_12345' // new mobile API key
 
 export interface RegisterData {
   email: string
@@ -20,7 +20,8 @@ export async function register(data: RegisterData) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      "User-Agent": userAgent,
+      'User-Agent': userAgent,
+      'x-api-key': MOBILE_API_KEY, 
     },
     credentials: 'include',
     body: JSON.stringify(data),
@@ -32,7 +33,6 @@ export async function register(data: RegisterData) {
       res.status !== 422
         ? bodyRes.err
         : 'Hubo un problema en el registro'
-    // Muestro alerta antes de devolver el objeto
     showError(msg)
     return { success: false, err: msg }
   }
@@ -45,7 +45,8 @@ export async function login(email: string, password: string) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      "User-Agent": userAgent,
+      'User-Agent': userAgent,
+      'x-api-key': MOBILE_API_KEY, 
     },
     credentials: 'include',
     body: JSON.stringify({ email, password }),
@@ -57,7 +58,6 @@ export async function login(email: string, password: string) {
       res.status !== 422
         ? bodyRes.err
         : 'Hubo un problema en el login'
-    // Muestro alerta antes de devolver el objeto
     showError(msg)
     return { success: false, err: msg }
   }
@@ -68,7 +68,10 @@ export async function login(email: string, password: string) {
 export async function logout() {
   const res = await fetch(`${API_URL}/auth/logout`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'x-api-key': MOBILE_API_KEY, 
+    },
     credentials: 'include',
   })
 

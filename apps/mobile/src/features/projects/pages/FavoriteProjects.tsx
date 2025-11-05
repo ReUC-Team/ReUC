@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import ProjectsList from '../components/ProjectsList';
-import { styles } from '../../../styles/screens/FavoriteProjects.styles';
+import { useThemedStyles } from '../../../hooks/useThemedStyles';
+import { createFavoriteProjectsStyles } from '../../../styles/screens/FavoriteProjects.styles';
 
 const mockProjects = [
   {
@@ -13,6 +14,8 @@ const mockProjects = [
 ];
 
 const FavoriteProjects = () => {
+  const styles = useThemedStyles(createFavoriteProjectsStyles);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
