@@ -1,7 +1,7 @@
 {
   "get": {
     "summary": "(Web - Mobile) Get current user profile",
-    "description": "Fetches the combined user and outsider profile details for the authenticated **\"outsider\"** user.",
+    "description": "Fetches the combined user and the specific role profile data.",
     "tags": ["Profile"],
     "security": [
       {

@@ -1,7 +1,7 @@
 {
   "get": {
     "summary": "(Web - Mobile) Check profile completion status",
-    "description": "Checks if the authenticated **\"outsider\"** user's profile has all required fields filled.",
+    "description": "Checks if the authenticated role user's profile has all required fields filled.",
     "tags": ["Profile"],
     "security": [
       {

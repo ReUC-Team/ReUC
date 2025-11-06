@@ -1,7 +1,7 @@
 {
   "get": {
     "summary": "(Web - Mobile) Explore available applications",
-    "description": "Retrieves a paginated list of applications, optionally filtered by faculty. Requires **\"outsider\"** role.",
+    "description": "Retrieves a paginated list of applications, optionally filtered by faculty.\n - Requires **\"outsider\"** _or_ **\"professor\"** role.",
     "tags": ["Application"],
     "security": [{ "BearerAuth": [] }],
     "parameters": [
