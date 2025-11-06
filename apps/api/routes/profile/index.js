@@ -9,7 +9,10 @@ import {
 } from "./handlers.js";
 
 export const profileRouter = express.Router();
-profileRouter.use(authMiddleware, requireRole("outsider"));
+profileRouter.use(
+  authMiddleware,
+  requireRole(["outsider", "professor", "student"])
+);
 
 const csrfProtection = csurf({ cookie: true });
 
