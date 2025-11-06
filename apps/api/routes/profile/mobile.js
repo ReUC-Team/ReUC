@@ -12,7 +12,7 @@ export const mobileProfileRouter = express.Router();
 mobileProfileRouter.use(
   requireMobileClient,
   authMiddleware,
-  requireRole("outsider")
+  requireRole(["outsider", "professor", "student", "admin"])
 );
 
 mobileProfileRouter.patch("/edit", asyncHandler(editProfileHandler));
