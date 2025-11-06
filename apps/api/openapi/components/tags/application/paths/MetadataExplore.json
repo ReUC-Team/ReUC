@@ -1,7 +1,7 @@
 {
   "get": {
     "summary": "(Web - Mobile) Get metadata for exploring applications",
-    "description": "Retrieves data needed for filtering applications, such as available faculties. Requires **\"outsider\"** role.",
+    "description": "Retrieves data needed for filtering applications, such as available faculties.",
     "tags": ["Application"],
     "security": [{ "BearerAuth": [] }],
     "responses": {
