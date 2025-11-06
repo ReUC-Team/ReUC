@@ -18,7 +18,7 @@
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true,
           "NSExceptionDomains": {
-            "192.168.100.10": {
+            "192.168.34.4": {
               "NSIncludesSubdomains": true,
               "NSExceptionAllowsInsecureHTTPLoads": true
             }
@@ -34,6 +34,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font",
+      "expo-splash-screen"
+    ]
   }
 }

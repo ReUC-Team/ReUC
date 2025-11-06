@@ -52,6 +52,7 @@ export const createMainHeaderStyles = (palette: ColorPalette) => StyleSheet.crea
     alignItems: 'center',
     backgroundColor: palette.surface,
     borderRadius: spacing.md,
+    marginBottom: spacing.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     // Añadir borde en dark mode para mejor visibilidad
