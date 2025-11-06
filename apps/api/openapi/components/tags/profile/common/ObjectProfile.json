@@ -47,13 +47,5 @@
       "nullable": true
     }
   },
-  "required": [
-    "firstName",
-    "middleName",
-    "lastName",
-    "status",
-    "organizationName",
-    "phoneNumber",
-    "location"
-  ]
+  "required": ["firstName", "middleName", "lastName", "status"]
 }

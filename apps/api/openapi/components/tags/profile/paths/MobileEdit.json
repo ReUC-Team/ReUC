@@ -1,7 +1,7 @@
 {
   "patch": {
     "summary": "(Mobile) Update current user profile",
-    "description": "Updates the profile information (user and outsider details) for the authenticated **\"outsider\"** user.",
+    "description": "Updates the profile information (user and role profile details).",
     "tags": ["Profile"],
     "security": [
       {

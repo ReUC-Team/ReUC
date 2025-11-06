@@ -16,19 +16,19 @@
     },
     "phoneNumber": {
       "type": "string",
-      "description": "User's contact phone number.",
+      "description": "User's contact phone number.\n - Required _if_ user have **outsider** role.",
       "example": "+523141234567"
     },
     "location": {
       "type": "string",
-      "description": "User's location or address.",
+      "description": "User's location or address.\n - Required _if_ user have **outsider** role.",
       "example": "Manzanillo, Colima, Mexico"
     },
     "organizationName": {
       "type": "string",
-      "description": "Name of the outsider's organization.",
+      "description": "Name of the outsider's organization.\n - Required _if_ user have **outsider** role.",
       "example": "Example Corp."
     }
   },
-  "required": ["organizationName", "phoneNumber", "location"]
+  "required": ["firstName", "middleName", "lastName"]
 }
