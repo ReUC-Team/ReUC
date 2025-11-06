@@ -3,6 +3,8 @@ import { applicationSeedData } from "./application.seed.js";
 import { facultySeedData } from "./faculty.seed.js";
 import { fileSeedData } from "./file.seed.js";
 import { outsiderSeedData } from "./outsider.seed.js";
+import { studentSeedData } from "./student.seed.js";
+import { professorSeedData } from "./professor.seed.js";
 import { problemTypeSeedData } from "./problemType.seed.js";
 import { professorRoleSeedData } from "./professorRole.seed.js";
 import { projectTypeSeedData } from "./projectType.seed.js";
@@ -82,16 +84,48 @@ const seedCoreData = async () => {
  * Seeds the database with a large amount of dummy data for testing.
  */
 async function seedDummyData() {
-  // ======================= USERS =======================
-  console.log("  - Generating dummy user and outsider data...");
-  const outsidersToCreate = await outsiderSeedData(10); // Generate 10 outsiders
+  // --- FETCH CATALOGS FIRST ---
+  console.log("  - Fetching catalog data for seeding dummy users...");
+  const allStudentStatus = await prisma.student_Status.findMany();
+  const allProfessorRoles = await prisma.professor_Role.findMany();
 
-  if (outsidersToCreate.length > 0) {
+  // ======================= USERS =======================
+  console.log(
+    "  - Generating dummy user data (outsiders, students, professors)..."
+  );
+
+  // Define limits for each role
+  const outsiderLimit = 10;
+  const studentLimit = 15;
+  const professorLimit = 5;
+
+  const [outsidersToCreate, studentsToCreate, professorsToCreate] =
+    await Promise.all([
+      outsiderSeedData(outsiderLimit),
+      studentSeedData(studentLimit, outsiderLimit, allStudentStatus),
+      professorSeedData(
+        professorLimit,
+        outsiderLimit + studentLimit,
+        allProfessorRoles
+      ),
+    ]);
+
+  const allUsersToCreate = [
+    ...outsidersToCreate,
+    ...studentsToCreate,
+    ...professorsToCreate,
+  ];
+
+  if (allUsersToCreate.length > 0) {
     await Promise.all(
-      outsidersToCreate.map((user) => prisma.user.create({ data: user }))
+      allUsersToCreate.map((user) => prisma.user.create({ data: user }))
     );
     console.log(
       `  - Created ${outsidersToCreate.length} dummy users/outsiders.`
+    );
+    console.log(`  - Created ${studentsToCreate.length} dummy users/students.`);
+    console.log(
+      `  - Created ${professorsToCreate.length} dummy users/professors.`
     );
   } else {
     console.log("  - No dummy users to create.");
