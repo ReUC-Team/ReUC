@@ -13,6 +13,14 @@ import LandingPage   from '../features/landing/pages/LandingPage'
 import LoginPage     from '../features/auth/pages/LoginPageNative'
 import RegisterPage  from '../features/auth/pages/RegisterPageNative'
 import DashboardMain from '../features/dashboard/external/pages/DashboardMain'
+import ProfileScreen from '../features/profile/pages/ProfileScreen'
+
+
+import ExploreProjects from '../features/projects/pages/ExploreProjects'
+import MyProjects from '../features/projects/pages/MyProjects'
+import FavoriteProjects from '../features/projects/pages/FavoriteProjects'
+import ProjectDetails from '../features/projects/pages/ProjectDetails'
+import RequestProject from '../features/projects/pages/RequestProject'
 
 const Stack = createNativeStackNavigator()
 
@@ -56,7 +64,6 @@ const AppNavigator: React.FC = () => (
         )}
       </Stack.Screen>
 
-    
       <Stack.Screen name="Messages">
         {() => (
           <DashboardLayout>
@@ -78,7 +85,48 @@ const AppNavigator: React.FC = () => (
       <Stack.Screen name="Profile">
         {() => (
           <DashboardLayout>
-            <View /> 
+            <ProfileScreen />
+          </DashboardLayout>
+        )}
+      </Stack.Screen>
+
+      {/* RUTAS DE PROJECTS */}
+      <Stack.Screen name="ExploreProjects">
+        {() => (
+          <DashboardLayout>
+            <ExploreProjects />
+          </DashboardLayout>
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="MyProjects">
+        {() => (
+          <DashboardLayout>
+            <MyProjects />
+          </DashboardLayout>
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="FavoriteProjects">
+        {() => (
+          <DashboardLayout>
+            <FavoriteProjects />
+          </DashboardLayout>
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="ProjectDetails">
+        {() => (
+          <DashboardLayout>
+            <ProjectDetails />
+          </DashboardLayout>
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen name="RequestProject">
+        {() => (
+          <DashboardLayout>
+            <RequestProject />
           </DashboardLayout>
         )}
       </Stack.Screen>

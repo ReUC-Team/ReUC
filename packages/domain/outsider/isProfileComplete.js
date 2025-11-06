@@ -1,7 +1,6 @@
 /**
- * Checks if an outsider's profile has all required fields filled with meaningful data.
+ * Checks if an outsider's profile has all required fields.
  * This is a business rule that defines what constitutes a "complete" profile.
- *
  * @param {object} outsider - The outsider data object.
  * @param {string} outsider.location
  * @param {string} outsider.organizationName

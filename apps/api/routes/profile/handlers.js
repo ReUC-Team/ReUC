@@ -5,11 +5,11 @@ import profile from "@reuc/application/profile/index.js";
  */
 export async function editProfileHandler(req, res) {
   const user = req.user;
-  const outsider = req.role;
+  const role = req.role;
 
   const { profile: updatedProfile } = await profile.update({
     uuidUser: user.uuid_user,
-    uuidOutsider: outsider.uuid,
+    role,
     body: req.body,
   });
 
@@ -24,11 +24,11 @@ export async function editProfileHandler(req, res) {
  */
 export async function getProfileHandler(req, res) {
   const user = req.user;
-  const outsider = req.role;
+  const role = req.role;
 
   const { profile: profileData } = await profile.getByUuids({
     uuidUser: user.uuid_user,
-    uuidOutsider: outsider.uuid,
+    role,
   });
 
   return res.status(200).json({
@@ -41,10 +41,12 @@ export async function getProfileHandler(req, res) {
  * Handles checking the completion status of an outsider's profile.
  */
 export async function getProfileStatusHandler(req, res) {
-  const outsider = req.role;
+  const user = req.user;
+  const role = req.role;
 
   const { status } = await profile.checkStatus({
-    uuidOutsider: outsider.uuid,
+    uuidUser: user.uuid_user,
+    role,
   });
 
   return res.status(200).json({

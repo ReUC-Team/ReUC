@@ -81,7 +81,7 @@ applicationRouter.post(
 );
 applicationRouter.get(
   "/explore{/:faculty}",
-  requireRole("outsider"),
+  requireRole(["outsider", "professor"]),
   asyncHandler(getExploreApplicationsHandler)
 );
 applicationRouter.get(
@@ -90,6 +90,6 @@ applicationRouter.get(
 );
 applicationRouter.get(
   "/:uuid",
-  requireRole(["admin", "professor", "outsider"]),
+  requireRole(["professor"]),
   asyncHandler(getDetailedApplicationHandler)
 );

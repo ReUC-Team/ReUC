@@ -1,7 +1,7 @@
 {
   "get": {
     "summary": "(Web - Mobile) Get a single detailed application",
-    "description": "Retrieves all public and internal details for a single application, including author, descriptions, and file attachments. Requires **\"admin\"** or **\"professor\"** role.",
+    "description": "Retrieves all public and internal details for a single application, including author, descriptions, and file attachments.\n - Requires **\"professor\"** role.",
     "tags": ["Application"],
     "security": [{ "BearerAuth": [] }],
     "parameters": [
