@@ -95,7 +95,7 @@ function _prepareBannerPayload({ selectedBannerUuid, customBannerFile }) {
   return {
     defaultBannerUuid: undefined,
     customBanner: {
-      name: customBannerFile.fieldname || "application-banner-upload",
+      name: customBannerFile.originalname || "application-banner-upload",
       file: {
         mimetype: customBannerFile.mimetype,
         buffer: customBannerFile.buffer,
@@ -118,7 +118,7 @@ function _prepareAttachmentsPayload({ attachments }) {
 
   for (const [idx, file] of attachments.entries()) {
     attachmentsPayload.push({
-      name: file.fieldname || `application-attachment${idx}-upload`,
+      name: file.originalname || `application-attachment${idx}-upload`,
       file: {
         mimetype: file.mimetype,
         buffer: file.buffer,
