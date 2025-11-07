@@ -6,6 +6,9 @@
     "security": [
       {
         "BearerAuth": []
+      },
+      {
+        "TicketAuth": []
       }
     ],
     "parameters": [

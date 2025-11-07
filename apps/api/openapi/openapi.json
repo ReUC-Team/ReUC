@@ -20,6 +20,9 @@
       },
       "CsrfAuth": {
         "$ref": "./components/securitySchemes/CsrfAuth.json"
+      },
+      "TicketAuth": {
+        "$ref": "./components/securitySchemes/TicketAuth.json"
       }
     },
 
