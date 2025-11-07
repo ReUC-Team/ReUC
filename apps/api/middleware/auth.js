@@ -113,3 +113,67 @@ export function requireRole(allowedRoles) {
     next();
   };
 }
+
+/**
+ * @description Authenticates a file request for the VIEWING context.
+ *
+ * Tries two methods in order:
+ * 1. Standard 'Authorization: Bearer' header (for clients fetching manually).
+ * 2. A 'ticket' query parameter (for <img> tags).
+ *
+ * On success, attaches the decoded payload to `req.user`.
+ * On failure, throws an ApplicationError.AuthenticationError.
+ */
+export function fileAuthMiddleware(req, res, next) {
+  try {
+    const authHeader = req.headers.authorization;
+
+    // --- Case 1: Standard 'Authorization: Bearer' token ---
+    // For mobile or JS clients that prefer to use their main access token
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+
+      const decodedPayload = session.authenticate({
+        token,
+        ip: req.ip,
+        userAgent: req.headers["user-agent"],
+        tokenConfig: TOKEN_CONFIG,
+      });
+
+      req.user = {
+        uuid_user: decodedPayload.uuid_user,
+        role: decodedPayload.role,
+      };
+
+      return next();
+    }
+
+    // --- Case 2: 'ticket' query parameter ---
+    // For <img> tags using the pre-signed URL
+    const ticket = req.query.ticket;
+    if (ticket) {
+      const { model, uuidmodel, purpose } = req.params;
+      const fileIdentifier = `file/${model}/${purpose}/${uuidmodel}`;
+
+      const decodedPayload = session.authTicket({
+        token: String(ticket),
+        fileIdentifier,
+        audience: "viewing",
+        tokenConfig: TOKEN_CONFIG,
+      });
+
+      req.user = {
+        uuid_user: decodedPayload.sub,
+      };
+
+      return next();
+    }
+
+    // --- Case 3: No credentials provided ---
+    throw new ApplicationError.AuthenticationError(
+      "Authorization is required for this file."
+    );
+  } catch (err) {
+    return next(err);
+  }
+}
