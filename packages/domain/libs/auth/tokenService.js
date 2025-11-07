@@ -39,13 +39,20 @@ export const tokenService = {
    * @param {object} config - The configuration for token verification.
    * @param {string} config.token - The JWT string to verify.
    * @param {string} config.secret - The secret key used to sign the token.
+   * @param {string} [config.audience] - (Optional) The audience to validate.
    *
    * @returns {{uuid_user: string, role: string, ip: string, ua: string}} The decoded payload from the token.
    * @throws {AuthenticationError} If the token is expired, malformed, or has an invalid signature.
    */
-  verify({ token, secret }) {
+  verify({ token, secret, audience = null }) {
     try {
-      return jwt.verify(token, secret, { algorithms: [ALGORITHM] });
+      const options = { algorithms: [ALGORITHM] };
+
+      if (audience) {
+        options.audience = audience;
+      }
+
+      return jwt.verify(token, secret, options);
     } catch (err) {
       if (err instanceof jwt.TokenExpiredError)
         throw new AuthenticationError("Token has expired.", { cause: err });
