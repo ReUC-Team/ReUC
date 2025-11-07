@@ -1,5 +1,6 @@
 import * as ApplicationError from "../errors/index.js";
 import { validateExploreQuery } from "./validators.js";
+import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
 import { getApplicationsByFaculty } from "@reuc/domain/application/getApplicationsByFaculty.js";
 import { getLinksByTargets } from "@reuc/domain/file/getLinksByTargets.js";
 import { buildFileUrl } from "@reuc/domain/file/buildFileUrl.js";
@@ -9,15 +10,25 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * Retrieves a paginated list of applications for the "Explore" page,
  * optionally filtered by faculty.
  *
- * @param {object} params
- * @param {string} [params.faculty] - The faculty name to filter by.
- * @param {number} [params.page] - The page number for pagination.
- * @param {number} [params.perPage] - The number of items per page.
+ * @param {string} uuidUser - The unique identifier for the user requesting the applications.
+ * @param {object} tokenConfig - Configuration for tokens.
+ * @param {string} tokenConfig.ticketSecret - The secret for the ticket token.
+ * @param {object} tokenConfig.ticketExpiresIn - The expiration for the new ticket token.
+ * @param {string} tokenConfig.ticketExpiresIn.viewing
+ * @param {string} tokenConfig.ticketExpiresIn.download
+ * @param {object} options
+ * @param {string} [options.faculty] - The faculty name to filter by.
+ * @param {number} [options.page] - The page number for pagination.
+ * @param {number} [options.perPage] - The number of items per page.
  *
  * @throws {ApplicationError.ValidationError} If query parameters are invalid.
  * @throws {ApplicationError.ApplicationError} For any unexpected errors.
  */
-export async function getExploreApplications({ faculty, page, perPage }) {
+export async function getExploreApplications(
+  uuidUser,
+  tokenConfig,
+  { faculty, page, perPage }
+) {
   validateExploreQuery({ faculty, page, perPage });
 
   try {
@@ -41,12 +52,27 @@ export async function getExploreApplications({ faculty, page, perPage }) {
       "BANNER"
     );
 
-    // Step 3: Use the domain helper to apply business logic
+    // Step 3: Stitch data and create ticketed URLs
     const bannerMap = new Map();
     for (const link of bannerLinks) {
-      // Only add the banner if this application ID hasn't been seen yet
       if (!bannerMap.has(link.uuidTarget)) {
-        bannerMap.set(link.uuidTarget, buildFileUrl(link));
+        // 1. Build the base path
+        const basePath = buildFileUrl(link);
+        if (!basePath) continue;
+
+        // 2. Define the resource identifier from the path
+        const fileIdentifier = basePath.substring(1);
+
+        // 3. Generate the ticket
+        const ticket = generateFileTicket({
+          uuidUser: uuidUser,
+          fileIdentifier,
+          audience: "viewing",
+          tokenConfig,
+        });
+
+        // 4. Set the final URL in the map
+        bannerMap.set(link.uuidTarget, `${basePath}?ticket=${ticket}`);
       }
     }
 
