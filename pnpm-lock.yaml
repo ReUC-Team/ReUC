@@ -6458,6 +6458,25 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@expo/metro@54.1.0':
+    dependencies:
+      metro: 0.83.2
+      metro-babel-transformer: 0.83.2
+      metro-cache: 0.83.2
+      metro-cache-key: 0.83.2
+      metro-config: 0.83.2
+      metro-core: 0.83.2
+      metro-file-map: 0.83.2
+      metro-resolver: 0.83.2
+      metro-runtime: 0.83.2
+      metro-source-map: 0.83.2
+      metro-transform-plugins: 0.83.2
+      metro-transform-worker: 0.83.2
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@expo/osascript@2.3.7':
     dependencies:
       '@expo/spawn-async': 1.7.2
@@ -9154,7 +9173,7 @@ snapshots:
       safe-buffer: 5.2.1
 
   jwt-decode@4.0.0: {}
-  
+
   keyv@4.5.4:
     dependencies:
       json-buffer: 3.0.1
