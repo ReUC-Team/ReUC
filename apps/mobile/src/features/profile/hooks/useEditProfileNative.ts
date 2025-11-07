@@ -110,13 +110,8 @@ export function useEditProfileNative(profile: any, onClose?: () => void) {
         bottomOffset: 60,
       })
 
-      // Cerrar modal/pantalla si existe
+      // Cerrar modal (ProfileScreen recargará los datos automáticamente)
       onClose?.()
-
-      // Navegar de vuelta al perfil o dashboard después de un momento
-      setTimeout(() => {
-        navigation.navigate('Profile')
-      }, 500)
 
     } catch (error: any) {
       console.error('Error updating profile:', error)

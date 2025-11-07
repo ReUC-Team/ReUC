@@ -1,23 +1,60 @@
 // apps/mobile/src/features/profile/pages/ProfileScreen.tsx
 
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { ScrollView, View, ActivityIndicator, Text } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
 import ProfileHeader from '../components/ProfileHeader'
 import ProfileTabs from '../components/ProfileTabs'
 import ProfileInfo from '../components/ProfileInfo'
 import EditProfileModal from '../components/EditProfileModal'
 import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles'
 import { createProfileScreenStyles } from '../../../styles/screens/ProfileScreen.styles'
-import { useGetProfileNative } from '../hooks/useGetProfileNative'
+import { getProfile } from '../services/profileServiceNative'
+import { AuthenticationError, getDisplayMessage } from '../../../utils/errorHandler'
+import Toast from 'react-native-toast-message'
 
 const ProfileScreen = () => {
   const styles = useThemedStyles(createProfileScreenStyles)
   const palette = useThemedPalette()
   const [activeTab, setActiveTab] = useState('overview')
   const [modalVisible, setModalVisible] = useState(false)
+  const [profile, setProfile] = useState<any>({})
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Obtener datos del perfil
-  const { profile, isLoading } = useGetProfileNative()
+  // Función para cargar el perfil
+  const loadProfile = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const data = await getProfile()
+      setProfile(data.profile || {})
+    } catch (err: any) {
+      console.error('Error loading profile:', err)
+      
+      if (err instanceof AuthenticationError) {
+        // Manejar error de autenticación si es necesario
+        Toast.show({
+          type: 'error',
+          text1: 'Error de autenticación',
+          position: 'bottom',
+        })
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: getDisplayMessage(err),
+          position: 'bottom',
+        })
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  // Recargar perfil cuando la pantalla se enfoca
+  useFocusEffect(
+    useCallback(() => {
+      loadProfile()
+    }, [loadProfile])
+  )
 
   const handleEditPress = () => {
     setModalVisible(true)
@@ -30,6 +67,12 @@ const ProfileScreen = () => {
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
+  }
+
+  const handleModalClose = () => {
+    setModalVisible(false)
+    // Recargar el perfil cuando se cierra el modal
+    loadProfile()
   }
 
   const getContentForTab = () => {
@@ -80,7 +123,7 @@ const ProfileScreen = () => {
       {/* Modal de edición */}
       <EditProfileModal
         visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+        onClose={handleModalClose}
         profile={profile}
       />
     </View>
