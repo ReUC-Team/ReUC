@@ -60,4 +60,15 @@ export const createRequestProjectStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       color: palette.errorText,
     },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: palette.background,
+    },
+    loadingText: {
+      marginTop: spacing.md,
+      fontSize: typography.base,
+      color: palette.textSecondary,
+    },
   });

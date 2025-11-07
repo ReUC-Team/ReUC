@@ -1,11 +1,16 @@
 // apps/mobile/src/features/auth/utils/fetchWithAuth.ts
 
+import { Platform } from 'react-native'
 import { tokenStorage } from './tokenStorage'
 import { refreshAccessToken } from '../pages/authServiceNative'
+
+const userAgent = `ReUC/1.0 (${Platform.OS})`
 
 /**
  * Wrapper de fetch que incluye automáticamente el accessToken
  * y refresca el token si recibe un 401
+ * 
+ * CRÍTICO: Incluye User-Agent para evitar session mismatch con el backend
  */
 export async function fetchWithAuth(
   url: string,
@@ -18,6 +23,7 @@ export async function fetchWithAuth(
   let response = await fetch(url, {
     ...options,
     headers: {
+      'User-Agent': userAgent,
       ...options.headers,
       'Authorization': accessToken ? `Bearer ${accessToken}` : '',
     },
@@ -33,6 +39,7 @@ export async function fetchWithAuth(
       response = await fetch(url, {
         ...options,
         headers: {
+          'User-Agent': userAgent,
           ...options.headers,
           'Authorization': `Bearer ${newAccessToken}`,
         },
