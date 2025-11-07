@@ -1,33 +1,33 @@
 // apps/mobile/src/components/MainHeader.tsx
 
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { createMainHeaderStyles } from '../styles/components/header/MainHeader.styles'
 import { useThemedStyles, useThemedPalette } from '../hooks/useThemedStyles'
 import LeftSidebar from './LeftSidebar'
 import RightSidebar from './RightSidebar'
-import avatar from '../assets/avatar.png' 
+import Avatar from './Avatar'
+import { useProfile } from '../context/ProfileContext'
 
 type Props = {
   onSearchChange?: (text: string) => void
   searchValue?: string
   onNavigate?: (screen: string) => void
-  userEmail?: string
-  userAvatar?: any
 }
 
 export default function MainHeader({
   onSearchChange,
   searchValue,
   onNavigate,
-  userEmail,
-  userAvatar,
 }: Props) {
   const styles = useThemedStyles(createMainHeaderStyles)
   const palette = useThemedPalette()
   const [isSidebarVisible, setIsSidebarVisible] = useState(false)
   const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(false)
+  
+  // Usar el ProfileContext para obtener datos del perfil
+  const { profile, isLoading: isLoadingProfile } = useProfile()
 
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible)
@@ -36,6 +36,12 @@ export default function MainHeader({
   const toggleRightSidebar = () => {
     setIsRightSidebarVisible(!isRightSidebarVisible)
   }
+
+  // Obtener datos del perfil con valores por defecto
+  const firstName = profile?.firstName || 'ReUC'
+  const middleName = profile?.middleName || ''
+  const lastName = profile?.lastName || ''
+  const userEmail = profile?.email || 'usuario@ejemplo.com'
 
   return (
     <>
@@ -60,14 +66,16 @@ export default function MainHeader({
             style={styles.profileBtn}
             onPress={toggleRightSidebar}
           >
-            <Image
-              source={userAvatar || avatar}
-              style={{
-                width: styles.profileBtn.width,
-                height: styles.profileBtn.height,
-                borderRadius: styles.profileBtn.borderRadius,
-              }}
-            />
+            {isLoadingProfile ? (
+              <ActivityIndicator size="small" color={palette.primary} />
+            ) : (
+              <Avatar
+                firstName={firstName}
+                middleName={middleName}
+                lastName={lastName}
+                size="small"
+              />
+            )}
           </TouchableOpacity>
         </View>
 
@@ -98,7 +106,9 @@ export default function MainHeader({
         onClose={() => setIsRightSidebarVisible(false)}
         onNavigate={onNavigate}
         userEmail={userEmail}
-        userAvatar={userAvatar}
+        firstName={firstName}
+        middleName={middleName}
+        lastName={lastName}
       />
     </>
   )

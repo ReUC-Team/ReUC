@@ -1,11 +1,11 @@
 // apps/mobile/App.tsx
 import 'react-native-gesture-handler'
 import React, { useEffect, useState, useCallback } from 'react'
-import { View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { ThemeProvider } from './src/context/ThemeContext'
+import { ProfileProvider } from './src/context/ProfileContext'   // ← IMPORTADO
 import AppNavigator from './src/routes/AppNavigator'
 import Toast from 'react-native-toast-message'
 
@@ -18,13 +18,10 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
-        // Cargar fuentes
         await Font.loadAsync({
           'OpenDyslexic-Regular': require('./src/assets/fonts/OpenDyslexic3-Regular.ttf'),
           'OpenDyslexic-Bold': require('./src/assets/fonts/OpenDyslexic3-Bold.ttf')
         })
-      } catch (e) {
-        console.warn(e)
       } finally {
         setAppIsReady(true)
       }
@@ -46,8 +43,10 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <ThemeProvider>
-        <AppNavigator />
-        <Toast />
+        <ProfileProvider> {/* ← PROVEEDOR AGREGADO AQUÍ */}
+          <AppNavigator />
+          <Toast />
+        </ProfileProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   )
