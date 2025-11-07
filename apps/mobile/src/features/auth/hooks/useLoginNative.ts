@@ -1,47 +1,75 @@
-// apps/mobile/src/features/auth/hooks/useLoginNative.ts
-
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { login } from '../pages/authServiceNative'
+import { tokenStorage } from '../utils/tokenStorage' 
+import { 
+  ValidationError, 
+  AuthenticationError,
+  processFieldErrors, 
+  getDisplayMessage 
+} from '../../../utils/errorHandler'
 import { showError } from '../utils/toast'
 
 export default function useLoginNative() {
   const [form, setForm] = useState({ email: '', password: '' })
   const [isLoading, setIsLoading] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, any>>({})
   const nav = useNavigation<any>()
 
-  const handleChange = (field: 'email'|'password', value: string) => {
+  const handleChange = (field: 'email' | 'password', value: string) => {
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
+
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async () => {
     if (isLoading) return
     setIsLoading(true)
-
-    if (!form.email.trim()) {
-      showError('El correo es obligatorio')
-      setIsLoading(false)
-      return
-    }
-    if (!form.password) {
-      showError('La contraseña es obligatoria')
-      setIsLoading(false)
-      return
-    }
+    setFieldErrors({})
 
     try {
-      const res = await login(form.email, form.password)
-      if (!res.success) {
-        showError(res.err || 'Error al iniciar sesión')
+      const { user } = await login(form.email, form.password)
+      
+      // ← AGREGAR: Verificar tokens guardados
+      const accessToken = await tokenStorage.getAccessToken()
+      const refreshToken = await tokenStorage.getRefreshToken()
+      console.log('✅ Access Token:', accessToken ? 'Guardado' : 'NO guardado')
+      console.log('✅ Refresh Token:', refreshToken ? 'Guardado' : 'NO guardado')
+      
+      nav.navigate('Dashboard')
+
+    } catch (error: any) {
+      console.error('Login error:', error)
+
+      if (error instanceof ValidationError) {
+        if (error.details && error.details.length > 0) {
+          const processedErrors = processFieldErrors(error.details)
+          setFieldErrors(processedErrors)
+          showError('Por favor revisa los campos marcados')
+        } else {
+          showError(getDisplayMessage(error))
+        }
+      } else if (error instanceof AuthenticationError) {
+        showError('Credenciales incorrectas. Verifica tu correo y contraseña.')
       } else {
-        nav.navigate('Dashboard')
+        showError(getDisplayMessage(error))
       }
-    } catch (e: any) {
-      showError(e.message || 'Algo salió mal')
     } finally {
       setIsLoading(false)
     }
   }
 
-  return { form, handleChange, handleSubmit, isLoading }
+  return { 
+    form, 
+    isLoading, 
+    fieldErrors,
+    handleChange, 
+    handleSubmit 
+  }
 }
