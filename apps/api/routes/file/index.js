@@ -1,5 +1,5 @@
 import express from "express";
-import { fileAuthMiddleware } from "../../middleware/auth.js";
+import { authFileTicketMiddleware } from "../../middleware/auth.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import { getPublicAssetHandler, getFileHandler } from "./handlers.js";
 
@@ -9,6 +9,6 @@ fileRouter.get("/public/:uuid", asyncHandler(getPublicAssetHandler));
 
 fileRouter.get(
   "/:model/:purpose/:uuidmodel",
-  fileAuthMiddleware,
+  authFileTicketMiddleware,
   asyncHandler(getFileHandler)
 );

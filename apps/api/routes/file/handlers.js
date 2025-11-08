@@ -1,5 +1,6 @@
 import fs from "fs";
 import { promises as fsPromises } from "fs";
+import { getFileRule } from "@reuc/file-storage/shared/ruleUtils.js";
 import file from "@reuc/application/file/index.js";
 import * as ApplicationError from "@reuc/application/errors/index.js";
 
@@ -29,11 +30,24 @@ export async function getPublicAssetHandler(req, res) {
 export async function getFileHandler(req, res) {
   const { model, uuidmodel, purpose } = req.params;
 
+  const rule = ensureFileRuleExists(model, purpose);
+
   const { file: fileData } = await file.getFile({
     modelTarget: model,
     uuidTarget: uuidmodel,
     purpose,
   });
+
+  // Set the 'Content-Disposition' header based on the rule.
+  if (rule.context === "download") {
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${fileData.originalName}"`
+    );
+  } else {
+    // "viewing" context
+    res.setHeader("Content-Disposition", "inline");
+  }
 
   await ensureFileExists(fileData.storedPath);
 
@@ -89,4 +103,28 @@ async function ensureFileExists(filePath) {
       "The requested file asset is no longer available."
     );
   }
+}
+
+/**
+ * Checks if the file rule exists on file-storage module and throws a NotFoundError if not.
+ * This should never happen if the authFileTicketMiddleware ran, but as a safeguard
+ * @private
+ */
+async function ensureFileRuleExists(model, purpose) {
+  const rule = getFileRule(model, purpose);
+
+  if (!rule || !rule.context) {
+    throw new ApplicationError.ValidationError(
+      `File purpose '${purpose}' is not available for the model '${model}'.`,
+      {
+        details: {
+          rule: "invalid_model_purpose_combination",
+          modelTarget: model,
+          purpose,
+        },
+      }
+    );
+  }
+
+  return rule;
 }
