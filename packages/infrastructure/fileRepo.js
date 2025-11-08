@@ -78,18 +78,32 @@ export const fileRepo = {
    * @param {string} modelTarget - The name of the model.
    * @param {string} uuidTarget - The UUID of the model related.
    * @param {string} purpose - The purpose of the file linked to the model.
+   * @param {string} [uuidFile] - The UUID of the specific file (required for "many" cardinality).
    *
    * @throws {DatabaseError} For other unexpected errors.
    * @throws {InfrastructureError} For other unexpected errors.
    */
-  async getFileByTarget(modelTarget, uuidTarget, purpose) {
+  async getFileByTarget(
+    modelTarget,
+    uuidTarget,
+    purpose,
+    uuidFile = undefined
+  ) {
+    const whereClause = {
+      modelTarget,
+      uuidTarget,
+      purpose,
+    };
+
+    if (uuidFile) {
+      whereClause.file = {
+        uuid_file: uuidFile,
+      };
+    }
+
     try {
       const link = await db.file_Link.findFirst({
-        where: {
-          modelTarget,
-          uuidTarget,
-          purpose,
-        },
+        where: whereClause,
         select: {
           file: {
             select: {
@@ -176,6 +190,7 @@ export const fileRepo = {
           uuidTarget: true,
           file: {
             select: {
+              uuid_file: true,
               originalName: true,
               fileSize: true,
               mimetype: true,

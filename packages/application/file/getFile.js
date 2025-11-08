@@ -10,16 +10,27 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @param {string} params.modelTarget - The name of the target model (e.g., "APPLICATION").
  * @param {string} params.uuidTarget - The UUID of the target entity.
  * @param {string} params.purpose - The purpose of the file link (e.g., "BANNER").
+ * @param {string} [params.uuidFile] - The UUID of the specific file (required for "many" cardinality).
  *
  * @throws {ApplicationError.ValidationError} If the input parameters are invalid.
  * @throws {ApplicationError.NotFoundError} If the domain layer reports that the file link was not found.
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
-export async function getFile({ modelTarget, uuidTarget, purpose }) {
-  validateGetFileQuery({ modelTarget, uuidTarget, purpose });
+export async function getFile({
+  modelTarget,
+  uuidTarget,
+  purpose,
+  uuidFile = undefined,
+}) {
+  validateGetFileQuery({ modelTarget, uuidTarget, purpose, uuidFile });
 
   try {
-    const fileData = await getFileByTarget(modelTarget, uuidTarget, purpose);
+    const fileData = await getFileByTarget(
+      modelTarget,
+      uuidTarget,
+      purpose,
+      uuidFile
+    );
 
     return { file: fileData };
   } catch (err) {

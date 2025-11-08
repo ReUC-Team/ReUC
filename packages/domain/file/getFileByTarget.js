@@ -7,16 +7,23 @@ import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
  * @param {string} modelTarget - The name of the target model (e.g., "APPLICATION").
  * @param {string} uuidTarget - The UUID of the target entity.
  * @param {string} purpose - The purpose of the file link (e.g., "BANNER").
+ * @param {string} [uuidFile] - The UUID of the specific file (required for "many" cardinality).
  *
  * @throws {DomainError.NotFoundError} If no file link is found.
  * @throws {DomainError.DomainError} For any unexpected errors.
  */
-export async function getFileByTarget(modelTarget, uuidTarget, purpose) {
+export async function getFileByTarget(
+  modelTarget,
+  uuidTarget,
+  purpose,
+  uuidFile = undefined
+) {
   try {
     const file = await fileRepo.getFileByTarget(
       modelTarget,
       uuidTarget,
-      purpose
+      purpose,
+      uuidFile
     );
 
     if (!file) {

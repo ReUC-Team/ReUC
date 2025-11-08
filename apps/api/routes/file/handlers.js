@@ -27,7 +27,7 @@ export async function getPublicAssetHandler(req, res) {
  * Handles serving a protected file based on its model relationship.
  */
 export async function getFileHandler(req, res) {
-  const { model, uuidmodel, purpose } = req.params;
+  const { model, uuidmodel, purpose, uuidfile } = req.params;
 
   const rule = ensureFileRuleExists(model, purpose);
 
@@ -35,6 +35,7 @@ export async function getFileHandler(req, res) {
     modelTarget: model,
     uuidTarget: uuidmodel,
     purpose,
+    uuidFile: uuidfile,
   });
 
   // Set the 'Content-Disposition' header based on the rule.
