@@ -2,7 +2,7 @@
   "type": "object",
   "description": "A single file attachment.",
   "properties": {
-    "url": {
+    "downloadUrl": {
       "type": "string",
       "format": "uri-relative",
       "description": "The relative URL path to download the attachment.",
