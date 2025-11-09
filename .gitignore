@@ -55,3 +55,9 @@ apps/mobile/.DS_Store
 
 # For local not to be commited files.
 *.local.js
+
+# ignore all the files saved in the server by the app
+**/file-storage/storage/
+
+# git rm --cached -r file-storage/storage
+# git commit -m "Stop tracking file-storage/storage"
