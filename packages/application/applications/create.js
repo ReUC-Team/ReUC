@@ -36,12 +36,20 @@ export async function create({
   customBannerFile,
   attachments,
 }) {
-  const filteredProblemType = (body.problemType || []).filter(
-    (id) => id !== "otro"
-  );
+  const filteredProblemType = Array.isArray(body.problemType)
+    ? body.problemType.filter((id) => id !== "otro")
+    : body.problemType === "otro"
+    ? []
+    : body.problemType;
+
   const bodyForValidation = { ...body, problemType: filteredProblemType };
 
-  validateCreationPayload(bodyForValidation, customBannerFile, attachments);
+  validateCreationPayload(
+    uuidAuthor,
+    bodyForValidation,
+    customBannerFile,
+    attachments
+  );
 
   const { selectedBannerUuid, problemType, ...applicationData } = body;
   applicationData.problemType = filteredProblemType;

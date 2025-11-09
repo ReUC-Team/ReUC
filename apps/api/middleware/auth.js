@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import config from "../config/index.js";
 import session from "@reuc/application/auth/index.js";
-import { getFileRule } from "@reuc/file-storage/shared/ruleUtils.js";
 import * as ApplicationError from "@reuc/application/errors/index.js";
 
 const MOBILE_API_KEY = config.mobileApiKey;
