@@ -170,7 +170,7 @@ function _normalizeFiles(uuidUser, tokenConfig, fileLinks) {
       });
 
       return {
-        url: `${basePath}?ticket=${ticket}`,
+        downloadUrl: `${basePath}?ticket=${ticket}`,
         name: link.file.originalName,
         size: link.file.fileSize,
         type: link.file.mimetype,
