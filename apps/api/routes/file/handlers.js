@@ -1,6 +1,5 @@
 import fs from "fs";
 import { promises as fsPromises } from "fs";
-import { getFileRule } from "../../../../packages/file-storage/shared/ruleUtils.js";
 import file from "@reuc/application/file/index.js";
 import * as ApplicationError from "@reuc/application/errors/index.js";
 
