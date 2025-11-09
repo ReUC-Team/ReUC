@@ -1,7 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
-import pdfIcon from '@/assets/icons/pdf.png'
-import docIcon from '@/assets/icons/doc.png'
-import zipIcon from '@/assets/icons/zip.png'
+import pdfIcon from '@/assets/icons/pdf.svg'
+import docIcon from '@/assets/icons/doc.svg'
+import zipIcon from '@/assets/icons/zip.svg'
+import excelIcon from '@/assets/icons/excel.svg'           
+import powerpointIcon from '@/assets/icons/powerpoint.svg' 
+import imageIcon from '@/assets/icons/image.svg'           
+import videoIcon from '@/assets/icons/video.svg'           
+import audioIcon from '@/assets/icons/audio.svg'           
+import textIcon from '@/assets/icons/text.svg'             
+import fileIcon from '@/assets/icons/file.svg'           
 import useFormProjectMetadata from "../hooks/useFormProjectMetadata"
 
 export default function RequestProjectForm({ 
@@ -59,11 +66,15 @@ export default function RequestProjectForm({
   // ========== ATTACHMENTS HANDLERS ==========
   const handleAttachmentsChange = (e) => {
     if (e.target.files) {
-      const files = Array.from(e.target.files)
+      const newFiles = Array.from(e.target.files)
+      const currentFiles = form.attachments || []
       
-      // Validar cantidad (máx 5)
-      if (files.length > 5) {
-        alert('Máximo 5 archivos adjuntos permitidos')
+      // Combinar archivos existentes con nuevos
+      const combinedFiles = [...currentFiles, ...newFiles]
+      
+      // Validar cantidad total (máx 5)
+      if (combinedFiles.length > 5) {
+        alert(`Solo puedes adjuntar máximo 5 archivos. Actualmente tienes ${currentFiles.length} archivo(s). Puedes agregar ${5 - currentFiles.length} más.`)
         e.target.value = ''
         return
       }
@@ -72,10 +83,13 @@ export default function RequestProjectForm({
       handleChange({
         target: {
           name: "attachments",
-          files: files,
+          files: combinedFiles, // ← Enviar archivos combinados
           type: "file"
         }
       })
+      
+      // Limpiar el input para permitir seleccionar los mismos archivos de nuevo
+      e.target.value = ''
     }
   }
 
@@ -83,22 +97,46 @@ export default function RequestProjectForm({
     // Usar handleRemoveAttachment del hook
     handleRemoveAttachment(index)
     
-    // Actualizar el input file para reflejar el cambio
+    // Limpiar el input file después de remover
     if (attachmentsInputRef.current) {
-      const dt = new DataTransfer()
-      form.attachments.filter((_, i) => i !== index).forEach(file => dt.items.add(file))
-      attachmentsInputRef.current.files = dt.files
+      attachmentsInputRef.current.value = ''
     }
   }
 
   // ========== HELPERS ==========
-  const getFileIcon = (file) => {
-    if (file.type.startsWith('image/')) return URL.createObjectURL(file)
-    if (file.type === 'application/pdf') return pdfIcon
-    if (file.type.includes('word') || file.type.includes('document')) return docIcon
-    if (file.type.includes('zip')) return zipIcon
-    return null
-  }
+const getFileIcon = (file) => {
+  const mimeType = file.type
+  
+  // Imágenes (mostrar preview)
+  if (mimeType.startsWith('image/')) return URL.createObjectURL(file)
+  
+  // PDF
+  if (mimeType === 'application/pdf') return pdfIcon
+  
+  // Word
+  if (mimeType.includes('word') || mimeType.includes('document')) return docIcon
+  
+  // Excel
+  if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return excelIcon
+  
+  // PowerPoint
+  if (mimeType.includes('powerpoint') || mimeType.includes('presentation')) return powerpointIcon
+  
+  // ZIP/RAR
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('compressed')) return zipIcon
+  
+  // Video
+  if (mimeType.startsWith('video/')) return videoIcon
+  
+  // Audio
+  if (mimeType.startsWith('audio/')) return audioIcon
+  
+  // Texto
+  if (mimeType.startsWith('text/')) return textIcon
+  
+  // Por defecto
+  return fileIcon
+}
 
   const getShortFileName = (file) => {
     if (file.name.length <= 25) return file.name
@@ -377,23 +415,40 @@ export default function RequestProjectForm({
           Archivos adjuntos <span className="text-sm text-gray-500">(Opcional, máximo 5 archivos)</span>
         </label>
 
+        {/* Indicador de archivos adjuntados */}
+        <div className="flex items-center justify-between bg-gray-100 p-3 rounded-lg">
+          <span className="text-sm text-gray-700">
+            Archivos adjuntados: <strong>{form.attachments?.length || 0} / 5</strong>
+          </span>
+          {form.attachments && form.attachments.length > 0 && (
+            <span className="text-xs text-lime-600 font-medium">
+              Puedes agregar {5 - form.attachments.length} más
+            </span>
+          )}
+        </div>
+
         {/* Lista de attachments */}
         {form.attachments && form.attachments.length > 0 && (
           <div className="space-y-2">
             {form.attachments.map((file, index) => (
               <div key={index} className="flex items-center p-2 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex-shrink-0 h-12 w-12 flex items-center justify-center bg-gray-100 rounded">
-                  {getFileIcon(file) ? (
-                    <img 
-                      src={getFileIcon(file)} 
-                      alt="Icono" 
-                      className={`${file.type.startsWith('image/') ? 'h-full w-full object-cover rounded' : 'h-8 w-8'}`}
-                    />
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  )}
+                  {(() => {
+                    const icon = getFileIcon(file);
+                    const isImage = file.type.startsWith('image/');
+                    
+                    return icon ? (
+                      <img 
+                        src={icon} 
+                        alt={file.name}
+                        className={isImage ? 'h-full w-full object-cover rounded' : 'h-8 w-8 object-contain'}
+                      />
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    );
+                  })()}
                 </div>
                 <div className="ml-3 flex-1">
                   <p className="text-sm font-medium text-gray-700">{getShortFileName(file)}</p>
@@ -420,10 +475,11 @@ export default function RequestProjectForm({
           onChange={handleAttachmentsChange}
           type="file"
           multiple
-          accept="image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,text/plain"
+          accept="image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,text/plain,video/*,audio/*"
           className={`w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-lime-500 ${
             fieldErrors?.attachments ? 'border-red-500' : 'border-gray-300'
           }`}
+            disabled={form.attachments?.length >= 5} // Deshabilitar si ya hay 5 archivos
         />
         <p className="text-sm text-gray-500">
           Formatos permitidos: Imágenes, PDF, Word, PowerPoint, Excel, ZIP, TXT

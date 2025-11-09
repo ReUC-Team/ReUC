@@ -52,10 +52,11 @@ export async function exploreApplications(facultyId = null, page = 1, limit = 9)
   const records = response.data.applications.records;
   const paginationData = response.data.applications.metadata.pagination;
 
-  // Procesar aplicaciones: convertir URLs relativas a absolutas
   const applications = records.map((app) => ({
     ...app,
-    bannerUrl: app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+    bannerUrl: app.bannerUrl?.startsWith('http') 
+      ? app.bannerUrl 
+      : app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
   }));
 
   return {
@@ -80,11 +81,12 @@ export async function getCreateMetadata() {
 
   const metadata = response.data.metadata;
   
-  // Convertir URLs de banners a absolutas
   if (metadata.defaultBanners) {
     metadata.defaultBanners = metadata.defaultBanners.map((banner) => ({
       ...banner,
-      url: `${API_URL}${banner.url}`,
+      url: banner.url?.startsWith('http') 
+        ? banner.url 
+        : `${API_URL}${banner.url}`,
     }));
   }
 
@@ -100,8 +102,6 @@ export async function getCreateMetadata() {
 export async function createApplication(formData) {
   const csrfToken = await getCSRFToken();
 
-  // NO establecer Content-Type cuando se envía FormData
-  // El navegador lo hará automáticamente con el boundary correcto
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/application/create`,
     {
@@ -109,7 +109,7 @@ export async function createApplication(formData) {
       headers: {
         "csrf-token": csrfToken,
       },
-      body: formData, // Enviar FormData directamente
+      body: formData,
     }
   );
 
@@ -150,8 +150,6 @@ export async function getApplicationDetails(uuid) {
 
   const app = response.data.application;
 
-
-  // Mapear la estructura del backend a la estructura esperada por el frontend
   return {
     // Información básica del proyecto
     title: app.details?.title || 'Sin título',
@@ -161,20 +159,24 @@ export async function getApplicationDetails(uuid) {
     // Fechas
     dueDate: app.details?.deadline,
     createdAt: app.createdAt,
-    
-    // Estado (asumiendo que no viene en la respuesta actual)
     status: app.status || 'pending',
     
-    // Banner
-    bannerUrl: app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+    // Banner con verificación de URL absoluta
+    bannerUrl: app.bannerUrl?.startsWith('http') 
+      ? app.bannerUrl 
+      : app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
     
-    // Adjuntos
+    // Usar el nombre original del archivo
     attachments: (app.attachments || []).map((a) => ({
-      ...a,
-      url: `${API_URL}${a.url}`,
+      downloadUrl: a.downloadUrl?.startsWith('http') 
+        ? a.downloadUrl 
+        : `${API_URL}${a.downloadUrl}`,
+      name: a.name, // ← Este es el nombre ORIGINAL del archivo
+      size: a.size,
+      type: a.type,
     })),
     
-    // Mapear author → outsider (para mantener compatibilidad con el componente)
+    // Información del autor
     outsider: {
       firstName: app.author?.fullName?.split(' ')[0] || 'No especificado',
       lastName: app.author?.fullName?.split(' ').slice(1).join(' ') || '',
@@ -184,7 +186,7 @@ export async function getApplicationDetails(uuid) {
       location: app.author?.location || 'No especificado',
     },
     
-    // Tomar la primera facultad del array (si solo se muestra una)
+    // Facultad
     faculty: app.details?.faculties?.length > 0 
       ? { 
           name: app.details.faculties[0], 
@@ -192,9 +194,106 @@ export async function getApplicationDetails(uuid) {
         }
       : null,
     
-    // Arrays directos
+    // Arrays
     faculties: app.details?.faculties || [],
     projectTypes: app.details?.projectTypes || [],
     problemTypes: app.details?.problemTypes || [],
   };
+}
+
+/**
+ * Descarga un archivo individual y lo abre en nueva pestaña o descarga según el tipo
+ * @param {string} downloadUrl - URL del archivo con ticket
+ * @param {string} fileName - Nombre del archivo
+ * @param {string} mimeType - Tipo MIME del archivo
+ * @param {boolean} forceDownload - Si es true, fuerza la descarga en lugar de abrir
+ * @returns {Promise<void>}
+ */
+export async function downloadFile(downloadUrl, fileName, mimeType, forceDownload = false) {
+  try {
+    
+    // Agregar credentials: 'include' para enviar cookies de sesión
+    const response = await fetch(downloadUrl, {
+      method: 'GET',
+      credentials: 'include', // Envía cookies de autenticación
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error ${response.status}: ${response.statusText || errorText}`);
+    }
+
+    const blob = await response.blob();
+
+    // Si es PDF y NO se fuerza la descarga, abrir en nueva pestaña
+    if (mimeType === 'application/pdf' && !forceDownload) {
+      const objectUrl = URL.createObjectURL(blob);
+      const newWindow = window.open(objectUrl, '_blank');
+      
+      if (!newWindow) {
+        throw new Error('No se pudo abrir la ventana. Verifica que tu navegador permita ventanas emergentes.');
+      }
+      
+      // Limpiar después de un tiempo para liberar memoria
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+      return;
+    }
+
+    // Para otros archivos o descarga forzada, descargar con nombre original
+    const link = document.createElement('a');
+    const objectUrl = URL.createObjectURL(blob);
+    
+    link.href = objectUrl;
+    link.download = fileName; // Usa el nombre ORIGINAL
+    link.style.display = 'none';
+    
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpiar
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(objectUrl);
+    }, 100);
+    
+  } catch (error) {
+    throw new Error(`No se pudo descargar el archivo: ${error.message}`);
+  }
+}
+
+/**
+ * Descarga todos los archivos adjuntos de un proyecto
+ * @param {Array} attachments - Array de objetos con downloadUrl, name, type
+ * @returns {Promise<{successful: number, failed: number, errors: Array}>}
+ */
+export async function downloadAllAttachments(attachments) {
+  if (!attachments || attachments.length === 0) {
+    throw new Error('No hay archivos para descargar');
+  }
+
+  let successful = 0;
+  let failed = 0;
+  const errors = [];
+
+  // Descargar archivos secuencialmente con delay
+  for (let i = 0; i < attachments.length; i++) {
+    const file = attachments[i];
+    
+    try {
+      
+      await downloadFile(file.downloadUrl, file.name, file.type, true);
+      successful++;
+      
+      // Delay entre descargas para evitar bloqueo del navegador
+      if (i < attachments.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 800)); // 800ms de delay
+      }
+    } catch (error) {
+      failed++;
+      const errorMessage = `${file.name}: ${error.message}`;
+      errors.push(errorMessage);
+    }
+  }
+  
+  return { successful, failed, errors };
 }
