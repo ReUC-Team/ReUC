@@ -121,67 +121,102 @@ model Outsider {
 
 /**
  * TODO: For futures features this fields could be added
- * status (enum)      submitted, reviewed, approved, rejected, etc.
- * reviewedBy         Admin UUID who reviewed it
- * reviewNotes        Internal notes during evaluation
- * archivedAt         Soft-delete logic
+ * - status
+ * This should be make in another catalog table. Having submitted (default),
+ * in review (when a proffessor open the application), rejected, approved.
+ * If this is implemented add a @@index to filter by status efficiently.
+ * - rejectionReason
+ * when the application is rejected, could be nullable (?)
+ * - reviewedBy
+ * when an application enter on a rejected or approved status, the proffesor
+ * who did this action, could be nullable (?), add a @@index for audit purpose,
+ * analitics of who did more approval or who did what
+ * - slug
+ * a URL friendly string from the title, must be @unique, on domain convert
+ * the title ("My title" -> "my-title"), check if the slug already exists
+ * (append "-1", "-2" if it does), add @@index for effient the check query
+ * (find project by slug)
+ * - @@fulltext([title, shortDescription])
+ * For efficient queries on text searching.
+ * https://www.prisma.io/docs/orm/prisma-client/queries/full-text-search
  */
 model Application {
   uuid_application String   @id @default(uuid())
   uuidOutsider     String   @map("uuid_outsider")
-  outsider         Outsider @relation(fields: [uuidOutsider], references: [uuid_outsider])
   title            String
   shortDescription String   @map("short_description")
   description      String
   deadline         DateTime
-  visibility       String?
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  project                Project[]
+  outsider Outsider @relation(fields: [uuidOutsider], references: [uuid_outsider])
+
+  project                Project?
   applicationProjectType Application_Project_Type[]
   applicationFaculty     Application_Faculty[]
   applicationProblemType Application_Problem_Type[]
 
   @@index([uuidOutsider])
   @@index([createdAt])
+  @@index([deadline])
   @@map("Applications")
 }
 
+/**
+ * TODO: For future features add this fields
+ * - uuidTeam
+ * The team unique indentifier, could be a link table, a relation table.
+ * Team_Member @@id([uuidProject, uuidStudent]) with own id
+ * Team_Advisor @@id([uuidProject, uuidProfessor]) with own id
+ * Team @@id([Team_Member, Team_Advisor]) pointing to tables id
+ * - slug
+ * a URL friendly string from the title, must be @unique, on domain convert
+ * the title ("My title" -> "my-title"), check if the slug already exists
+ * (append "-1", "-2" if it does), add @@index for effient the check query
+ * (find project by slug)
+ * - @@fulltext([title, shortDescription])
+ * For efficient queries on text searching.
+ * https://www.prisma.io/docs/orm/prisma-client/queries/full-text-search
+ * ==================================
+ * Notes: Regarding how some fields will work
+ * - estimatedEffortHours and estimatedDate
+ * e.g.
+ * Is effort based like Interships "400 hours" and expected to be done in 6 months
+ * estimatedEffortHours: 400
+ * estimatedDate: [6 months from now]
+ * Is time based like Thesis "1 year"
+ * estimatedEffortHours: -1
+ * estimatedDate: [1 year from now]
+ * a minus one because a 0 mean something in estimatedEffortHours context, but a negative
+ * number means this is irrelevant, and it should be prioritazed the estimatedDate
+ */
 model Project {
-  // TODO: checkout reflux usage and solve how to save and use
-  // for a cleaner looks in the uri instead of uuid
-  uuid_project    String         @id @default(uuid())
-  uuidApplication String         @map("uuid_application")
-  application     Application    @relation(fields: [uuidApplication], references: [uuid_application])
-  topicInterest   String?        @map("topic_interest")
-  type            Int            @map("project_type_id")
-  projectType     Project_Type   @relation(fields: [type], references: [project_type_id])
-  estimatedTime   String         @map("estimated_time")
-  // uuid_team
-  status          Int
-  projectStatus   Project_Status @relation(fields: [status], references: [project_status_id])
-  createdAt       DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @updatedAt @map("updated_at")
+  uuid_project         String   @id @default(uuid())
+  uuidApplication      String   @unique @map("uuid_application")
+  title                String
+  shortDescription     String   @map("short_description")
+  description          String
+  estimatedEffortHours Int?     @map("estimated_effort_hours")
+  estimatedDate        DateTime @map("estimated_date")
+  statusId             Int?
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+
+  application   Application     @relation(fields: [uuidApplication], references: [uuid_application])
+  projectStatus Project_Status? @relation(fields: [statusId], references: [project_status_id])
+
+  projectProjectTypes Project_Project_Type[]
+  projectFaculties    Project_Faculty[]
+  projectProblemTypes Project_Problem_Type[]
 
   @@index([uuidApplication])
-  @@index([type])
-  @@index([createdAt]) // filtering or sorting by date
-  @@index([status]) // filtering by status
+  @@index([createdAt])
+  @@index([statusId])
   @@map("Projects")
 }
 
 // ================== UNIVERSITY RELATED MODELS ==================
-model Professor_Role {
-  professor_role_id Int      @id @default(autoincrement())
-  name              String
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-
-  professors Professor[]
-
-  @@map("Professor_Roles")
-}
 
 model Faculty {
   faculty_id Int      @id @default(autoincrement())
@@ -190,6 +225,7 @@ model Faculty {
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   applicationFaculty Application_Faculty[]
+  projectFaculties   Project_Faculty[]
 
   @@map("Faculties")
 }
@@ -205,8 +241,8 @@ model Project_Type {
   createdAt           DateTime @default(now()) @map("created_at")
   updatedAt           DateTime @updatedAt @map("updated_at")
 
-  project                Project[]
   applicationProjectType Application_Project_Type[]
+  projectProjectTypes    Project_Project_Type[]
 
   @@map("Project_Types")
 }
@@ -219,14 +255,28 @@ model Problem_Type {
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   applicationProblemType Application_Problem_Type[]
+  projectProblemTypes    Project_Problem_Type[]
 
   @@map("Problem_Types")
 }
 
 // ================== CATALOG TABLES ==================
+model Professor_Role {
+  professor_role_id Int      @id @default(autoincrement())
+  name              String
+  description       String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  professors Professor[]
+
+  @@map("Professor_Roles")
+}
+
 model User_Status {
   user_status_id Int      @id @default(autoincrement())
   name           String
+  description    String?
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 
@@ -238,6 +288,7 @@ model User_Status {
 model Student_Status {
   student_status_id Int      @id @default(autoincrement())
   name              String
+  description       String?
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
@@ -249,6 +300,7 @@ model Student_Status {
 model Project_Status {
   project_status_id Int      @id @default(autoincrement())
   name              String
+  description       String?
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
 
@@ -267,6 +319,7 @@ model Application_Project_Type {
   projectTypeId   Project_Type @relation(fields: [projectType], references: [project_type_id])
 
   @@id([application, projectType])
+  @@index([projectType])
   @@map("Application_Project_Types")
 }
 
@@ -278,6 +331,7 @@ model Application_Faculty {
   facultyTypeId   Faculty     @relation(fields: [faculty], references: [faculty_id])
 
   @@id([application, faculty])
+  @@index([faculty])
   @@map("Application_Faculties")
 }
 
@@ -289,7 +343,41 @@ model Application_Problem_Type {
   problemTypeId   Problem_Type @relation(fields: [problemType], references: [problem_type_id])
 
   @@id([application, problemType])
+  @@index([problemType])
   @@map("Application_Problem_Types")
+}
+
+model Project_Project_Type {
+  uuidProject   String @map("uuid_project")
+  projectTypeId Int    @map("project_type_id")
+
+  project     Project      @relation(fields: [uuidProject], references: [uuid_project])
+  projectType Project_Type @relation(fields: [projectTypeId], references: [project_type_id])
+
+  @@id([uuidProject, projectTypeId])
+  @@map("Project_Project_Types")
+}
+
+model Project_Faculty {
+  uuidProject String @map("uuid_project")
+  facultyId   Int    @map("faculty_id")
+
+  project Project @relation(fields: [uuidProject], references: [uuid_project])
+  faculty Faculty @relation(fields: [facultyId], references: [faculty_id])
+
+  @@id([uuidProject, facultyId])
+  @@map("Project_Faculties")
+}
+
+model Project_Problem_Type {
+  uuidProject   String @map("uuid_project")
+  problemTypeId Int    @map("problem_type_id")
+
+  project     Project      @relation(fields: [uuidProject], references: [uuid_project])
+  problemType Problem_Type @relation(fields: [problemTypeId], references: [problem_type_id])
+
+  @@id([uuidProject, problemTypeId])
+  @@map("Project_Problem_Types")
 }
 
 // ================== OTHERS MODELS ==================

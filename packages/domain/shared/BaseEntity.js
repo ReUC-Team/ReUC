@@ -1,3 +1,5 @@
+import ValidationError from "../errors/ValidationError.js";
+
 /**
  * @class BaseEntity
  * @description A base class for domain entities to handle common boilerplate.
@@ -34,5 +36,57 @@ export class BaseEntity {
     }
 
     return primitive;
+  }
+
+  /**
+   * Normalize an input into an array of numbers and validate each entry.
+   *
+   * - If `input` is already an array, it is used as-is.
+   * - If `input` is a single value, it is wrapped into an array.
+   * - `null` and `undefined` values are filtered out.
+   * - Each remaining value is converted using `Number()`
+   *
+   * @param {(Array<number|string>|number|string|undefined)} [input] - The value(s) to normalize/validate.
+   * @param {string} [fieldName] - The name of the field used in validation errors.
+   *
+   * @returns {number[]} An array of numeric values.
+   * @throws {ValidationError} If any value cannot be converted to a valid number.
+   */
+  parseAndValidateNumberArray(input = [], fieldName = "Unknown") {
+    const normalized = Array.isArray(input)
+      ? input
+      : [input].filter((i) => i !== null && i !== undefined);
+
+    return normalized.map((val) => {
+      const num = Number(val);
+
+      if (isNaN(num)) {
+        throw new ValidationError(
+          `Field '${fieldName}' contains an invalid non-numeric value.`,
+          {
+            details: {
+              field: fieldName,
+              rule: "invalid_characters",
+            },
+          }
+        );
+      }
+
+      return num;
+    });
+  }
+
+  /**
+   * Normalize a string by trimming whitespace and converting to lowercase.
+   * @param {string|undefined|null} value - The value to normalize to a string.
+   *
+   * @returns {string|undefined} The normalized lowercase string, or `undefined` if empty/nonexistent.
+   */
+  normalizeString(value) {
+    if (value === undefined || value === null || String(value).trim() === "") {
+      return undefined;
+    }
+
+    return String(value).trim().toLowerCase();
   }
 }

@@ -1,0 +1,33 @@
+{
+  "post": {
+    "summary": "(Web) Create a new project",
+    "description": "Approve an application.\n - Requires **\"professor\"** role.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "allOf": [{ "$ref": "../payload/ProjectCreate.json" }]
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Application approved successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/CreateProjectSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "409": { "$ref": "../../../responses/Error409.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}
