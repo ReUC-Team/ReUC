@@ -12,3 +12,9 @@ fileRouter.get(
   authFileTicketMiddleware,
   asyncHandler(getFileHandler)
 );
+
+fileRouter.get(
+  "/:model/:purpose/:uuidmodel/:uuidfile",
+  authFileTicketMiddleware,
+  asyncHandler(getFileHandler)
+);

@@ -1,7 +1,7 @@
 {
   "get": {
     "summary": "Get a protected file associated with a model target.",
-    "description": "Serves a file linked to a specific model target instance (e.g., a user's avatar, an application's custom banner).\n - Requires authentication.\n - Used for file purpose with cardinality of **one**.\n - This endpoint URLs are made **ONLY** by the API on specifics resources.",
+    "description": "Serves a file linked to a specific model target instance (e.g., an application's attachments, a project's documents).\n - Requires authentication.\n - Used for file purpose with cardinality of **many**.\n - This endpoint URLs are made **ONLY** by the API on specifics resources.",
     "tags": ["File"],
     "security": [
       {
@@ -17,6 +17,16 @@
       },
       {
         "$ref": "../parameters/UuidModel.json"
+      },
+      {
+        "name": "uuidfile",
+        "in": "path",
+        "required": true,
+        "description": "The unique identifier (UUID) of the specific file if purpose carry a **many** cardinality.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
       }
     ],
     "responses": {

@@ -173,6 +173,9 @@
     "/file/{model}/{purpose}/{uuidmodel}": {
       "$ref": "./components/tags/file/paths/GetFile.json"
     },
+    "/file/{model}/{purpose}/{uuidmodel}/{uuidfile}": {
+      "$ref": "./components/tags/file/paths/GetManyFile.json"
+    },
 
     "/application/metadata/create": {
       "$ref": "./components/tags/application/paths/MetadataCreate.json"

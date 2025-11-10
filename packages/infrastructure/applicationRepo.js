@@ -509,7 +509,7 @@ async function _cleanupOrphanedFiles(allSavedFileMetas) {
  * @param {string} facultyName - The optional name of the faculty to filter by.
  */
 async function _buildGetLimitedWhereClause(facultyName) {
-  const where = { project: { none: {} } };
+  const where = { project: { is: null } };
 
   if (facultyName) {
     const facultyFound = await facultyRepo.findByName(facultyName);

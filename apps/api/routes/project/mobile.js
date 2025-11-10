@@ -9,8 +9,6 @@ import { createProjectHandler } from "./handlers.js";
 
 export const mobileProjectRouter = express.Router();
 
-mobileProjectRouter = express.Router();
-
 mobileProjectRouter.use(
   requireMobileClient,
   authMiddleware,
