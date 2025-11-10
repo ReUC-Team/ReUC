@@ -1,0 +1,6 @@
+{
+  "type": "apiKey",
+  "name": "ticket",
+  "in": "query",
+  "description": "A short-lived file access ticket. Used for authenticating file requests from contexts that cannot send headers (e.g., <img> tags)."
+}

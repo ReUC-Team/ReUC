@@ -113,3 +113,56 @@ export function requireRole(allowedRoles) {
     next();
   };
 }
+
+/**
+ * @description Express middleware that authorizes access to a file using a one-time ticket.
+ *
+ * On success, attaches the decoded payload to `req.user`.
+ * On failure, throws an ApplicationError.AuthenticationError.
+ */
+export function authFileTicketMiddleware(req, res, next) {
+  try {
+    const { model, purpose, uuidmodel } = req.params;
+
+    // 1. Get the business rule from your shared module
+    const rule = getFileRule(model, purpose);
+
+    if (!rule || !rule.context) {
+      throw new ApplicationError.ValidationError(
+        `File purpose '${purpose}' is not available for the model '${model}'.`,
+        {
+          details: {
+            rule: "invalid_model_purpose_combination",
+            modelTarget: model,
+            purpose,
+          },
+        }
+      );
+    }
+
+    // 2. Use the rule's context as the expected audience
+    const expectedAudience = rule.context;
+    const ticket = req.query.ticket;
+
+    if (!ticket) {
+      throw new ApplicationError.AuthenticationError(
+        "A valid file ticket is required."
+      );
+    }
+
+    const fileIdentifier = `file/${model}/${purpose}/${uuidmodel}`;
+
+    // 3. Validate the ticket
+    const decodedPayload = session.authTicket({
+      token: String(ticket),
+      fileIdentifier,
+      audience: expectedAudience,
+      tokenConfig: TOKEN_CONFIG,
+    });
+
+    req.user = { uuid_user: decodedPayload.sub };
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}

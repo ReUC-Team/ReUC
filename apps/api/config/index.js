@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const requiredEnvVars = [
+  "JWT_TICKET_SECRET",
+  "VIEWING_TICKET_EXPIRES",
+  "DOWNLOAD_TICKET_EXPIRES",
   "MOBILE_API_KEY",
   "JWT_AUTH_SECRET",
   "AUTH_TOKEN_EXPIRES",
@@ -30,6 +33,11 @@ const config = Object.freeze({
   },
   mobileApiKey: process.env.MOBILE_API_KEY,
   jwt: {
+    ticketSecret: process.env.JWT_TICKET_SECRET,
+    ticketExpiresIn: {
+      viewing: process.env.VIEWING_TICKET_EXPIRES,
+      download: process.env.DOWNLOAD_TICKET_EXPIRES,
+    },
     accessSecret: process.env.JWT_AUTH_SECRET,
     accessExpiresIn: process.env.AUTH_TOKEN_EXPIRES,
     refreshSecret: process.env.JWT_REFRESH_SECRET,

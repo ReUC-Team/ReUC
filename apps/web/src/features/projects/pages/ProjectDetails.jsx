@@ -1,13 +1,19 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import ProjectImage from '../components/ProjectImage';
 import ProjectSummary from '../components/ProjectSummary';
 import ProjectInfoCard from '../components/ProjectInfoCard';
+import AttachmentCard from '../components/AttachmentCard';
 import useApplicationDetails from '../hooks/useApplicationDetails';
+import { downloadAllAttachments } from '../projectsService';
 
 export default function ProjectDetails() {
   const { uuid } = useParams();
   const navigate = useNavigate();
   const { application, isLoading, error } = useApplicationDetails(uuid);
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false);
+  const [downloadError, setDownloadError] = useState(null);
+
 
   // Formatear fechas
   const formatDate = (dateString) => {
@@ -19,7 +25,34 @@ export default function ProjectDetails() {
     });
   };
 
-  // Loading state (igual que antes)
+  // Función para descargar todos los archivos
+  const handleDownloadAll = async () => {
+    if (!application?.attachments || application.attachments.length === 0) {
+      alert('No hay archivos para descargar');
+      return;
+    }
+
+    setIsDownloadingAll(true);
+    setDownloadError(null);
+    
+    try {
+      const result = await downloadAllAttachments(application.attachments);
+      
+      if (result.failed > 0) {
+        // Algunos archivos fallaron
+        const errorMessage = `Se descargaron ${result.successful} de ${application.attachments.length} archivos.\n\nErrores:\n${result.errors.join('\n')}`;
+        setDownloadError(errorMessage);
+        alert(errorMessage);
+      }
+    } catch (error) {
+      const errorMessage = error.message || 'Error desconocido al descargar archivos';
+      setDownloadError(errorMessage);
+    } finally {
+      setIsDownloadingAll(false);
+    }
+  };
+
+  // Loading state
   if (isLoading) {
     return (
       <section className="w-full px-10 py-12">
@@ -53,7 +86,7 @@ export default function ProjectDetails() {
     );
   }
 
-  // Error state (igual que antes)
+  // Error state
   if (error || !application) {
     return (
       <section className="w-full px-10 py-12">
@@ -84,7 +117,7 @@ export default function ProjectDetails() {
     );
   }
 
-  // Extraer datos de la aplicació
+  // Extraer datos de la aplicación
   const {
     title,
     shortDescription,
@@ -98,8 +131,8 @@ export default function ProjectDetails() {
     status,
     createdAt,
     dueDate,
+    attachments = [],
   } = application;
-
 
   // Preparar información del solicitante
   const applicantInfo = [
@@ -168,12 +201,6 @@ export default function ProjectDetails() {
     alert('Funcionalidad de aceptar proyecto en desarrollo');
   };
 
-  // Función para rechazar proyecto
-  const handleReject = () => {
-    console.log('Rechazar proyecto:', uuid);
-    alert('Funcionalidad de rechazar proyecto en desarrollo');
-  };
-
   return (
     <section className="w-full px-10 py-12">
       {/* Botón de regreso */}
@@ -192,16 +219,34 @@ export default function ProjectDetails() {
       </h1>
 
       <div className='flex mt-10 gap-6'>
-        {/* Columna izquierda: Imagen y descripción */}
+        {/* Columna izquierda: Imagen, descripción y archivos adjuntos */}
         <div className="w-5/12">
+          {/* Banner */}
           <ProjectImage 
             src={bannerUrl} 
             alt={title} 
           />
+          
+          {/* Resumen del proyecto */}
           <ProjectSummary
             title={title}
             description={detailedDescription}
           />
+
+          {/* Archivos adjuntos */}
+          {attachments.length > 0 && (
+            <div className="mt-6">
+              <h2 className="text-3xl font-bold mb-3">
+                Documentos <span className="text-lime-700">adjuntos</span>
+              </h2>
+              
+              <div className="space-y-3 mr-10">
+                {attachments.map((file, index) => (
+                  <AttachmentCard key={index} file={file} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Columna derecha: Información */}
@@ -221,19 +266,48 @@ export default function ProjectDetails() {
           {/* Botones de acción */}
           <div className="flex flex-col gap-3 pt-4 w-11/12">
             <div className='flex gap-5'>
+              {/* Botón Aceptar Proyecto */}
               <button 
                 onClick={handleAccept}
                 className="px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700 font-semibold w-6/12 transition"
               >
                 Aceptar proyecto
               </button>
+              
+              {/* Botón Descargar Todos los Archivos */}
               <button 
-                onClick={handleReject}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold w-6/12 transition"
+                onClick={handleDownloadAll}
+                disabled={isDownloadingAll || attachments.length === 0}
+                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold w-6/12 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                title={attachments.length === 0 ? 'No hay archivos para descargar' : 'Descargar todos los documentos'}
               >
-                Rechazar proyecto
+                {isDownloadingAll ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Descargando...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Descargar todos ({attachments.length})
+                  </>
+                )}
               </button>
             </div>
+
+            {/* Mensaje de error si ocurrió */}
+            {downloadError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                {downloadError}
+              </div>
+            )}
+            
+            {/* Botón Ponerse en Contacto */}
             <button 
               onClick={handleContact}
               disabled={!outsider?.email}

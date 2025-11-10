@@ -47,11 +47,13 @@ export const MODEL_FILE_RULES = {
   APPLICATION: {
     BANNER: {
       kind: "image",
+      context: "viewing",
       maxSizeMB: MAX_FILE_SIZES_MB.images,
       allowedMime: ALLOWED_MIME_TYPES.images,
     },
     ATTACHMENT: {
       kind: "mixed",
+      context: "download",
       maxSizeMB: MAX_FILE_SIZES_MB.attachment_files, // Using new limit
       allowedMime: ALLOWED_MIME_TYPES.attachment_files, // Using new list
     },

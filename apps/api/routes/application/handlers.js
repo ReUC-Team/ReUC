@@ -1,3 +1,4 @@
+import config from "../../config/index.js";
 import application from "@reuc/application/applications/index.js";
 
 // TODO: if outsider session expires, then save the form data and the
@@ -42,14 +43,19 @@ export async function getCreationFormDataHandler(req, res) {
  * Handles fetching a paginated list of applications, optionally filtered by faculty.
  */
 export async function getExploreApplicationsHandler(req, res) {
+  const user = req.user;
   const { faculty } = req.params;
   const { page, perPage } = req.query;
 
-  const applications = await application.getExploreApplications({
-    faculty,
-    page,
-    perPage,
-  });
+  const applications = await application.getExploreApplications(
+    user.uuid_user,
+    config.jwt,
+    {
+      faculty,
+      page,
+      perPage,
+    }
+  );
 
   return res.status(200).json({
     success: true,
@@ -77,9 +83,14 @@ export async function getExploreFiltersHandler(req, res) {
  * Handles fetching a single, detailed application by its UUID.
  */
 export async function getDetailedApplicationHandler(req, res) {
+  const user = req.user;
   const { uuid } = req.params;
 
-  const detailedApplication = await application.getDetailedApplication(uuid);
+  const detailedApplication = await application.getDetailedApplication(
+    user.uuid_user,
+    config.jwt,
+    uuid
+  );
 
   return res.status(200).json({
     success: true,
