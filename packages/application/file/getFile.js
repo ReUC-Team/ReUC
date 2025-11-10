@@ -32,8 +32,14 @@ export async function getFile({
       uuidFile
     );
 
-    return { file: fileData };
+    return fileData;
   } catch (err) {
+    if (err instanceof DomainError.BusinessRuleError)
+      throw new ApplicationError.ValidationError(
+        "The request violates business rules.",
+        { details: err.details, cause: err }
+      );
+
     if (err instanceof DomainError.NotFoundError)
       throw new ApplicationError.NotFoundError(
         "The requested resource was not found.",
