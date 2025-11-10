@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, Image, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { useThemedStyles } from '../../../hooks/useThemedStyles';
 import { createProfileHeaderStyles } from '../../../styles/components/profile/ProfileHeader.styles';
+import Avatar from '../../../components/Avatar';
 
 interface ProfileHeaderProps {
-  imageUrl?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   name: string;
   location: string;
   onEditPress?: () => void;
@@ -12,7 +15,9 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
-  imageUrl,
+  firstName,
+  middleName,
+  lastName,
   name,
   location,
   onEditPress,
@@ -23,9 +28,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
-        <Image
-          source={imageUrl ? { uri: imageUrl } : require('../../../assets/avatar.png')}
-          style={styles.profileImage}
+        <Avatar
+          firstName={firstName}
+          middleName={middleName}
+          lastName={lastName}
+          size="large"
         />
       </View>
       

@@ -1,6 +1,6 @@
 // apps/mobile/src/components/LeftSidebar.tsx
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import {
   View,
   Text,
@@ -10,10 +10,9 @@ import {
   TouchableWithoutFeedback,
   Animated,
   Dimensions,
-  Image,
 } from 'react-native'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native' // ⬅️ IMPORTA useNavigation
+import { useNavigation } from '@react-navigation/native'
 import { useThemedStyles } from '../hooks/useThemedStyles'
 import { createLeftSidebarStyles } from '../styles/components/header/LeftSidebar.styles'
 
@@ -28,24 +27,22 @@ type MenuItem = {
   iconType: 'ionicons' | 'material'
   label: string
   screen: string
-  hasSubmenu?: boolean
 }
 
 const menuItems: MenuItem[] = [
   { icon: 'list-outline',      iconType: 'ionicons', label: 'Solicitar un proyecto', screen: 'RequestProject' },
   { icon: 'search-outline',    iconType: 'ionicons', label: 'Explorar proyectos',    screen: 'ExploreProjects' },
-  { icon: 'folder-outline',    iconType: 'ionicons', label: 'Mis proyectos',         screen: 'MyProjects', hasSubmenu: true },
-  { icon: 'star-outline',      iconType: 'ionicons', label: 'Mis favoritos',         screen: 'FavoriteProjects', hasSubmenu: true },
-  { icon: 'people-outline',    iconType: 'ionicons', label: 'Miembros',              screen: 'Members',     hasSubmenu: true },
+  { icon: 'folder-outline',    iconType: 'ionicons', label: 'Mis proyectos',         screen: 'MyProjects' },
+  { icon: 'star-outline',      iconType: 'ionicons', label: 'Mis favoritos',         screen: 'FavoriteProjects' },
+  { icon: 'people-outline',    iconType: 'ionicons', label: 'Miembros',              screen: 'Members' },
   { icon: 'document-text-outline', iconType: 'ionicons', label: 'Documentos',        screen: 'Documents' },
   { icon: 'notifications-outline', iconType: 'ionicons', label: 'Notificaciones',    screen: 'Notifications' },
 ]
 
 export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
   const styles = useThemedStyles(createLeftSidebarStyles)
-  const navigation = useNavigation<any>() // ⬅️ USA useNavigation
+  const navigation = useNavigation<any>() 
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').width)).current
-  const [expandedMenus, setExpandedMenus] = useState<string[]>([])
 
   useEffect(() => {
     if (isVisible) {
@@ -62,14 +59,6 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
       }).start()
     }
   }, [isVisible])
-
-  const toggleSubmenu = (screen: string) => {
-    setExpandedMenus(prev =>
-      prev.includes(screen)
-        ? prev.filter(s => s !== screen)
-        : [...prev, screen]
-    )
-  }
 
   const renderIcon = (item: MenuItem) => {
     if (item.iconType === 'ionicons') {
@@ -91,60 +80,12 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
   }
 
   const handleMenuPress = (item: MenuItem) => {
-    if (item.hasSubmenu) {
-      toggleSubmenu(item.screen)
+    if (onNavigate) {
+      onNavigate(item.screen)
     } else {
-      // ⬇️ USA navigation.navigate EN LUGAR DE SOLO onNavigate
-      if (onNavigate) {
-        onNavigate(item.screen)
-      } else {
-        navigation.navigate(item.screen) // ⬅️ Navega directamente
-      }
-      onClose()
+      navigation.navigate(item.screen) 
     }
-  }
-
-  const renderSubmenuItems = (parentScreen: string) => {
-    const submenuData: Record<string, Array<{ title: string; avatar?: any }>> = {
-      MyProjects: [
-        { title: 'Proyecto Alpha', avatar: require('../assets/avatar.png') },
-        { title: 'Proyecto Beta', avatar: require('../assets/avatar.png') },
-        { title: 'Proyecto Gamma', avatar: require('../assets/avatar.png') },
-      ],
-      FavoriteProjects: [
-        { title: 'Proyecto Alpha', avatar: require('../assets/avatar.png') },
-        { title: 'Proyecto Beta', avatar: require('../assets/avatar.png') },
-        { title: 'Proyecto Gamma', avatar: require('../assets/avatar.png') },
-      ],
-      Members: [
-        { title: 'Miembro 1', avatar: require('../assets/avatar.png') },
-        { title: 'Miembro 2', avatar: require('../assets/avatar.png') },
-        { title: 'Miembro 3', avatar: require('../assets/avatar.png') },
-      ],
-    }
-
-    const items = submenuData[parentScreen] || []
-
-    return items.map((subItem, index) => (
-      <TouchableOpacity
-        key={index}
-        style={styles.submenuItem}
-        onPress={() => {
-          // ⬇️ USA navigation.navigate
-          if (onNavigate) {
-            onNavigate(`${parentScreen}/${subItem.title}`)
-          } else {
-            navigation.navigate(parentScreen) // ⬅️ Navega a la pantalla principal
-          }
-          onClose()
-        }}
-      >
-        {subItem.avatar && (
-          <Image source={subItem.avatar} style={styles.submenuAvatar} />
-        )}
-        <Text style={styles.submenuText}>{subItem.title}</Text>
-      </TouchableOpacity>
-    ))
+    onClose()
   }
 
   return (
@@ -178,29 +119,16 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
               {/* Menu Items */}
               <ScrollView style={styles.menuContainer}>
                 {menuItems.map((item, index) => (
-                  <View key={index}>
-                    <TouchableOpacity
-                      style={styles.menuItem}
-                      onPress={() => handleMenuPress(item)}
-                    >
-                      <View style={styles.menuItemContent}>
-                        {renderIcon(item)}
-                        <Text style={styles.menuText}>{item.label}</Text>
-                        {item.hasSubmenu && (
-                          <Ionicons
-                            name={expandedMenus.includes(item.screen) ? "chevron-up" : "chevron-down"}
-                            size={20}
-                            style={styles.chevronIcon}
-                          />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                    {item.hasSubmenu && expandedMenus.includes(item.screen) && (
-                      <View style={styles.submenuContainer}>
-                        {renderSubmenuItems(item.screen)}
-                      </View>
-                    )}
-                  </View>
+                  <TouchableOpacity
+                    key={index}
+                    style={styles.menuItem}
+                    onPress={() => handleMenuPress(item)}
+                  >
+                    <View style={styles.menuItemContent}>
+                      {renderIcon(item)}
+                      <Text style={styles.menuText}>{item.label}</Text>
+                    </View>
+                  </TouchableOpacity>
                 ))}
               </ScrollView>
             </Animated.View>

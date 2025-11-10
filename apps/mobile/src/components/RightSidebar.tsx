@@ -10,21 +10,23 @@ import {
   TouchableWithoutFeedback,
   Animated,
   Dimensions,
-  Image,
   Switch,
 } from 'react-native'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native' 
 import { useThemedStyles } from '../hooks/useThemedStyles'
 import { createRightSidebarStyles } from '../styles/components/header/RightSidebar.styles'
-import { useTheme } from '../context/ThemeContext' 
+import { useTheme } from '../context/ThemeContext'
+import Avatar from './Avatar'
 
 type Props = {
   isVisible: boolean
   onClose: () => void
   onNavigate?: (screen: string) => void
   userEmail?: string
-  userAvatar?: any
+  firstName?: string
+  middleName?: string
+  lastName?: string
 }
 
 type MenuItem = {
@@ -61,13 +63,15 @@ export default function RightSidebar({
   onClose,
   onNavigate,
   userEmail = 'usuario@ejemplo.com',
-  userAvatar
+  firstName,
+  middleName,
+  lastName,
 }: Props) {
   const styles = useThemedStyles(createRightSidebarStyles)
-  const navigation = useNavigation<any>() // ⬅️ USA useNavigation
+  const navigation = useNavigation<any>()
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
-  const { themeMode, setThemeMode, isDarkMode, isHighContrast } = useTheme()
+  const { themeMode, setThemeMode } = useTheme()
 
   const [accessibilitySettings, setAccessibilitySettings] = useState({
     darkMode: themeMode === 'dark',
@@ -139,11 +143,10 @@ export default function RightSidebar({
     if (typeof item !== "string" && item.hasSubmenu) {
       toggleSubmenu(item.screen)
     } else {
-      // ⬇️ USA navigation.navigate EN LUGAR DE onNavigate
       if (onNavigate) {
         onNavigate(screen)
       } else {
-        navigation.navigate(screen) // ⬅️ Navega directamente
+        navigation.navigate(screen)
       }
       onClose()
     }
@@ -154,7 +157,7 @@ export default function RightSidebar({
       if (onNavigate) {
         onNavigate('FontSettings')
       } else {
-        navigation.navigate('FontSettings') // ⬅️ Navega directamente
+        navigation.navigate('FontSettings')
       }
       onClose()
     }
@@ -227,9 +230,11 @@ export default function RightSidebar({
                 </TouchableOpacity>
 
                 <View style={styles.profileContainer}>
-                  <Image
-                    source={userAvatar || require('../assets/avatar.png')}
-                    style={styles.profileAvatar}
+                  <Avatar
+                    firstName={firstName}
+                    middleName={middleName}
+                    lastName={lastName}
+                    size="medium"
                   />
                   <Text style={styles.userEmail}>{userEmail}</Text>
                 </View>
