@@ -1,0 +1,136 @@
+{
+  "type": "object",
+  "description": "Payload for creating a new application.",
+  "properties": {
+    "title": {
+      "type": "string",
+      "example": "New University Project Initiative"
+    },
+    "shortDescription": {
+      "type": "string",
+      "example": "A brief summary of the project."
+    },
+    "description": {
+      "type": "string",
+      "example": "Detailed description covering the problem, solution, and impact."
+    },
+    "estimatedEffortHours": {
+      "type": "integer",
+      "format": "number",
+      "example": "400",
+      "description": "The estimated total number of work hours required to complete the project."
+    },
+    "estimatedDate": {
+      "type": "string",
+      "format": "date",
+      "example": "2025-12-31",
+      "description": "The projected completion date when all project milestones and deliverables are expected to be achieved."
+    },
+    "projectType": {
+      "oneOf": [
+        {
+          "description": "Single ID",
+          "oneOf": [
+            {
+              "type": "string",
+              "example": "1"
+            },
+            {
+              "type": "integer",
+              "example": 1
+            }
+          ]
+        },
+        {
+          "description": "Array of IDs",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "integer" },
+              "example": [1, 3]
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["1", "3"]
+            }
+          ]
+        }
+      ],
+      "description": "Associated project type ID(s)."
+    },
+    "problemType": {
+      "oneOf": [
+        {
+          "description": "Single ID",
+          "oneOf": [
+            {
+              "type": "string",
+              "example": "5"
+            },
+            {
+              "type": "integer",
+              "example": 5
+            }
+          ]
+        },
+        {
+          "description": "Array of IDs",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "integer" },
+              "example": [5, 8]
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["5", "8"]
+            }
+          ]
+        }
+      ],
+      "description": "Associated problem type ID(s)."
+    },
+    "faculty": {
+      "oneOf": [
+        {
+          "description": "Single ID",
+          "oneOf": [
+            {
+              "type": "string",
+              "example": "2"
+            },
+            {
+              "type": "integer",
+              "example": 2
+            }
+          ]
+        },
+        {
+          "description": "Array of IDs",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": { "type": "integer" },
+              "example": [2, 6]
+            },
+            {
+              "type": "array",
+              "items": { "type": "string" },
+              "example": ["2", "6"]
+            }
+          ]
+        }
+      ],
+      "description": "Associated faculty ID(s)."
+    },
+    "problemTypeOther": {
+      "type": "string",
+      "description": "User-defined problem type description if 'other' is selected in problemType.",
+      "nullable": true,
+      "example": "Specific issue related to campus logistics."
+    }
+  },
+  "required": ["title", "shortDescription", "description", "estimatedDate"]
+}

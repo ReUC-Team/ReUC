@@ -29,7 +29,7 @@ export async function createApplication({
       applicationProjectType: application.projectType,
       applicationFaculty: application.faculty,
       applicationProblemType: application.problemType,
-      applicationProblemTypeOther: application.problemTypeOther,
+      applicationCustomProblemType: application.problemTypeOther,
     });
 
     const bannerPayload = _prepareBannerPayload(banner);

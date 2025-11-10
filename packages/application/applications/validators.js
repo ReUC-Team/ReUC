@@ -2,43 +2,15 @@ import {
   validateDate,
   validateString,
   validateUuid,
+  validateNumberOrNumberArray,
 } from "../shared/validators.js";
 import { ValidationError } from "../errors/ValidationError.js";
 import { validateFile } from "@reuc/file-storage/shared/validations.js";
 
 /**
- * A helper function to validate a field that can be a single ID (as a string or number)
- * or an array of such IDs. It ensures the value is a valid numeric representation.
- * @private
- * @param {string|number|Array<string|number>} value - The value to validate.
- * @param {string} fieldName - The name of the field for error messages.
- *
- * @returns {Array<object>} - A list with all the errors object.
- * @example [{ field: "firstName", rule: "missing_or_empty" }]
- */
-function _validateIdOrIdArray(value, fieldName) {
-  const errors = [];
-
-  const validateSingleId = (id) => {
-    errors.push(...validateString(String(id), fieldName, "numeric"));
-  };
-
-  if (Array.isArray(value)) {
-    if (value.length === 0) {
-      errors.push({ field: fieldName, rule: "min_length", expected: 1 });
-    } else {
-      value.forEach(validateSingleId);
-    }
-  } else if (value !== undefined && value !== null) {
-    validateSingleId(value);
-  }
-
-  return errors;
-}
-
-/**
  * Validates the entire payload for creating a new application, including the body and any uploaded files.
  * This function acts as a gatekeeper to ensure all data is well-formed before being passed to the domain layer.
+ * @param {string} uuidAuthor - The UUID of the author.
  * @param {object} body - The request body payload.
  * @param {string} body.title - The main title of the application.
  * @param {string} body.shortDescription - A brief, one-sentence summary.
@@ -60,8 +32,15 @@ function _validateIdOrIdArray(value, fieldName) {
  *
  * @throws {ValidationError} If the payload is invalid.
  */
-export function validateCreationPayload(body, customBannerFile, attachments) {
+export function validateCreationPayload(
+  uuidAuthor,
+  body,
+  customBannerFile,
+  attachments
+) {
   const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidAuthor, "uuidAuthor"));
 
   // ---- Body Validation ----
   allErrors.push(...validateString(body.title, "title", "title"));
@@ -72,15 +51,19 @@ export function validateCreationPayload(body, customBannerFile, attachments) {
   allErrors.push(...validateDate(body.deadline, "deadline"));
 
   if (body.projectType !== undefined) {
-    allErrors.push(..._validateIdOrIdArray(body.projectType, "projectType"));
+    allErrors.push(
+      ...validateNumberOrNumberArray(body.projectType, "projectType")
+    );
   }
 
   if (body.problemType !== undefined) {
-    allErrors.push(..._validateIdOrIdArray(body.problemType, "problemType"));
+    allErrors.push(
+      ...validateNumberOrNumberArray(body.problemType, "problemType")
+    );
   }
 
   if (body.faculty !== undefined) {
-    allErrors.push(..._validateIdOrIdArray(body.faculty, "faculty"));
+    allErrors.push(...validateNumberOrNumberArray(body.faculty, "faculty"));
   }
 
   if (body.problemTypeOther !== undefined) {

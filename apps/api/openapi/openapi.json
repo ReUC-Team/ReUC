@@ -39,6 +39,9 @@
       "ProfileEditPayload": {
         "$ref": "./components/tags/profile/payload/ProfileEdit.json"
       },
+      "ProjectCreatePayload": {
+        "$ref": "./components/tags/project/payload/ProjectCreate.json"
+      },
       "DataTablePayload": {
         "$ref": "./components/tags/admin/payload/DataTable.json"
       },
@@ -118,6 +121,10 @@
     {
       "name": "File",
       "description": "File serving endpoints"
+    },
+    {
+      "name": "Project",
+      "description": "Project management"
     }
   ],
 
@@ -194,6 +201,13 @@
     },
     "/admin/data/{table}": {
       "$ref": "./components/tags/admin/paths/DataTable.json"
+    },
+
+    "/project/create": {
+      "$ref": "./components/tags/project/paths/WebCreate.json"
+    },
+    "/mobile/project/create": {
+      "$ref": "./components/tags/project/paths/MobileCreate.json"
     }
   }
 }

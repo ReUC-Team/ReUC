@@ -17,6 +17,7 @@ import { applicationRouter } from "./routes/application/index.js";
 import { profileRouter } from "./routes/profile/index.js";
 import { adminRouter } from "./routes/admin.js";
 import { fileRouter } from "./routes/file/index.js";
+import { projectRouter } from "./routes/project/index.js";
 
 // ----- DECLARE CONSTANTS -----
 
@@ -72,6 +73,9 @@ app.use("/profile", profileRouter);
 
 // Routes File
 app.use("/file", fileRouter);
+
+// Routes Project
+app.use("/project", projectRouter);
 
 // Routes base
 app.get("/", (req, res) => {

@@ -1,0 +1,36 @@
+{
+  "description": "Successful response after aproving a project.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "application": {
+              "type": "object",
+              "properties": {
+                "uuid_project": { "type": "string", "format": "uuid" },
+                "title": { "type": "string" },
+                "shortDescription": { "type": "string" },
+                "description": { "type": "string" },
+                "estimatedDate": { "type": "string", "format": "date-time" },
+                "uuidApplication": { "type": "string", "format": "uuid" }
+              },
+              "required": [
+                "uuid_project",
+                "title",
+                "shortDescription",
+                "description",
+                "estimatedDate",
+                "uuidApplication"
+              ]
+            }
+          },
+          "required": ["application"]
+        }
+      }
+    }
+  ]
+}

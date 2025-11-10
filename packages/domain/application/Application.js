@@ -9,7 +9,6 @@ export class Application extends BaseEntity {
     "shortDescription",
     "description",
     "deadline",
-    "visibility",
     "applicationProjectType",
     "applicationFaculty",
     "applicationProblemType",
@@ -54,52 +53,20 @@ export class Application extends BaseEntity {
       });
     }
 
-    this.applicationProjectType = this._parseAndValidateNumberArray(
+    this.applicationProjectType = this.parseAndValidateNumberArray(
       this.applicationProjectType,
       "Project Type"
     );
-    this.applicationFaculty = this._parseAndValidateNumberArray(
+    this.applicationFaculty = this.parseAndValidateNumberArray(
       this.applicationFaculty,
       "Faculty"
     );
-    this.applicationProblemType = this._parseAndValidateNumberArray(
+    this.applicationProblemType = this.parseAndValidateNumberArray(
       this.applicationProblemType,
       "Problem Type"
     );
-    this.applicationCustomProblemType = this._normalizeString(
+    this.applicationCustomProblemType = this.normalizeString(
       this.applicationCustomProblemType
     );
-  }
-
-  _parseAndValidateNumberArray(input = [], fieldName = "Unknown") {
-    const normalized = Array.isArray(input)
-      ? input
-      : [input].filter((i) => i !== null && i !== undefined);
-
-    return normalized.map((val) => {
-      const num = Number(val);
-
-      if (isNaN(num)) {
-        throw new DomainError.ValidationError(
-          `Field '${fieldName}' contains an invalid non-numeric value.`,
-          {
-            details: {
-              field: fieldName,
-              rule: "invalid_characters",
-            },
-          }
-        );
-      }
-
-      return num;
-    });
-  }
-
-  _normalizeString(value) {
-    if (value === undefined || value === null || String(value).trim() === "") {
-      return undefined;
-    }
-
-    return String(value).trim().toLowerCase();
   }
 }

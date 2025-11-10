@@ -139,3 +139,33 @@ export function validateString(value, fieldName, level = "title") {
 
   return errors;
 }
+
+/**
+ * Validate a field that can be a single number or an array of number (as a string or number type).
+ * It ensures the value is a valid numeric representation.
+ *
+ * @param {string|number|Array<string|number>} value - The value to validate.
+ * @param {string} fieldName - The name of the field for error messages.
+ *
+ * @returns {Array<object>} - A list with all the errors object.
+ * @example [{ field: "firstName", rule: "missing_or_empty" }]
+ */
+export function validateNumberOrNumberArray(value, fieldName) {
+  const errors = [];
+
+  const validateSingleNumber = (n) => {
+    errors.push(...validateString(String(n), fieldName, "numeric"));
+  };
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      errors.push({ field: fieldName, rule: "min_length", expected: 1 });
+    } else {
+      value.forEach(validateSingleNumber);
+    }
+  } else if (value !== undefined && value !== null) {
+    validateSingleNumber(value);
+  }
+
+  return errors;
+}
