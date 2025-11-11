@@ -13,7 +13,7 @@ export async function createApplicationHandler(req, res) {
   const { customBannerFile, attachments } = req.files;
 
   const { application: applicationData } = await application.create({
-    uuidAuthor: req.role.uuid,
+    uuidAuthor: req.user.uuid_user,
     body: req.body,
     customBannerFile: customBannerFile ? customBannerFile[0] : undefined,
     attachments: attachments || [],
