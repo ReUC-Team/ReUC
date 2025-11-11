@@ -14,10 +14,13 @@ import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
  */
 export async function getApplicationsByFaculty({ faculty, page, perPage }) {
   try {
+    const pageNum = Number(page) >= 1 ? Number(page) : undefined;
+    const perPageNum = Number(perPage) >= 1 ? Number(perPage) : undefined;
+
     return await applicationRepo.getLimitedByFacultyWithoutProjectRelation({
       faculty,
-      page,
-      perPage,
+      page: pageNum,
+      perPage: perPageNum,
     });
   } catch (err) {
     if (err instanceof InfrastructureError.InfrastructureError)
