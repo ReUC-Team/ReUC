@@ -5,7 +5,14 @@ import ProjectSummary from '../components/ProjectSummary';
 import ProjectInfoCard from '../components/ProjectInfoCard';
 import AttachmentCard from '../components/AttachmentCard';
 import useApplicationDetails from '../hooks/useApplicationDetails';
-import { downloadAllAttachments } from '../projectsService';
+import { downloadAllAttachments, approveApplication } from '../projectsService';
+import { Alerts } from '@/shared/alerts';
+import { 
+  PROJECT_TYPE_MAP, 
+  FACULTY_MAP, 
+  PROBLEM_TYPE_MAP, 
+  mapNamesToIds 
+} from '../constants/metadata';
 
 export default function ProjectDetails() {
   const { uuid } = useParams();
@@ -13,6 +20,7 @@ export default function ProjectDetails() {
   const { application, isLoading, error } = useApplicationDetails(uuid);
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
+  const [isApproving, setIsApproving] = useState(false);
 
 
   // Formatear fechas
@@ -49,6 +57,76 @@ export default function ProjectDetails() {
       setDownloadError(errorMessage);
     } finally {
       setIsDownloadingAll(false);
+    }
+  }; 
+
+    const handleApprove = async () => {
+    const confirmed = window.confirm(
+      '¿Estás seguro de que deseas aprobar este proyecto?\n\n' +
+      'Esta acción creará un nuevo proyecto activo basado en esta solicitud.'
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsApproving(true);
+    
+    try {
+      // Mapear nombres a ID
+      const projectTypeIds = application.projectTypeIds || 
+        mapNamesToIds(application.projectTypes, PROJECT_TYPE_MAP);
+      
+      const facultyIds = application.facultyIds || 
+        mapNamesToIds(application.faculties, FACULTY_MAP);
+      
+      const problemTypeIds = application.problemTypeIds || 
+        mapNamesToIds(application.problemTypes, PROBLEM_TYPE_MAP);
+
+      // Validar que no estén vacíos
+      if (projectTypeIds.length === 0) {
+        Alerts.warning('El proyecto debe tener al menos un tipo de proyecto');
+        return;
+      }
+      if (facultyIds.length === 0) {
+        Alerts.warning('El proyecto debe tener al menos una facultad');
+        return;
+      }
+      if (problemTypeIds.length === 0) {
+        Alerts.warning('El proyecto debe tener al menos un tipo de problemática');
+        return;
+      }
+
+      const projectData = {
+        title: application.title,
+        shortDescription: application.shortDescription,
+        description: application.detailedDescription,
+        estimatedDate: application.dueDate?.split('T')[0] || null,
+        projectType: projectTypeIds,
+        faculty: facultyIds,
+        problemType: problemTypeIds,
+      };
+
+      const response = await approveApplication(uuid, projectData);
+
+      console.log('Proyecto aprobado:', response);
+
+      Alerts.success('¡Proyecto aprobado exitosamente!');
+      
+      setTimeout(() => {
+        navigate('/my-projects');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error al aprobar proyecto:', error);
+      
+      if (error.message) {
+        Alerts.error(error.message);
+      } else {
+        Alerts.error('No se pudo aprobar el proyecto. Por favor, intenta nuevamente.');
+      }
+    } finally {
+      setIsApproving(false);
     }
   };
 
@@ -195,12 +273,8 @@ export default function ProjectDetails() {
     }
   };
 
-  // Función para aceptar proyecto
-  const handleAccept = () => {
-    console.log('Aceptar proyecto:', uuid);
-    alert('Funcionalidad de aceptar proyecto en desarrollo');
-  };
-
+  const isAlreadyApproved = application?.status === 'approved';
+  
   return (
     <section className="w-full px-10 py-12">
       {/* Botón de regreso */}
@@ -268,10 +342,38 @@ export default function ProjectDetails() {
             <div className='flex gap-5'>
               {/* Botón Aceptar Proyecto */}
               <button 
-                onClick={handleAccept}
-                className="px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700 font-semibold w-6/12 transition"
+                onClick={handleApprove}
+                disabled={isApproving || isAlreadyApproved}
+                className={`px-4 py-2 rounded-lg font-semibold w-6/12 transition flex items-center justify-center gap-2 ${
+                  isAlreadyApproved
+                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    : 'bg-lime-600 text-white hover:bg-lime-700'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                title={isAlreadyApproved ? 'Este proyecto ya fue aprobado' : 'Aprobar proyecto y crear nuevo proyecto activo'}
               >
-                Aceptar proyecto
+                {isApproving ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Aprobando...
+                  </>
+                ) : isAlreadyApproved ? (
+                  <>
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Ya aprobado
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Aceptar proyecto
+                  </>
+                )}
               </button>
               
               {/* Botón Descargar Todos los Archivos */}
@@ -315,6 +417,21 @@ export default function ProjectDetails() {
             >
               Ponerse en contacto
             </button>
+
+            {isAlreadyApproved && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-start gap-2">
+                <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="font-semibold mb-1">Proyecto ya aprobado</p>
+                  <p className="text-xs">
+                    Este proyecto ya fue convertido en un proyecto activo. 
+                    Puedes encontrarlo en la sección "Mis proyectos".
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

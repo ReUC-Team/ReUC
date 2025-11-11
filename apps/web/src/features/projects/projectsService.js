@@ -297,3 +297,40 @@ export async function downloadAllAttachments(attachments) {
   
   return { successful, failed, errors };
 }
+
+/**
+ * Aprueba una Application y crea un Project
+ * @param {string} uuid_application - UUID de la Application a aprobar
+ * @param {object} projectData - Datos opcionales del proyecto (título, descripción, etc.)
+ * @returns {Promise<object>} Project creado
+ * @throws {ValidationError|ApplicationError}
+ */
+export async function approveApplication(uuid_application, projectData = {}) {
+  const csrfToken = await getCSRFToken();
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/create`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "csrf-token": csrfToken,
+      },
+      body: JSON.stringify({
+        uuidApplication: uuid_application,
+        // Heredar datos de la Application o usar valores modificados
+        title: projectData.title,
+        shortDescription: projectData.shortDescription,
+        description: projectData.description,
+        estimatedEffortHours: projectData.estimatedEffortHours,
+        estimatedDate: projectData.estimatedDate,
+        projectType: projectData.projectType,
+        faculty: projectData.faculty,
+        problemType: projectData.problemType,
+        problemTypeOther: projectData.problemTypeOther,
+      }),
+    }
+  );
+
+  return response.data;
+}
