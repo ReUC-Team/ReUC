@@ -211,6 +211,12 @@
     },
     "/mobile/project/create": {
       "$ref": "./components/tags/project/paths/MobileCreate.json"
+    },
+    "/project/all": {
+      "$ref": "./components/tags/project/paths/GetProjects.json"
+    },
+    "/project/my-projects": {
+      "$ref": "./components/tags/project/paths/GetMyProjects.json"
     }
   }
 }

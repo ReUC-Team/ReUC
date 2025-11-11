@@ -1,0 +1,26 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Get all projects",
+    "description": "Retrieves a paginated list of all projects in the system.\n - Requires **\"professor\"** role.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [] }],
+    "parameters": [
+      { "$ref": "../../common/parameters/Page.json" },
+      { "$ref": "../../common/parameters/PerPage.json" }
+    ],
+    "responses": {
+      "200": {
+        "description": "All projects retrieved successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/GetProjectsSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}
