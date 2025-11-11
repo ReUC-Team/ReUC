@@ -115,9 +115,9 @@ export function validateCreationPayload(
  * Validates the query parameters for exploring applications.
  *
  * @param {object} params
- * @param {string} [faculty] - The faculty name to filter by.
- * @param {number|string} [page] - The page number for pagination.
- * @param {number|string} [perPage] - The number of items per page.
+ * @param {string} [params.faculty] - The faculty name to filter by.
+ * @param {number|string} [params.page] - The page number for pagination.
+ * @param {number|string} [params.perPage] - The number of items per page.
  *
  * @throws {ValidationError} If the query parameters are invalid.
  */

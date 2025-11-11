@@ -1,3 +1,4 @@
+import config from "../../config/index.js";
 import project from "@reuc/application/project/index.js";
 
 /**
@@ -9,5 +10,45 @@ export async function createProjectHandler(req, res) {
   return res.status(201).json({
     success: true,
     data: { project: applicationData },
+  });
+}
+
+/**
+ * Handles fetching a paginated list of projects.
+ */
+export async function getProjectsHandler(req, res) {
+  const user = req.user;
+  const { page, perPage } = req.query;
+
+  const projects = await project.getProjects(user.uuid_user, config.jwt, {
+    page,
+    perPage,
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      projects,
+    },
+  });
+}
+
+/**
+ * Handles fetching a paginated list of user-requesting projects.
+ */
+export async function getMyProjectsHandler(req, res) {
+  const user = req.user;
+  const { page, perPage } = req.query;
+
+  const projects = await project.myProjects(user.uuid_user, config.jwt, {
+    page,
+    perPage,
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      projects,
+    },
   });
 }
