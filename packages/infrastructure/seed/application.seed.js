@@ -6,20 +6,20 @@ const getRandomSample = (arr, count) => {
 };
 
 export const applicationSeedData = (
-  outsiders,
+  author,
   faculties,
   projectTypes,
   problemTypes,
   count = 15
 ) => {
   if (
-    !outsiders.length ||
+    !author.length ||
     !faculties.length ||
     !projectTypes.length ||
     !problemTypes.length
   ) {
     console.log(
-      "Skipping application seeding due to missing related data (outsiders, faculties, etc.)."
+      "Skipping application seeding due to missing related data (author, faculties, etc.)."
     );
     return [];
   }
@@ -27,8 +27,7 @@ export const applicationSeedData = (
   const applications = [];
 
   for (let i = 0; i < count; i++) {
-    const randomOutsider =
-      outsiders[Math.floor(Math.random() * outsiders.length)];
+    const randomAuthor = author[Math.floor(Math.random() * author.length)];
 
     const selectedFaculties = getRandomSample(
       faculties,
@@ -48,7 +47,7 @@ export const applicationSeedData = (
       shortDescription: faker.lorem.sentence(),
       description: faker.lorem.paragraphs(3),
       deadline: faker.date.future({ years: 1 }),
-      uuidOutsider: randomOutsider.uuid_outsider,
+      uuidAuthor: randomAuthor.uuid_user,
 
       applicationFaculty: {
         create: selectedFaculties.map((faculty) => ({

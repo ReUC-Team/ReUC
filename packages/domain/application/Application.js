@@ -4,7 +4,7 @@ import * as DomainError from "../errors/index.js";
 export class Application extends BaseEntity {
   static allowedFields = [
     "uuid_application",
-    "uuidOutsider",
+    "uuidAuthor",
     "title",
     "shortDescription",
     "description",
@@ -19,7 +19,7 @@ export class Application extends BaseEntity {
     super(data, Application.allowedFields);
 
     const requiredFields = [
-      "uuidOutsider",
+      "uuidAuthor",
       "title",
       "shortDescription",
       "description",

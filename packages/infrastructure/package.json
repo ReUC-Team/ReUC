@@ -11,7 +11,8 @@
     "test": "dotenv -e .env.test -- vitest run",
     "db:seed": "node ./seed/seed.js",
     "db:migrate": "npx prisma migrate dev",
-    "db:apply": "npx prisma generate client"
+    "db:apply": "npx prisma generate client",
+    "db:clear": "node ./seed/clear.js"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.0.0",

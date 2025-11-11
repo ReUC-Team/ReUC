@@ -55,6 +55,8 @@ model User {
   professor Professor?
   outsider  Outsider?
 
+  application Application[]
+
   @@index([email])
   @@map("Users")
 }
@@ -111,8 +113,6 @@ model Outsider {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  application Application[]
-
   @@index([uuidUser])
   @@map("Outsiders")
 }
@@ -142,7 +142,7 @@ model Outsider {
  */
 model Application {
   uuid_application String   @id @default(uuid())
-  uuidOutsider     String   @map("uuid_outsider")
+  uuidAuthor       String   @map("uuid_author")
   title            String
   shortDescription String   @map("short_description")
   description      String
@@ -150,14 +150,14 @@ model Application {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  outsider Outsider @relation(fields: [uuidOutsider], references: [uuid_outsider])
+  author User @relation(fields: [uuidAuthor], references: [uuid_user])
 
   project                Project?
   applicationProjectType Application_Project_Type[]
   applicationFaculty     Application_Faculty[]
   applicationProblemType Application_Problem_Type[]
 
-  @@index([uuidOutsider])
+  @@index([uuidAuthor])
   @@index([createdAt])
   @@index([deadline])
   @@map("Applications")

@@ -132,13 +132,13 @@ async function seedDummyData() {
   }
   // ======================= APPLICATIONS =======================
   console.log("  - Generating dummy application data...");
-  const allOutsiders = await prisma.outsider.findMany();
+  const allUsers = await prisma.user.findMany({ take: outsiderLimit });
   const allFaculties = await prisma.faculty.findMany();
   const allProjectTypes = await prisma.project_Type.findMany();
   const allProblemTypes = await prisma.problem_Type.findMany();
 
   const applicationsToCreate = applicationSeedData(
-    allOutsiders,
+    allUsers,
     allFaculties,
     allProjectTypes,
     allProblemTypes,

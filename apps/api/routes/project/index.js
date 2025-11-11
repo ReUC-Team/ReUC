@@ -10,7 +10,7 @@ projectRouter.use(authMiddleware);
 
 const csrfProtection = csurf({ cookie: true });
 
-applicationRouter.post(
+projectRouter.post(
   "/create",
   csrfProtection,
   requireRole("professor"),

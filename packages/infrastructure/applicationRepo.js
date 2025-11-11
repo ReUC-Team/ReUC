@@ -53,7 +53,7 @@ export const applicationRepo = {
           data: createData,
           select: {
             uuid_application: true,
-            uuidOutsider: true,
+            uuidAuthor: true,
             title: true,
             shortDescription: true,
             description: true,
@@ -194,19 +194,19 @@ export const applicationRepo = {
         where: { uuid_application: uuid },
         select: {
           // --- User & Organization ---
-          outsider: {
+          author: {
             select: {
-              user: {
+              uuid_user: true,
+              firstName: true,
+              middleName: true,
+              lastName: true,
+              outsider: {
                 select: {
-                  uuid_user: true,
-                  firstName: true,
-                  middleName: true,
-                  lastName: true,
+                  location: true,
+                  phoneNumber: true,
+                  organizationName: true,
                 },
               },
-              organizationName: true,
-              phoneNumber: true,
-              location: true,
             },
           },
           // --- Application Details ---
@@ -214,6 +214,7 @@ export const applicationRepo = {
           shortDescription: true,
           description: true,
           deadline: true,
+          createdAt: true,
           // --- Related Types (Many-to-Many) ---
           applicationProjectType: {
             select: {
@@ -565,7 +566,7 @@ const filtered = await prisma.application.findMany({
 
 ### User logs in and wants to view their past submissions.
 await prisma.application.findMany({
-  where: { uuidOutsider: outsiderId },
+  where: { uuidAuthor: outsiderId },
   include: {
     project: true,
     applicationProjectType: {

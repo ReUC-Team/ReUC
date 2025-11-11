@@ -16,7 +16,7 @@
                 "shortDescription": { "type": "string" },
                 "description": { "type": "string" },
                 "deadline": { "type": "string", "format": "date-time" },
-                "uuidOutsider": { "type": "string", "format": "uuid" }
+                "uuidAplication": { "type": "string", "format": "uuid" }
               },
               "required": [
                 "uuid_application",
@@ -24,7 +24,7 @@
                 "shortDescription",
                 "description",
                 "deadline",
-                "uuidOutsider"
+                "uuidAplication"
               ]
             }
           },
