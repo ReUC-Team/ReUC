@@ -16,7 +16,7 @@ import { ValidationError } from "../errors/ValidationError.js";
  * @returns {Array<object>} - A list with all the errors object.
  * @example [{ field: "firstName", rule: "missing_or_empty" }]
  */
-export function validateSignedNumber(value, fieldName) {
+function validateSignedNumber(value, fieldName) {
   const errors = [];
   const signedNumberRegex = /^-?[0-9]+$/;
 
@@ -56,6 +56,45 @@ export function validateSignedNumber(value, fieldName) {
   });
 
   return errors;
+}
+
+/**
+ * Validates the pagination query parameters for a paginated request.
+ *
+ * @param {object} params
+ * @param {number|string} [params.page] - The page number for pagination.
+ * @param {number|string} [params.perPage] - The number of items per page.
+ *
+ * @returns {Array<object>} - A list with all the errors object.
+ * @example [{ field: "firstName", rule: "missing_or_empty" }]
+ */
+function validatePaginationQuery({ page, perPage }) {
+  const allErrors = [];
+
+  if (page !== undefined) {
+    const pageNum = Number(page);
+
+    if (!Number.isInteger(pageNum) || pageNum < 1) {
+      allErrors.push({
+        field: "page",
+        rule: "invalid_format",
+        expected: "positive integer",
+      });
+    }
+  }
+
+  if (perPage !== undefined) {
+    const perPageNum = Number(perPage);
+    if (!Number.isInteger(perPageNum) || perPageNum < 1) {
+      allErrors.push({
+        field: "perPage",
+        rule: "invalid_format",
+        expected: "positive integer",
+      });
+    }
+  }
+
+  return allErrors;
 }
 
 /**
@@ -121,5 +160,45 @@ export function validateCreationPayload(uuidApplication, body) {
     throw new ValidationError("Input validation failed.", {
       details: allErrors,
     });
+  }
+}
+
+/**
+ * Validates the query parameters for get proyects.
+ *
+ * @param {object} params
+ * @param {number|string} [params.page] - The page number for pagination.
+ * @param {number|string} [params.perPage] - The number of items per page.
+ *
+ * @throws {ValidationError} If the query parameters are invalid.
+ */
+export function validateGetProjectsQuery({ page, perPage }) {
+  const allErrors = [];
+
+  allErrors.push(...validatePaginationQuery({ page, perPage }));
+
+  if (allErrors.length > 0) {
+    throw new ValidationError("Invalid query parameters.", allErrors);
+  }
+}
+
+/**
+ * Validates the query parameters for my projects.
+ *
+ * @param {object} params
+ * @param {string} params.uuidRequestingUser - The unique identifier for the user.
+ * @param {number|string} [params.page] - The page number for pagination.
+ * @param {number|string} [params.perPage] - The number of items per page.
+ *
+ * @throws {ValidationError} If the query parameters are invalid.
+ */
+export function validateMyProjectsQuery({ uuidRequestingUser, page, perPage }) {
+  const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidRequestingUser, "uuidRequestingUser"));
+  allErrors.push(...validatePaginationQuery({ page, perPage }));
+
+  if (allErrors.length > 0) {
+    throw new ValidationError("Invalid query parameters.", allErrors);
   }
 }

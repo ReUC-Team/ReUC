@@ -1,8 +1,8 @@
 {
   "type": "object",
-  "description": "Summary details for an application listing.",
+  "description": "Summary details for a project listing.",
   "properties": {
-    "uuid_application": { "type": "string", "format": "uuid" },
+    "uuid_project": { "type": "string", "format": "uuid" },
     "title": {
       "type": "string",
       "example": "New University Project Initiative"
@@ -11,13 +11,20 @@
       "type": "string",
       "example": "A brief summary of the project."
     },
+    "uuidApplication": { "type": "string", "format": "uuid" },
     "bannerUrl": {
       "type": "string",
       "format": "url",
       "nullable": true,
       "example": "/file/APPLICATION/BANNER/123e4567-e89b-12d3-a456-426614174000",
-      "description": "URL to the application's banner image."
+      "description": "URL to the application's banner image. Can be null."
     }
   },
-  "required": ["uuid_application", "title", "shortDescription", "bannerUrl"]
+  "required": [
+    "uuid_project",
+    "title",
+    "shortDescription",
+    "uuidApplication",
+    "bannerUrl"
+  ]
 }

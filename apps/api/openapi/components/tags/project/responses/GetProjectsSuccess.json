@@ -1,0 +1,35 @@
+{
+  "description": "Successful response containing a list of projects and pagination metadata.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "projects": {
+              "allOf": [
+                {
+                  "$ref": "../../common/Objects/RecordsPaginated.json"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "records": {
+                      "type": "array",
+                      "description": "The list of projects for the current page.",
+                      "items": {
+                        "$ref": "../common/ObjectRecords.json"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}
