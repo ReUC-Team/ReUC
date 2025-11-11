@@ -1,12 +1,11 @@
-// apps/mobile/src/features/auth/services/authServiceNative.ts
-
-import { Platform } from "react-native";
-import { API_URL } from '@env'
+// apps/mobile/src/features/auth/services/authService.ts
+import { Platform } from 'react-native'
+import { API_URL, MOBILE_API_KEY } from '@env'
 import { tokenStorage } from '../utils/tokenStorage'
 import { createErrorFromResponse } from '../../../utils/errorHandler'
 
 const userAgent = `ReUC/1.0 (${Platform.OS})`
-const MOBILE_API_KEY = 'test_mobile_key_1234567890'
+
 export interface RegisterData {
   email: string
   password: string
@@ -82,6 +81,9 @@ export async function login(email: string, password: string) {
 /**
  * Refresca el access token usando el refresh token
  * Lanza excepciones estructuradas en caso de error
+ * 
+ * NOTA: Esta función es usada internamente por client.ts
+ * No necesitas llamarla manualmente
  */
 export async function refreshAccessToken(): Promise<string> {
   const refreshToken = await tokenStorage.getRefreshToken()

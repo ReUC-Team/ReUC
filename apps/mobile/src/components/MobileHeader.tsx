@@ -3,7 +3,7 @@
 import React from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
-import { MobileHeaderStyles as styles } from '../styles/components/header/MobileHeader.styles'
+import { MobileHeaderStyles as styles } from '@styles'
 
 export default function MobileHeader() {
   const nav = useNavigation<any>()
