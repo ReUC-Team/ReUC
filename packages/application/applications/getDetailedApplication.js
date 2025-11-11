@@ -42,7 +42,7 @@ export async function getDetailedApplication(
     ]);
 
     // Step 2: Normalize and separate the data.
-    const author = _normalizeAuthor(applicationData.outsider);
+    const author = _normalizeAuthor(applicationData.author);
     const details = _normalizeDetails(applicationData);
     const { bannerUrl, attachments } = _normalizeFiles(
       uuidUser,
@@ -84,22 +84,20 @@ export async function getDetailedApplication(
 /**
  * @private
  * Normalize the author data from the domain model.
- * @param {object} outsider - The 'outsider' object from the domain.
+ * @param {object} author - The 'user' object from the domain.
  */
-function _normalizeAuthor(outsider) {
-  if (!outsider) return null; // Or some default author object
+function _normalizeAuthor(author) {
+  if (!author) return null; // Or some default author object
 
-  const { user, organizationName, phoneNumber, location } = outsider;
-  const fullName = [user.firstName, user.middleName, user.lastName]
-    .filter(Boolean)
-    .join(" ");
+  const { uuid_user, firstName, middleName, lastName, outsider } = author;
+  const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
 
   return {
-    uuid_user: user.uuid_user,
+    uuid_user: uuid_user,
     fullName,
-    organizationName,
-    phoneNumber,
-    location,
+    organizationName: outsider?.organizationName || null,
+    phoneNumber: outsider?.phoneNumber || null,
+    location: outsider?.location || null,
   };
 }
 
@@ -110,11 +108,13 @@ function _normalizeAuthor(outsider) {
  */
 function _normalizeDetails(appData) {
   // Flatten the many-to-many relationships
-  const projectTypes = appData.applicationProjectType.map(
+  const projectTypes = (appData?.applicationProjectType || []).map(
     (pt) => pt.projectTypeId.name
   );
-  const faculties = appData.applicationFaculty.map((f) => f.facultyTypeId.name);
-  const problemTypes = appData.applicationProblemType.map(
+  const faculties = (appData?.applicationFaculty || []).map(
+    (f) => f.facultyTypeId.name
+  );
+  const problemTypes = (appData?.applicationProblemType || []).map(
     (pt) => pt.problemTypeId.name
   );
 
@@ -123,6 +123,7 @@ function _normalizeDetails(appData) {
     shortDescription: appData.shortDescription,
     description: appData.description,
     deadline: appData.deadline,
+    createdAt: appData.createdAt,
     projectTypes,
     faculties,
     problemTypes,

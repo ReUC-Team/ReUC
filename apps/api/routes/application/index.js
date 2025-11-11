@@ -75,7 +75,7 @@ applicationRouter.get(
 applicationRouter.post(
   "/create",
   csrfProtection,
-  requireRole("outsider"),
+  requireRole(["outsider", "professor"]),
   fileUploadMiddleware,
   asyncHandler(createApplicationHandler)
 );

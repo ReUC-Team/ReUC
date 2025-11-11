@@ -25,7 +25,7 @@ export async function createApplication({
   try {
     const newApplication = new Application({
       ...application,
-      uuidOutsider: uuidAuthor,
+      uuidAuthor,
       applicationProjectType: application.projectType,
       applicationFaculty: application.faculty,
       applicationProblemType: application.problemType,
