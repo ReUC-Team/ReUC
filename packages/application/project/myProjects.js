@@ -1,5 +1,5 @@
 import * as ApplicationError from "../errors/index.js";
-import { validateMyProjectsQuery } from "./validators.js";
+import { validateGetProjectsQuery } from "./validators.js";
 import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
 import { getProjectsByAuthor } from "@reuc/domain/project/getProjectsByAuthor.js";
 import { getLinksByTargets } from "@reuc/domain/file/getLinksByTargets.js";
@@ -25,7 +25,7 @@ export async function myProjects(
   tokenConfig,
   { page, perPage }
 ) {
-  validateMyProjectsQuery({ uuidRequestingUser, page, perPage });
+  validateGetProjectsQuery({ uuidRequestingUser, page, perPage });
 
   try {
     // Step 1: Get the primary data from the project domain
@@ -80,7 +80,7 @@ export async function myProjects(
         { cause: err }
       );
 
-    console.error(`Application Error (application.getProjectsByAuthor):`, err);
+    console.error(`Application Error (project.myProjects):`, err);
     throw new ApplicationError.ApplicationError(
       "An unexpected error occurred while fetching your projects.",
       { cause: err }
