@@ -3,6 +3,7 @@ import {
   validateString,
   validateUuid,
   validateNumberOrNumberArray,
+  validatePaginationQuery,
 } from "../shared/validators.js";
 import { ValidationError } from "../errors/ValidationError.js";
 import { validateFile } from "@reuc/file-storage/shared/validations.js";
@@ -112,44 +113,56 @@ export function validateCreationPayload(
 }
 
 /**
+ * Validates a standard query parameters for get applications.
+ *
+ * @param {object} params
+ * @param {string} params.uuidRequestingUser - The unique identifier for the user.
+ * @param {number|string} [params.page] - The page number for pagination.
+ * @param {number|string} [params.perPage] - The number of items per page.
+ *
+ * @throws {ValidationError} If the query parameters are invalid.
+ */
+export function validateGetApplicationsQuery({
+  uuidRequestingUser,
+  page,
+  perPage,
+}) {
+  const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidRequestingUser, "uuidRequestingUser"));
+  allErrors.push(...validatePaginationQuery({ page, perPage }));
+
+  if (allErrors.length > 0) {
+    throw new ValidationError("Invalid query parameters.", allErrors);
+  }
+}
+
+/**
  * Validates the query parameters for exploring applications.
  *
  * @param {object} params
+ * @param {string} params.uuidRequestingUser - The unique identifier for the user.
  * @param {string} [params.faculty] - The faculty name to filter by.
  * @param {number|string} [params.page] - The page number for pagination.
  * @param {number|string} [params.perPage] - The number of items per page.
  *
  * @throws {ValidationError} If the query parameters are invalid.
  */
-export function validateExploreQuery({ faculty, page, perPage }) {
+export function validateExploreQuery({
+  uuidRequestingUser,
+  faculty,
+  page,
+  perPage,
+}) {
   const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidRequestingUser, "uuidRequestingUser"));
 
   if (faculty !== undefined) {
     allErrors.push(...validateString(faculty, "faculty", "name"));
   }
 
-  if (page !== undefined) {
-    const pageNum = Number(page);
-
-    if (!Number.isInteger(pageNum) || pageNum < 1) {
-      allErrors.push({
-        field: "page",
-        rule: "invalid_format",
-        expected: "positive integer",
-      });
-    }
-  }
-
-  if (perPage !== undefined) {
-    const perPageNum = Number(perPage);
-    if (!Number.isInteger(perPageNum) || perPageNum < 1) {
-      allErrors.push({
-        field: "perPage",
-        rule: "invalid_format",
-        expected: "positive integer",
-      });
-    }
-  }
+  allErrors.push(...validatePaginationQuery({ page, perPage }));
 
   if (allErrors.length > 0) {
     throw new ValidationError("Invalid query parameters.", allErrors);

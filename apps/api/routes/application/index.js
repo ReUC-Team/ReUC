@@ -9,6 +9,7 @@ import {
   getExploreApplicationsHandler,
   getExploreFiltersHandler,
   getDetailedApplicationHandler,
+  getMyApplicationsHandler,
 } from "./handlers.js";
 
 export const applicationRouter = express.Router();
@@ -92,4 +93,9 @@ applicationRouter.get(
   "/:uuid",
   requireRole(["professor"]),
   asyncHandler(getDetailedApplicationHandler)
+);
+applicationRouter.get(
+  "/my-applications",
+  requireRole(["outsider", "professor"]),
+  asyncHandler(getMyApplicationsHandler)
 );

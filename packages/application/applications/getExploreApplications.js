@@ -10,7 +10,7 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * Retrieves a paginated list of applications for the "Explore" page,
  * optionally filtered by faculty.
  *
- * @param {string} uuidUser - The unique identifier for the user requesting the applications.
+ * @param {string} uuidRequestingUser - The unique identifier for the user requesting the applications.
  * @param {object} tokenConfig - Configuration for tokens.
  * @param {string} tokenConfig.ticketSecret - The secret for the ticket token.
  * @param {object} tokenConfig.ticketExpiresIn - The expiration for the new ticket token.
@@ -25,11 +25,11 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @throws {ApplicationError.ApplicationError} For any unexpected errors.
  */
 export async function getExploreApplications(
-  uuidUser,
+  uuidRequestingUser,
   tokenConfig,
   { faculty, page, perPage }
 ) {
-  validateExploreQuery({ faculty, page, perPage });
+  validateExploreQuery({ uuidRequestingUser, faculty, page, perPage });
 
   try {
     // Step 1: Get the primary data from the application domain
@@ -65,7 +65,7 @@ export async function getExploreApplications(
 
         // 3. Generate the ticket
         const ticket = generateFileTicket({
-          uuidUser: uuidUser,
+          uuidUser: uuidRequestingUser,
           fileIdentifier,
           audience: "viewing",
           tokenConfig,

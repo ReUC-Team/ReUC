@@ -1,13 +1,13 @@
 import * as ApplicationError from "../errors/index.js";
-import { validateGetProjectsQuery } from "./validators.js";
+import { validateGetApplicationsQuery } from "./validators.js";
 import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
-import { getProjectsByAuthor } from "@reuc/domain/project/getProjectsByAuthor.js";
+import { getApplicationsByAuthor } from "@reuc/domain/application/getApplicationsByAuthor.js";
 import { getLinksByTargets } from "@reuc/domain/file/getLinksByTargets.js";
 import { buildFileUrl } from "@reuc/domain/file/buildFileUrl.js";
 import * as DomainError from "@reuc/domain/errors/index.js";
 
 /**
- * Retrieves a paginated list of projects created by the requesting user.
+ * Retrieves a paginated list of applications created by the requesting user.
  * @param {string} uuidRequestingUser - The unique identifier for the user.
  * @param {object} tokenConfig - Configuration for tokens.
  * @param {string} tokenConfig.ticketSecret
@@ -20,27 +20,27 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @throws {ApplicationError.ValidationError} If query parameters are invalid.
  * @throws {ApplicationError.ApplicationError} For any unexpected errors.
  */
-export async function myProjects(
+export async function myApplications(
   uuidRequestingUser,
   tokenConfig,
   { page, perPage }
 ) {
-  validateGetProjectsQuery({ uuidRequestingUser, page, perPage });
+  validateGetApplicationsQuery({ uuidRequestingUser, page, perPage });
 
   try {
     // Step 1: Get the primary data from the project domain
-    const { records: projects, metadata } = await getProjectsByAuthor({
+    const { records: applications, metadata } = await getApplicationsByAuthor({
       uuidAuthor: uuidRequestingUser,
       page,
       perPage,
     });
 
-    if (projects.length === 0) {
+    if (applications.length === 0) {
       return { records: [], metadata };
     }
 
     // Step 2: Get related file data (identical logic to getProjects)
-    const applicationIds = projects.map((p) => p.uuidApplication);
+    const applicationIds = applications.map((p) => p.uuid_application);
     const bannerLinks = await getLinksByTargets(
       "APPLICATION",
       applicationIds,
@@ -67,12 +67,12 @@ export async function myProjects(
     }
 
     // Step 4: Combine the data (identical logic)
-    const projectsWithBanners = projects.map((project) => ({
+    const applicationsWithBanners = applications.map((project) => ({
       ...project,
-      bannerUrl: bannerMap.get(project.uuidApplication) || null,
+      bannerUrl: bannerMap.get(project.uuid_application) || null,
     }));
 
-    return { records: projectsWithBanners, metadata };
+    return { records: applicationsWithBanners, metadata };
   } catch (err) {
     if (err instanceof DomainError.DomainError)
       throw new ApplicationError.ApplicationError(
@@ -80,9 +80,9 @@ export async function myProjects(
         { cause: err }
       );
 
-    console.error(`Application Error (project.myProjects):`, err);
+    console.error(`Application Error (application.myApplications):`, err);
     throw new ApplicationError.ApplicationError(
-      "An unexpected error occurred while fetching your projects.",
+      "An unexpected error occurred while fetching your applications.",
       { cause: err }
     );
   }

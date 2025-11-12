@@ -195,6 +195,9 @@
     "/application/{uuid}": {
       "$ref": "./components/tags/application/paths/Get.json"
     },
+    "/application/my-applications": {
+      "$ref": "./components/tags/application/paths/GetMyApplications.json"
+    },
 
     "/admin/meta/tables": {
       "$ref": "./components/tags/admin/paths/MetadataTables.json"

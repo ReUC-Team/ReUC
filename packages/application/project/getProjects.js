@@ -25,7 +25,7 @@ export async function getProjects(
   tokenConfig,
   { page, perPage }
 ) {
-  validateGetProjectsQuery({ page, perPage });
+  validateGetProjectsQuery({ uuidRequestingUser, page, perPage });
 
   try {
     // Step 1: Get the primary data from the project domain
@@ -80,7 +80,7 @@ export async function getProjects(
         { cause: err }
       );
 
-    console.error(`Application Error (application.getProjects):`, err);
+    console.error(`Application Error (project.getProjects):`, err);
     throw new ApplicationError.ApplicationError(
       "An unexpected error occurred while fetching projects.",
       { cause: err }
