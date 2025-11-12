@@ -1,20 +1,17 @@
-// apps/mobile/src/features/dashboard/faculty/pages/DashboardFaculty.tsx
+// apps/mobile/src/features/dashboards/faculty/pages/DashboardFaculty.tsx
 
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { useThemedStyles } from '../../../../hooks/useThemedStyles'
-import { createComingSoonStyles } from '../../../../styles/screens/ComingSoon.styles'
+import { createDashboardMainStyles } from '../../../../styles/screens/DashboardMain.styles'
+import DashboardTabs from './DashboardTabs'
 
 export default function DashboardFaculty() {
-  const styles = useThemedStyles(createComingSoonStyles)
+  const styles = useThemedStyles(createDashboardMainStyles)
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Dashboard de Profesor</Text>
-      <Text style={styles.subtitle}>Próximamente disponible</Text>
-      <Text style={styles.description}>
-        Estamos trabajando en esta sección. Pronto podrás acceder a todas las funcionalidades para profesores.
-      </Text>
+      <DashboardTabs />
     </View>
   )
 }
