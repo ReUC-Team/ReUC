@@ -18,8 +18,8 @@ export {
 
 //Dashboard components 
 export * from './components/dashboard/dashboardComponents.styles'
-export { DashboardTabsStyles } from './components/dashboard/DashboardTabs.styles'
-export { BottomNavStyles }       from './components/header/BottomNav.styles'
+export { createDashboardTabsStyles } from './components/dashboard/DashboardTabs.styles'
+export { createBottomNavStyles }       from './components/header/BottomNav.styles'
 export { MobileHeaderStyles } from './components/header/MobileHeader.styles'
 
 //Screen styles 
