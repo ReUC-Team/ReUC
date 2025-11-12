@@ -1,7 +1,9 @@
+// apps/mobile/src/features/auth/hooks/useLoginNative.ts
+
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { login } from '../pages/authServiceNative'
-import { tokenStorage } from '../utils/tokenStorage' 
+import { useAuth } from '../../../context/AuthContext'
 import { 
   ValidationError, 
   AuthenticationError,
@@ -15,6 +17,7 @@ export default function useLoginNative() {
   const [isLoading, setIsLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, any>>({})
   const nav = useNavigation<any>()
+  const { refreshUser } = useAuth()
 
   const handleChange = (field: 'email' | 'password', value: string) => {
     if (fieldErrors[field]) {
@@ -34,18 +37,21 @@ export default function useLoginNative() {
     setFieldErrors({})
 
     try {
-      const { user } = await login(form.email, form.password)
+      // 1. Login y guardar tokens
+      await login(form.email, form.password)
       
-      // ← AGREGAR: Verificar tokens guardados
-      const accessToken = await tokenStorage.getAccessToken()
-      const refreshToken = await tokenStorage.getRefreshToken()
-      console.log('✅ Access Token:', accessToken ? 'Guardado' : 'NO guardado')
-      console.log('✅ Refresh Token:', refreshToken ? 'Guardado' : 'NO guardado')
+      console.log('✅ Login successful, tokens saved')
       
+      // 2. Cargar usuario completo desde /auth/me (incluye rol)
+      await refreshUser()
+      
+      console.log('✅ User session loaded')
+      
+      // 3. Navegar al dashboard (el router decidirá cuál mostrar)
       nav.navigate('Dashboard')
 
     } catch (error: any) {
-      console.error('Login error:', error)
+      console.error('❌ Login error:', error)
 
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
