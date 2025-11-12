@@ -107,7 +107,6 @@ export const applicationRepo = {
       );
     }
   },
-
   /**
    * Retrieves a paginated list of applications that are not yet linked to a project,
    * optionally filtered by faculty.
@@ -263,6 +262,71 @@ export const applicationRepo = {
       );
       throw new InfrastructureError.InfrastructureError(
         "Unexpected Infrastructure error while quering application",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Retrieves a paginated list of all applications owned by a specfic user.
+   * @param {object} options - The filtering and pagination options.
+   * @param {string} [options.uuidAuthor] - The unique indentifier ID of a user to filter by.
+   * @param {number} [options.page] - The current page number for pagination.
+   * @param {number} [options.perPage] - The number of items per page.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async getByUuidAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
+    try {
+      const where = { uuidAuthor };
+      const sort = { createdAt: "asc" };
+      const skip = (page - 1) * perPage;
+      const take = perPage;
+
+      const [applicationsRaw, totalItems] = await db.$transaction([
+        db.application.findMany({
+          where,
+          select: {
+            uuid_application: true,
+            title: true,
+            shortDescription: true,
+          },
+          orderBy: sort,
+          skip,
+          take,
+        }),
+        db.application.count({ where }),
+      ]);
+
+      const totalPages = Math.ceil(totalItems / perPage);
+
+      return {
+        records: applicationsRaw,
+        metadata: {
+          pagination: {
+            page: Number(page),
+            perPage: Number(perPage),
+            totalPages,
+            filteredItems: totalItems,
+          },
+          query: where,
+          sort,
+        },
+      };
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while querying applications by author: ${err.message}`,
+          { cause: err }
+        );
+
+      const context = JSON.stringify({ uuidAuthor, page, perPage });
+      console.error(
+        `Infrastructure error (applicationRepo.getByUuidUser) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while quering applications by author",
         { cause: err }
       );
     }

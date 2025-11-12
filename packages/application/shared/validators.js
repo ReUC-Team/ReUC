@@ -169,3 +169,42 @@ export function validateNumberOrNumberArray(value, fieldName) {
 
   return errors;
 }
+
+/**
+ * Validates the pagination query parameters for a paginated request.
+ *
+ * @param {object} params
+ * @param {number|string|undefined} [params.page] - The page number for pagination.
+ * @param {number|string|undefined} [params.perPage] - The number of items per page.
+ *
+ * @returns {Array<object>} - A list with all the errors object.
+ * @example [{ field: "firstName", rule: "missing_or_empty" }]
+ */
+export function validatePaginationQuery({ page, perPage }) {
+  const allErrors = [];
+
+  if (page !== undefined) {
+    const pageNum = Number(page);
+
+    if (!Number.isInteger(pageNum) || pageNum < 1) {
+      allErrors.push({
+        field: "page",
+        rule: "invalid_format",
+        expected: "positive integer",
+      });
+    }
+  }
+
+  if (perPage !== undefined) {
+    const perPageNum = Number(perPage);
+    if (!Number.isInteger(perPageNum) || perPageNum < 1) {
+      allErrors.push({
+        field: "perPage",
+        rule: "invalid_format",
+        expected: "positive integer",
+      });
+    }
+  }
+
+  return allErrors;
+}

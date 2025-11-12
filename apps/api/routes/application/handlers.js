@@ -99,3 +99,27 @@ export async function getDetailedApplicationHandler(req, res) {
     },
   });
 }
+
+/**
+ * Handles fetching a paginated list of user-requesting applications.
+ */
+export async function getMyApplicationsHandler(req, res) {
+  const user = req.user;
+  const { page, perPage } = req.query;
+
+  const applications = await application.myApplications(
+    user.uuid_user,
+    config.jwt,
+    {
+      page,
+      perPage,
+    }
+  );
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      applications,
+    },
+  });
+}
