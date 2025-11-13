@@ -43,7 +43,7 @@ export const ProfileProvider: React.FC<{ children: ReactNode }> = ({ children })
     } finally {
       setIsLoading(false)
     }
-  }, []) // ← SE MANTIENE ESTABLE
+  }, []) 
 
   useEffect(() => {
     refreshProfile()

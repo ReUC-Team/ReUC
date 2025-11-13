@@ -1,47 +1,37 @@
 // apps/mobile/src/features/dashboards/faculty/hooks/useFacultyStats.ts
 
+export interface FacultyStat {
+  label: string
+  value: number | string
+  icon: string 
+}
 
 export const useFacultyStats = () => {
-  const statsData = [
+  const statsData: FacultyStat[] = [
     {
       label: 'Proyectos Asignados',
       value: 8,
-      color: 'from-lime-500 to-lime-600',
-      bgColor: 'bg-lime-50',
-      textColor: 'text-lime-600',
       icon: 'folder-multiple'
     },
     {
       label: 'Proyectos en Curso',
       value: 7,
-      color: 'from-lime-500 to-lime-500',
-      bgColor: 'bg-lime-50',
-      textColor: 'text-lime-600',
-      icon: 'play-circle'
+      icon: 'progress-clock'
     },
     {
       label: 'Proyectos Finalizados',
       value: 1,
-      color: 'from-lime-500 to-lime-600',
-      bgColor: 'bg-lime-50',
-      textColor: 'text-lime-600',
       icon: 'check-circle'
     },
     {
       label: 'Solicitudes Pendientes',
       value: 12,
-      color: 'from-lime-500 to-lime-600',
-      bgColor: 'bg-lime-50',
-      textColor: 'text-lime-600',
-      icon: 'clock-outline'
+      icon: 'alert-circle-outline'
     },
     {
       label: 'Tiempo Promedio',
       value: '6 meses',
-      color: 'from-lime-500 to-lime-600',
-      bgColor: 'bg-lime-50',
-      textColor: 'text-lime-600',
-      icon: 'timer-outline'
+      icon: 'clock-outline'
     }
   ]
 

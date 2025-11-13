@@ -3,15 +3,18 @@
 import React, { useRef, useState } from 'react'
 import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { ProjectStatsStyles as styles } from '../../../../styles/components/dashboard/dashboardComponents.styles'
-import { palette } from '../../../../styles/theme/colors'
+import { useThemedStyles, useThemedPalette } from '../../../../hooks/useThemedStyles'
+import { createProjectStatsStyles } from '../../../../styles/components/dashboard/dashboardComponents.styles'
 import { spacing } from '../../../../styles/theme/spacing'
 import { useFacultyStats } from '../hooks/useFacultyStats'
 
 const { width: screenWidth } = Dimensions.get('window')
-const cardWidth = screenWidth * 0.7 // 70% del ancho de pantalla
+const cardWidth = screenWidth * 0.7
 
 const FacultyProjectStats: React.FC = () => {
+  const styles = useThemedStyles(createProjectStatsStyles)
+  const palette = useThemedPalette()
+
   const { statsData } = useFacultyStats()
   const scrollViewRef = useRef<ScrollView>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -27,11 +30,6 @@ const FacultyProjectStats: React.FC = () => {
       x: index * (cardWidth + 16),
       animated: true
     })
-  }
-
-  const handleStatClick = (stat: any) => {
-    console.log('Faculty stat clicked:', stat.label)
-    // Funcionalidad extra para más adelante
   }
 
   return (
@@ -50,8 +48,8 @@ const FacultyProjectStats: React.FC = () => {
 
       {/* Resumen General Section */}
       <View style={styles.summarySection}>
-        <Text style={styles.summaryTitle}>Resumen de Gestión</Text>
-        <Text style={styles.summarySubtitle}>Estado general de los proyectos bajo tu supervisión</Text>
+        <Text style={styles.summaryTitle}>Resumen General</Text>
+        <Text style={styles.summarySubtitle}>Estado actual de todos los proyectos asignados</Text>
         
         <View style={styles.summaryStats}>
           <View style={styles.summaryStatItem}>
@@ -67,7 +65,7 @@ const FacultyProjectStats: React.FC = () => {
       </View>
 
       {/* Estadísticas Title */}
-      <Text style={styles.sectionTitle}>Estadísticas de Facultad</Text>
+      <Text style={styles.sectionTitle}>Estadísticas</Text>
 
       {/* Horizontal Scrollable Cards */}
       <ScrollView 
@@ -91,7 +89,6 @@ const FacultyProjectStats: React.FC = () => {
               i === 0 && styles.horizontalCardFirst
             ]}
             activeOpacity={0.9}
-            onPress={() => handleStatClick(stat)}
           >
             {/* Floating Icon */}
             <View style={styles.floatingIcon}>
@@ -130,7 +127,7 @@ const FacultyProjectStats: React.FC = () => {
         ))}
       </View>
 
-      {/* Espacio adicional al final para scroll completo */}
+      {/* Espacio adicional al final */}
       <View style={{ height: spacing.xl }} />
     </ScrollView>
   )

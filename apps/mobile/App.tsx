@@ -5,11 +5,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import * as Font from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { ThemeProvider } from './src/context/ThemeContext'
-import { ProfileProvider } from './src/context/ProfileContext'   // ← IMPORTADO
+import { AuthProvider } from './src/context/AuthContext'
+import { ProfileProvider } from './src/context/ProfileContext'
 import AppNavigator from './src/routes/AppNavigator'
 import Toast from 'react-native-toast-message'
 
-// Mantener la splash screen visible mientras cargamos recursos
 SplashScreen.preventAutoHideAsync()
 
 export default function App() {
@@ -43,10 +43,12 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <ThemeProvider>
-        <ProfileProvider> {/* ← PROVEEDOR AGREGADO AQUÍ */}
-          <AppNavigator />
-          <Toast />
-        </ProfileProvider>
+        <AuthProvider> {/* ← NUEVO */}
+          <ProfileProvider>
+            <AppNavigator />
+            <Toast />
+          </ProfileProvider>
+        </AuthProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   )
