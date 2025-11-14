@@ -89,13 +89,15 @@ applicationRouter.get(
   "/metadata/explore",
   asyncHandler(getExploreFiltersHandler)
 );
-applicationRouter.get(
-  "/:uuid",
-  requireRole(["professor"]),
-  asyncHandler(getDetailedApplicationHandler)
-);
+
 applicationRouter.get(
   "/my-applications",
   requireRole(["outsider", "professor"]),
   asyncHandler(getMyApplicationsHandler)
+);
+
+applicationRouter.get(
+  "/:uuid",
+  requireRole(["outsider", "professor"]),
+  asyncHandler(getDetailedApplicationHandler)
 );

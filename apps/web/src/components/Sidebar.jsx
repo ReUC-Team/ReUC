@@ -45,6 +45,19 @@ export default function Sidebar() {
 
                     <li className="flex items-center gap-4">
                         <Link 
+                            to="/my-applications" 
+                            className={`flex items-center gap-4 ${isDark ? 'text-white' : ''} ${largeText ? 'text-2xl' : ''} ${dyslexiaFont ? 'font-dyslexia' : ''}`}
+                        >
+                            <svg className={`text-4xl ${isDark ? 'text-white' : ''}`} xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm4 18H6V4h7v5h5z"/>
+                                <path fill="currentColor" d="M8 15.5h8v1.5H8zm0-3h8V14H8zm0-3h5v1.5H8z"/>
+                            </svg>
+                            Mis solicitudes
+                        </Link>
+                    </li>
+
+                    <li className="flex items-center gap-4">
+                        <Link 
                             to="/my-projects" 
                             className={`flex items-center gap-4 ${isDark ? 'text-white' : ''} ${largeText ? 'text-2xl' : ''} ${dyslexiaFont ? 'font-dyslexia' : ''}`}
                         >

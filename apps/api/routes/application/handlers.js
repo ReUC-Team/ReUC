@@ -92,6 +92,7 @@ export async function getDetailedApplicationHandler(req, res) {
     uuid
   );
 
+
   return res.status(200).json({
     success: true,
     data: {

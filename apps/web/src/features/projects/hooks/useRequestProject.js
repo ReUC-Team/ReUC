@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createApplication } from "../projectsService.js";
 import { ValidationError, processFieldErrors, getDisplayMessage } from "@/utils/errorHandler";
@@ -218,7 +218,7 @@ export default function useRequestProject() {
       Alerts.success("¡Tu proyecto ha sido enviado correctamente!");
       
       setTimeout(() => {
-        navigate("/explore-projects");
+        navigate("/my-applications");
       }, 2000);
 
     } catch (error) {

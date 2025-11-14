@@ -4,13 +4,13 @@ import ProjectImage from '../components/ProjectImage';
 import ProjectSummary from '../components/ProjectSummary';
 import ProjectInfoCard from '../components/ProjectInfoCard';
 import AttachmentCard from '../components/AttachmentCard';
-import useProjectDetails from '../hooks/useProjectDetails';
+import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments } from '../projectsService';
 
-export default function ProjectDetails() {
+export default function MyApplicationDetails() {
   const { uuid } = useParams();
   const navigate = useNavigate();
-  const { project, isLoading, error } = useProjectDetails(uuid);
+  const { application, isLoading, error } = useApplicationDetails(uuid);
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
 
@@ -26,7 +26,7 @@ export default function ProjectDetails() {
 
   // Función para descargar todos los archivos
   const handleDownloadAll = async () => {
-    if (!project?.attachments || project.attachments.length === 0) {
+    if (!application?.attachments || application.attachments.length === 0) {
       alert('No hay archivos para descargar');
       return;
     }
@@ -35,10 +35,10 @@ export default function ProjectDetails() {
     setDownloadError(null);
     
     try {
-      const result = await downloadAllAttachments(project.attachments);
+      const result = await downloadAllAttachments(application.attachments);
       
       if (result.failed > 0) {
-        const errorMessage = `Se descargaron ${result.successful} de ${project.attachments.length} archivos.\n\nErrores:\n${result.errors.join('\n')}`;
+        const errorMessage = `Se descargaron ${result.successful} de ${application.attachments.length} archivos.\n\nErrores:\n${result.errors.join('\n')}`;
         setDownloadError(errorMessage);
         alert(errorMessage);
       }
@@ -48,7 +48,7 @@ export default function ProjectDetails() {
     } finally {
       setIsDownloadingAll(false);
     }
-  };
+  }; 
 
   // Loading state
   if (isLoading) {
@@ -85,167 +85,148 @@ export default function ProjectDetails() {
   }
 
   // Error state
-  if (error || !project) {
+  if (error || !application) {
     return (
       <section className="w-full px-10 py-12">
         <button
-          onClick={() => navigate('/my-projects')}
+          onClick={() => navigate(-1)}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Volver a mis proyectos
+          Volver
         </button>
 
         <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
           <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-2xl font-bold text-red-800 mb-2">Proyecto no encontrado</h2>
-          <p className="text-red-600 mb-6">{error || 'No se pudo cargar la información del proyecto'}</p>
+          <h2 className="text-2xl font-bold text-red-800 mb-2">Solicitud no encontrada</h2>
+          <p className="text-red-600 mb-6">{error || 'No se pudo cargar la información de la solicitud'}</p>
           <button
-            onClick={() => navigate('/my-projects')}
+            onClick={() => navigate('/my-applications')}
             className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition"
           >
-            Volver a mis proyectos
+            Volver a mis solicitudes
           </button>
         </div>
       </section>
     );
   }
 
-  // Extraer datos del proyecto
+  // Extraer datos de la aplicación
   const {
     title,
-    description,
-    shortDescription,
+    detailedDescription,
     bannerUrl,
     faculties = [],
-    author,
+    outsider,
     projectTypes = [],
     problemTypes = [],
     status,
     createdAt,
-    estimatedDate,
+    dueDate,
     attachments = [],
-  } = project;
+    project,
+  } = application;
 
-  // Obtener datos del autor
-  const authorFirstName = author?.firstName || 'No especificado';
-  const authorLastName = author?.lastName || '';
-  const authorFullName = `${authorFirstName} ${authorLastName}`.trim();
-  const authorEmail = author?.email || null;
-
-  // Datos específicos de outsider (pueden ser null)
-  const outsiderData = author?.outsider || null;
-  const organizationName = outsiderData?.organizationName || 'N/A';
-  const phoneNumber = outsiderData?.phoneNumber || 'N/A';
-  const location = outsiderData?.location || 'N/A';
-
-  // Determinar si el autor es outsider o profesor
-  const isOutsider = !!outsiderData;
-  const authorRole = isOutsider ? 'Outsider' : 'Profesor';
-
-  // Información del autor
-  const authorInfo = [
-    { 
-      label: 'Nombre', 
-      value: authorFullName
+  // Determinar el estado visual
+  const statusConfig = {
+    pending: {
+      label: 'Pendiente de revisión',
+      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+        </svg>
+      )
     },
-    { 
-      label: 'Tipo de usuario', 
-      value: authorRole
+    approved: {
+      label: 'Aprobada',
+      color: 'bg-green-100 text-green-800 border-green-200',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+        </svg>
+      )
     },
-    ...(isOutsider ? [
-      { 
-        label: 'Organización', 
-        value: organizationName
-      },
-      { 
-        label: 'Teléfono de contacto', 
-        value: phoneNumber
-      },
-      { 
-        label: 'Ubicación', 
-        value: location
-      },
-    ] : [
-      {
-        label: 'Información',
-        value: 'Proyecto creado por un profesor'
-      }
-    ]),
-  ];
+    rejected: {
+      label: 'Rechazada',
+      color: 'bg-red-100 text-red-800 border-red-200',
+      icon: (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+        </svg>
+      )
+    }
+  };
 
-  // Información del proyecto
+  const currentStatus = statusConfig[status] || statusConfig.pending;
+
+  // Preparar información del proyecto
   const projectInfo = [
     { 
       label: 'Tipo de proyecto', 
       value: projectTypes.length > 0 
-        ? projectTypes
-            .map(pt => typeof pt === 'object' ? pt.name : pt)  // Soporte para ambos
-            .join(', ')
+        ? projectTypes.map(pt => pt.name).join(', ')  // Extraer .name
         : 'No especificado' 
     },
     { 
       label: 'Facultades', 
       value: faculties.length > 0 
-        ? faculties
-            .map(f => typeof f === 'object' ? f.name : f)
-            .join(', ')
+        ? faculties.map(f => f.name).join(', ')
         : 'No especificada' 
     },
     { 
       label: 'Tipo de problemática', 
       value: problemTypes.length > 0 
-        ? problemTypes
-            .map(pt => typeof pt === 'object' ? pt.name : pt)
-            .join(', ')
+        ? problemTypes.map(pt => pt.name).join(', ')
         : 'No especificado' 
     },
     { 
-      label: 'Fecha estimada', 
-      value: formatDate(estimatedDate) 
+      label: 'Fecha límite', 
+      value: formatDate(dueDate) 
     },
     { 
       label: 'Fecha de creación', 
       value: formatDate(createdAt) 
     },
-    { 
-      label: 'Estado', 
-      value: status === 'in_progress' ? 'En Progreso' : 
-             status === 'completed' ? 'Completado' : 
-             status === 'approved' ? 'Aprobado' : 
-             status === 'pending' ? 'Pendiente' : status
-    },
   ];
 
-  // Función para contactar
+  // Función para manejar contacto
   const handleContact = () => {
-    if (authorEmail) {
-      window.location.href = `mailto:${authorEmail}?subject=Consulta sobre proyecto: ${title}`;
+    if (outsider?.email) {
+      window.location.href = `mailto:${outsider.email}?subject=Consulta sobre solicitud: ${title}`;
     } else {
-      alert('No hay correo de contacto disponible para este proyecto');
+      alert('No hay correo de contacto disponible');
     }
   };
-
+  
   return (
     <section className="w-full px-10 py-12">
       {/* Botón de regreso */}
       <button
-        onClick={() => navigate('/my-projects')}
+        onClick={() => navigate('/my-applications')}
         className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Volver a mis proyectos
+        Volver a mis solicitudes
       </button>
 
-      <h1 className="text-4xl font-bold mb-6">
-        Detalles del <span className="text-lime-700">proyecto</span>
-      </h1>
+      <div className="flex items-center gap-4 mb-6">
+        <h1 className="text-4xl font-bold">
+          Detalles de mi <span className="text-lime-700">solicitud</span>
+        </h1>
+
+        {/* Badge de estado */}
+        <div className={`flex items-center gap-2 px-4 py-2 rounded-full border ${currentStatus.color}`}>
+          {currentStatus.icon}
+          <span className="font-semibold">{currentStatus.label}</span>
+        </div>
+      </div>
 
       <div className='flex mt-10 gap-6'>
         {/* Columna izquierda: Imagen, descripción y archivos adjuntos */}
@@ -259,7 +240,7 @@ export default function ProjectDetails() {
           {/* Resumen del proyecto */}
           <ProjectSummary
             title={title}
-            description={description || shortDescription}
+            description={detailedDescription}
           />
 
           {/* Archivos adjuntos */}
@@ -280,17 +261,36 @@ export default function ProjectDetails() {
 
         {/* Columna derecha: Información */}
         <div className="w-7/12">
-          {/* Información del autor */}
-          <h2 className="text-3xl font-bold mb-3">
-            Información del <span className="text-lime-700">autor</span>
-          </h2>
-          <ProjectInfoCard items={authorInfo} />
-
           {/* Información del proyecto */}
-          <h2 className="text-3xl font-bold mb-3 mt-8">
+          <h2 className="text-3xl font-bold mb-3">
             Información del <span className="text-lime-700">proyecto</span>
           </h2>
           <ProjectInfoCard items={projectInfo} />
+
+          {/* Si fue aprobada, mostrar info del proyecto creado */}
+          {status === 'approved' && project && (
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-green-800 mb-2">
+                    ¡Tu solicitud fue aprobada!
+                  </h3>
+                  <p className="text-sm text-green-700 mb-3">
+                    Esta solicitud se convirtió en un proyecto activo el {formatDate(project.createdAt)}
+                  </p>
+                  <button
+                    onClick={() => navigate(`/project/${project.uuid_project}`)}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm font-semibold"
+                  >
+                    Ver proyecto activo
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Botones de acción */}
           <div className="flex flex-col gap-3 pt-6 w-11/12">
@@ -326,28 +326,45 @@ export default function ProjectDetails() {
               </div>
             )}
             
-            {/* Botón Ponerse en Contacto */}
-            <button 
-              onClick={handleContact}
-              disabled={!authorEmail}
-              className="px-4 py-2 border-2 border-lime-600 text-lime-700 font-semibold rounded-lg hover:bg-lime-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              title={!authorEmail ? 'No hay correo de contacto disponible' : `Contactar a ${authorFullName}`}
-            >
-              Ponerse en contacto
-            </button>
+            {/* Botón Ponerse en Contacto (solo si está pendiente o rechazada) */}
+            {status !== 'approved' && (
+              <button 
+                onClick={handleContact}
+                disabled={!outsider?.email}
+                className="px-4 py-2 border-2 border-lime-600 text-lime-700 font-semibold rounded-lg hover:bg-lime-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Contactar soporte
+              </button>
+            )}
 
-            {/* Información adicional sobre el proyecto */}
-            <div className="p-3 bg-lime-50 border border-lime-200 rounded-lg text-sm text-lime-700 flex items-start gap-2">
-              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-              </svg>
-              <div>
-                <p className="font-semibold mb-1">Proyecto aprobado</p>
-                <p className="text-xs">
-                  Este proyecto fue aprobado el {formatDate(createdAt)}. Puedes gestionar su progreso desde esta página.
-                </p>
+            {/* Nota informativa según estado */}
+            {status === 'pending' && (
+              <div className="p-3 bg-yellow-100 border border-yellow-200 rounded-lg text-sm text-yellow-700 flex items-start gap-2">
+                <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="font-semibold mb-1">Solicitud en revisión</p>
+                  <p className="text-xs">
+                    Un profesor revisará tu solicitud pronto. Recibirás una notificación cuando sea aprobada o si requiere cambios.
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
+
+            {status === 'rejected' && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-start gap-2">
+                <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <p className="font-semibold mb-1">Solicitud rechazada</p>
+                  <p className="text-xs">
+                    Esta solicitud no cumplió con los requisitos. Puedes crear una nueva solicitud con las correcciones necesarias.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 const AuthContext = createContext(null);
 
@@ -12,28 +13,35 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // ✅ Obtener información del usuario desde localStorage o API
     const loadUser = async () => {
       try {
-        // Opción 1: Desde localStorage (si guardas la sesión ahí)
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
+        const token = sessionStorage.getItem('accessToken');
+        
+        if (token) {
+          // Decodificar el token para obtener la información del usuario
+          const decoded = jwtDecode(token);
+          
+          // El rol viene en formato "professor:uuid" según tu backend
+          const userRole = decoded.role?.split(':')[0] || null;
+          
+          setUser({
+            uuid: decoded.uuid_user,
+            role: userRole,
+            ip: decoded.ip,
+            userAgent: decoded.ua
+          });
+          setRole(userRole);
         }
-
-        // Opción 2: Llamar a un endpoint que devuelva el usuario actual
-        // const response = await fetch(`${API_URL}/auth/me`, {
-        //   credentials: 'include'
-        // });
-        // const data = await response.json();
-        // setUser(data.user);
-
       } catch (error) {
         console.error('Error loading user:', error);
+        // Si el token está corrupto o expiró, limpiarlo
+        sessionStorage.removeItem('accessToken');
         setUser(null);
+        setRole(null);
       } finally {
         setIsLoading(false);
       }
@@ -42,26 +50,55 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const login = (userData, accessToken) => {
+    // Guardar el token
+    sessionStorage.setItem('accessToken', accessToken);
+    
+    try {
+      const decoded = jwtDecode(accessToken);
+      const userRole = decoded.role?.split(':')[0] || null;
+      
+      setUser({
+        ...userData,
+        uuid: userData.uuid_user,
+        role: userRole
+      });
+      setRole(userRole);
+    } catch (error) {
+      console.error('Error decoding token on login:', error);
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      // Llamar al endpoint de logout del backend
+      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error('Error during logout:', error);
+    } finally {
+      // Limpiar estado local siempre
+      sessionStorage.removeItem('accessToken');
+      setUser(null);
+      setRole(null);
+    }
   };
 
   const value = {
     user,
+    role,
     isLoading,
     login,
     logout,
     // ✅ Helpers para verificar roles
-    isStudent: user?.role === 'student',
-    isFaculty: user?.role === 'professor',
-    isOutsider: user?.role === 'outsider',
-    isAdmin: user?.role === 'admin',
+    isStudent: role === 'student',
+    isProfessor: role === 'professor',
+    isOutsider: role === 'outsider',
+    isAdmin: role === 'admin',
+    // ✅ Helper para verificar si está autenticado
+    isAuthenticated: !!user && !!role,
   };
 
   return (
