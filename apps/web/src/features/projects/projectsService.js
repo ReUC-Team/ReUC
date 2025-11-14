@@ -151,6 +151,8 @@ export async function getApplicationDetails(uuid) {
   const app = response.data.application;
 
   return {
+
+    uuid_application: uuid,
     // Información básica del proyecto
     title: app.details?.title || 'Sin título',
     shortDescription: app.details?.shortDescription || 'Sin descripción corta',
@@ -314,15 +316,41 @@ export async function downloadAllAttachments(attachments) {
   return { successful, failed, errors };
 }
 
+// Línea 277-330: REEMPLAZAR función approveApplication
+
 /**
  * Aprueba una Application y crea un Project
  * @param {string} uuid_application - UUID de la Application a aprobar
- * @param {object} projectData - Datos opcionales del proyecto (título, descripción, etc.)
+ * @param {object} projectData - Datos del proyecto
  * @returns {Promise<object>} Project creado
  * @throws {ValidationError|ApplicationError}
  */
 export async function approveApplication(uuid_application, projectData = {}) {
   const csrfToken = await getCSRFToken();
+
+  // ✅ Construir payload solo con campos que tengan valor
+  const payload = {
+    uuidApplication: uuid_application,
+    title: projectData.title,
+    shortDescription: projectData.shortDescription,
+    description: projectData.description,
+    estimatedDate: projectData.estimatedDate,
+    projectType: projectData.projectType,
+    faculty: projectData.faculty,
+    problemType: projectData.problemType,
+  };
+
+  // ✅ Solo agregar problemTypeOther si existe
+  if (projectData.problemTypeOther !== undefined && projectData.problemTypeOther !== null) {
+    payload.problemTypeOther = projectData.problemTypeOther;
+  }
+
+  // ✅ Solo agregar estimatedEffortHours si existe
+  if (projectData.estimatedEffortHours !== undefined) {
+    payload.estimatedEffortHours = projectData.estimatedEffortHours;
+  }
+
+  console.log("📤 [projectsService] Payload final:", payload);
 
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/create`,
@@ -332,19 +360,7 @@ export async function approveApplication(uuid_application, projectData = {}) {
         "Content-Type": "application/json",
         "csrf-token": csrfToken,
       },
-      body: JSON.stringify({
-        uuidApplication: uuid_application,
-        // Heredar datos de la Application o usar valores modificados
-        title: projectData.title,
-        shortDescription: projectData.shortDescription,
-        description: projectData.description,
-        estimatedEffortHours: projectData.estimatedEffortHours,
-        estimatedDate: projectData.estimatedDate,
-        projectType: projectData.projectType,
-        faculty: projectData.faculty,
-        problemType: projectData.problemType,
-        problemTypeOther: projectData.problemTypeOther,
-      }),
+      body: JSON.stringify(payload),
     }
   );
 
@@ -480,4 +496,42 @@ export async function getProjectDetails(uuid) {
     estimatedDate: app.details?.deadline,
     status: app.status || 'approved', // Projects son applications aprobadas
   };
+}
+
+/**
+ * Edita una Application existente (solo metadata)
+ * @param {string} uuid - UUID de la Application
+ * @param {object} editData - Datos a editar
+ * @param {Array<number>} editData.projectType - IDs de tipos de proyecto
+ * @param {Array<number>} editData.faculty - IDs de facultades
+ * @param {Array<number>} editData.problemType - IDs de tipos de problemática
+ * @param {string|null} editData.problemTypeOther - Descripción si "Otro" está seleccionado
+ * @param {string} editData.deadline - Nueva fecha límite (YYYY-MM-DD)
+ * @param {string} editData.editReason - Razón de la edición
+ * @returns {Promise<object>} Application actualizada
+ * @throws {ValidationError|ApplicationError}
+ */
+export async function editApplication(uuid, editData) {
+  const csrfToken = await getCSRFToken();
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/${uuid}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "csrf-token": csrfToken,
+      },
+      body: JSON.stringify({
+        projectType: editData.projectType,
+        faculty: editData.faculty,
+        problemType: editData.problemType,
+        problemTypeOther: editData.problemTypeOther,
+        deadline: editData.deadline,
+        editReason: editData.editReason,
+      }),
+    }
+  );
+
+  return response.data;
 }

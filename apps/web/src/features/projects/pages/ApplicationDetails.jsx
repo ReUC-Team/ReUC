@@ -4,6 +4,7 @@ import ProjectImage from '../components/ProjectImage';
 import ProjectSummary from '../components/ProjectSummary';
 import ProjectInfoCard from '../components/ProjectInfoCard';
 import AttachmentCard from '../components/AttachmentCard';
+import EditApplicationModal from '../components/EditApplicationModal';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments, approveApplication } from '../projectsService';
 import { Alerts } from '@/shared/alerts';
@@ -11,10 +12,31 @@ import { Alerts } from '@/shared/alerts';
 export default function ApplicationDetails() {
   const { uuid } = useParams();
   const navigate = useNavigate();
-  const { application, isLoading, error } = useApplicationDetails(uuid);
+  const { application, isLoading, error, refetch } = useApplicationDetails(uuid);
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
   const [isApproving, setIsApproving] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Handler para abrir modal de edición
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+  };
+
+  // Handler cuando se aprueba exitosamente desde el modal
+// Línea 27-36: REEMPLAZAR handleApproveSuccess
+
+// ✅ Handler cuando se aprueba exitosamente desde el modal
+const handleApproveSuccess = (projectUuid) => {
+  console.log("✅ Proyecto aprobado con UUID:", projectUuid);
+  
+  Alerts.success('¡Proyecto aprobado exitosamente!');
+  
+  setTimeout(() => {
+    // ✅ Redirigir a los detalles del proyecto creado
+    navigate(`/my-projects/${projectUuid}`);
+  }, 1500);
+};
 
   // Formatear fechas
   const formatDate = (dateString) => {
@@ -52,91 +74,105 @@ export default function ApplicationDetails() {
     }
   }; 
 
-  const handleApprove = async () => {
-    const result = await Alerts.confirm({
-      title: '¿Aprobar este proyecto?',
-      text: 'Esta acción creará un nuevo proyecto activo basado en esta solicitud. El proyecto quedará disponible en "Mis Proyectos".',
-      confirmText: 'Sí, aprobar',
-      cancelText: 'Cancelar',
-    });
+  // ✅ Handler para aprobar directamente (SIN editar)
+// Línea 84-130: Actualizar función handleApprove
 
-    // Si el usuario cancela, salir
-    if (!result.isConfirmed) {
+// Línea 84-140: Actualizar handleApprove
+
+// Línea 84-140: REEMPLAZAR función handleApprove completa
+
+// Línea 84-145: REEMPLAZAR handleApprove
+
+const handleApprove = async () => {
+  const result = await Alerts.confirm({
+    title: '¿Aprobar este proyecto?',
+    text: 'Esta acción creará un nuevo proyecto activo basado en esta solicitud SIN modificaciones. El proyecto quedará disponible en "Mis Proyectos".',
+    confirmText: 'Sí, aprobar',
+    cancelText: 'Cancelar',
+  });
+
+  if (!result.isConfirmed) {
+    return;
+  }
+
+  setIsApproving(true);
+  
+  try {
+    // Extraer IDs directamente del backend
+    const projectTypeIds = application.projectTypes.map(pt => pt.id);
+    const facultyIds = application.faculties.map(f => f.id);
+    const problemTypeIds = application.problemTypes.map(pt => pt.id);
+
+    // Validaciones
+    if (projectTypeIds.length === 0) {
+      Alerts.warning('El proyecto debe tener al menos un tipo de proyecto');
+      setIsApproving(false);
+      return;
+    }
+    if (facultyIds.length === 0) {
+      Alerts.warning('El proyecto debe tener al menos una facultad');
+      setIsApproving(false);
+      return;
+    }
+    if (problemTypeIds.length === 0) {
+      Alerts.warning('El proyecto debe tener al menos un tipo de problemática');
+      setIsApproving(false);
       return;
     }
 
-    setIsApproving(true);
-    
+    const projectData = {
+      title: application.title,
+      shortDescription: application.shortDescription,
+      description: application.detailedDescription,
+      estimatedDate: application.dueDate?.split('T')[0] || null,
+      projectType: projectTypeIds,
+      faculty: facultyIds,
+      problemType: problemTypeIds,
+    };
+
+    console.log("📤 Aprobando proyecto directo:", projectData);
+
+    const loadingAlert = Alerts.loading('Aprobando proyecto...');
+
     try {
-      // Extraer IDs directamente del backend
-      const projectTypeIds = application.projectTypes.map(pt => pt.id);
-      const facultyIds = application.faculties.map(f => f.id);
-      const problemTypeIds = application.problemTypes.map(pt => pt.id);
+      const response = await approveApplication(uuid, projectData);
+      
+      loadingAlert.close();
 
-      // Validaciones
-      if (projectTypeIds.length === 0) {
-        Alerts.warning('El proyecto debe tener al menos un tipo de proyecto');
-        setIsApproving(false);
-        return;
-      }
-      if (facultyIds.length === 0) {
-        Alerts.warning('El proyecto debe tener al menos una facultad');
-        setIsApproving(false);
-        return;
-      }
-      if (problemTypeIds.length === 0) {
-        Alerts.warning('El proyecto debe tener al menos un tipo de problemática');
-        setIsApproving(false);
-        return;
+      console.log('✅ Proyecto aprobado:', response);
+
+      // ✅ Extraer UUID del proyecto creado
+      const projectUuid = response?.project?.uuid_project;
+
+      if (!projectUuid) {
+        console.error("❌ Backend no retornó uuid_project:", response);
+        throw new Error("No se pudo obtener el UUID del proyecto creado");
       }
 
-      const projectData = {
-        title: application.title,
-        shortDescription: application.shortDescription,
-        description: application.detailedDescription,
-        estimatedDate: application.dueDate?.split('T')[0] || null,
-        projectType: projectTypeIds,
-        faculty: facultyIds,
-        problemType: problemTypeIds,
-      };
-
-      // Mostrar loading mientras se aprueba
-      const loadingAlert = Alerts.loading('Aprobando proyecto...');
-
-      try {
-        const response = await approveApplication(uuid, projectData);
-        
-        // Cerrar loading
-        loadingAlert.close();
-
-        console.log('Proyecto aprobado:', response);
-
-        // Mostrar éxito
-        Alerts.success('¡Proyecto aprobado exitosamente!');
-        
-        // Redirigir después de 1.5 segundos
-        setTimeout(() => {
-          navigate('/my-projects');
-        }, 1500);
-        
-      } catch (error) {
-        // Cerrar loading en caso de error
-        loadingAlert.close();
-        throw error; // Re-lanzar para el catch externo
-      }
+      Alerts.success('¡Proyecto aprobado exitosamente!');
+      
+      setTimeout(() => {
+        // ✅ Redirigir a los detalles del proyecto creado
+        navigate(`/my-projects/${projectUuid}`);
+      }, 1500);
       
     } catch (error) {
-      console.error('Error al aprobar proyecto:', error);
-      
-      if (error.message) {
-        Alerts.error(error.message);
-      } else {
-        Alerts.error('No se pudo aprobar el proyecto. Por favor, intenta nuevamente.');
-      }
-    } finally {
-      setIsApproving(false);
+      loadingAlert.close();
+      throw error;
     }
-  };
+    
+  } catch (error) {
+    console.error('❌ Error al aprobar proyecto:', error);
+    
+    if (error.message) {
+      Alerts.error(error.message);
+    } else {
+      Alerts.error('No se pudo aprobar el proyecto. Por favor, intenta nuevamente.');
+    }
+  } finally {
+    setIsApproving(false);
+  }
+};
 
   // Loading state
   if (isLoading) {
@@ -262,12 +298,11 @@ export default function ApplicationDetails() {
     ]),
   ];
 
-  // Preparar información del proyecto
   const projectInfo = [
     { 
       label: 'Tipo de proyecto', 
       value: projectTypes.length > 0 
-        ? projectTypes.map(pt => pt.name).join(', ')  // Extraer .name
+        ? projectTypes.map(pt => pt.name).join(', ')
         : 'No especificado' 
     },
     { 
@@ -300,14 +335,6 @@ export default function ApplicationDetails() {
     },
   ];
 
-  const handleContact = () => {
-    if (authorEmail) {
-      window.location.href = `mailto:${authorEmail}?subject=Interés en el proyecto: ${title}`;
-    } else {
-      alert('No hay correo de contacto disponible para este proyecto');
-    }
-  };
-
   const isAlreadyApproved = application?.status === 'approved';
   
   return (
@@ -330,19 +357,16 @@ export default function ApplicationDetails() {
       <div className='flex mt-10 gap-6'>
         {/* Columna izquierda: Imagen, descripción y archivos adjuntos */}
         <div className="w-5/12">
-          {/* Banner */}
           <ProjectImage 
             src={bannerUrl} 
             alt={title} 
           />
           
-          {/* Resumen del proyecto */}
           <ProjectSummary
             title={title}
             description={detailedDescription}
           />
 
-          {/* Archivos adjuntos */}
           {attachments.length > 0 && (
             <div className="mt-6">
               <h2 className="text-3xl font-bold mb-3">
@@ -374,8 +398,26 @@ export default function ApplicationDetails() {
 
           {/* Botones de acción */}
           <div className="flex flex-col gap-3 pt-4 w-11/12">
+            {/* Primera fila: Editar + Aceptar */}
             <div className='flex gap-5'>
-              {/* Botón Aceptar Proyecto */}
+              {/* ✅ Botón Editar proyecto */}
+              <button 
+                onClick={handleEditClick}
+                disabled={isApproving || isAlreadyApproved}
+                className={`px-4 py-2 rounded-lg font-semibold w-6/12 transition flex items-center justify-center gap-2 ${
+                  isAlreadyApproved
+                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
+                    : 'border-2 border-lime-600 text-lime-700 hover:bg-lime-50'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                title={isAlreadyApproved ? 'No se puede editar un proyecto aprobado' : 'Editar metadata y aprobar proyecto'}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                {isAlreadyApproved ? 'Ya aprobado' : 'Editar proyecto'}
+              </button>
+
+              {/* ✅ Botón Aceptar Proyecto (directo, sin editar) */}
               <button 
                 onClick={handleApprove}
                 disabled={isApproving || isAlreadyApproved}
@@ -384,7 +426,7 @@ export default function ApplicationDetails() {
                     ? 'bg-gray-400 cursor-not-allowed text-white'
                     : 'bg-lime-600 text-white hover:bg-lime-700'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
-                title={isAlreadyApproved ? 'Este proyecto ya fue aprobado' : 'Aprobar proyecto y crear nuevo proyecto activo'}
+                title={isAlreadyApproved ? 'Este proyecto ya fue aprobado' : 'Aprobar proyecto sin modificaciones'}
               >
                 {isApproving ? (
                   <>
@@ -410,32 +452,32 @@ export default function ApplicationDetails() {
                   </>
                 )}
               </button>
-              
-              {/* Botón Descargar Todos los Archivos */}
-              <button 
-                onClick={handleDownloadAll}
-                disabled={isDownloadingAll || attachments.length === 0}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold w-6/12 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                title={attachments.length === 0 ? 'No hay archivos para descargar' : 'Descargar todos los documentos'}
-              >
-                {isDownloadingAll ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Descargando...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Descargar todos ({attachments.length})
-                  </>
-                )}
-              </button>
             </div>
+            
+            {/* Segunda fila: Descargar todos */}
+            <button 
+              onClick={handleDownloadAll}
+              disabled={isDownloadingAll || attachments.length === 0}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              title={attachments.length === 0 ? 'No hay archivos para descargar' : 'Descargar todos los documentos'}
+            >
+              {isDownloadingAll ? (
+                <>
+                  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Descargando...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  Descargar todos ({attachments.length})
+                </>
+              )}
+            </button>
 
             {/* Mensaje de error si ocurrió */}
             {downloadError && (
@@ -443,17 +485,8 @@ export default function ApplicationDetails() {
                 {downloadError}
               </div>
             )}
-            
-            {/* Botón Ponerse en Contacto */}
-            <button 
-              onClick={handleContact}
-              disabled={!authorEmail}
-              className="px-4 py-2 border-2 border-lime-600 text-lime-700 font-semibold rounded-lg hover:bg-lime-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              title={!authorEmail ? 'No hay correo de contacto disponible' : `Contactar a ${authorFullName}`}
-            >
-              Ponerse en contacto
-            </button>
 
+            {/* Mensaje informativo si ya está aprobado */}
             {isAlreadyApproved && (
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-start gap-2">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -471,6 +504,15 @@ export default function ApplicationDetails() {
           </div>
         </div>
       </div>
+
+      {/* Modal de edición y aprobación */}
+      <EditApplicationModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        uuid={uuid}
+        application={application}
+        onSuccess={handleApproveSuccess}
+      />
     </section>
   );
 }
