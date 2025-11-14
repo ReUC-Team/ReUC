@@ -55,7 +55,7 @@ const ProjectCard = ({ uuid, title, description, image, isFavorite = false, onFa
         <p className="text-md text-gray-700 mb-4 line-clamp-3">{description}</p>
         <button
           onClick={handleDetailsClick}
-          className="inline-block bg-lime-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-lime-700 transition"
+          className="inline-block bg-lime-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-lime-700 transition w-full"
         >
           Ver detalles
         </button>

@@ -4,24 +4,24 @@
  */
 
 export const PROJECT_TYPE_MAP = {
-  'Tesis': 48,
-  'Proyectos Integradores': 46,
-  'Servicio Social Constitucional': 47,
-  'Proyectos de investigación': 49,
-  'Prácticas profesionales': 50,
+  'Tesis': 3,
+  'Proyectos Integradores': 1,
+  'Servicio Social Constitucional': 2,
+  'Proyectos de investigación': 4,
+  'Prácticas profesionales': 5,
 };
 
 export const FACULTY_MAP = {
-  'FIE': 28,
-  'FACIMAR': 29,
-  'FECAM': 30,
+  'FIE': 1,
+  'FACIMAR': 2,
+  'FECAM': 3,
 };
 
 export const PROBLEM_TYPE_MAP = {
-  'Tecnológica': 34,
-  'Social': 35,
-  'Ambiental': 33,
-  'Logistica': 36,
+  'Tecnológica': 2,
+  'Social': 3,
+  'Ambiental': 2,
+  'Logistica': 4,
 };
 
 /**

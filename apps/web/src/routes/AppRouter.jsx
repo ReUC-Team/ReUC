@@ -16,9 +16,13 @@ import ProfilePage from '@/features/profile/pages/ProfilePage'
 // PROJECTS
 import RequestProject from '@/features/projects/pages/RequestProject'
 import ExploreProjects from '@/features/projects/pages/ExploreProjects'
+import ApplicationDetails from '@/features/projects/pages/ApplicationDetails'
 import ProjectDetails from '@/features/projects/pages/ProjectDetails'
 import MyProjects from '@/features/projects/pages/MyProjects';
 import FavoriteProjects from '@/features/projects/pages/FavoriteProjects';
+// APPLICATIONS
+import MyApplications from "@/features/projects/pages/MyApplications";
+import MyApplicationDetails from "@/features/projects/pages/MyApplicationDetails";
 // MEMBERS
 import Members from '@/features/members/pages/Members'
 //SETTINGS
@@ -52,11 +56,22 @@ const AppRouter = () => {
         <Route path="/dashboard/faculty" element={<DashboardFaculty />} />
         {/* Aquí puedes anidar más rutas como /dashboard/proyectos */}
         <Route path="/profile" element={<ProfilePage />} />
+        {/* PROJECTS */}
         <Route path="/request-project" element={<RequestProject />} />
+
+        {/* Explorar proyectos (Applications) */}
         <Route path="/explore-projects" element={<ExploreProjects />} />
-        <Route path="/project/:uuid" element={<ProjectDetails />} />
-        <Route path="/explore-projects/project-details" element={<ProjectDetails />} />
+        <Route path="/application/:uuid" element={<ApplicationDetails />} />
+
+        {/* Mis solicitudes (Applications del usuario) */}
+        <Route path="/my-applications" element={<MyApplications />} />
+        <Route path="/my-applications/:uuid" element={<MyApplicationDetails />} />
+
+        {/* Mis proyectos (Projects aprobados) */}
         <Route path="/my-projects" element={<MyProjects />} />
+        <Route path="/my-projects/:uuid" element={<ProjectDetails />} />
+
+        <Route path="/explore-projects/project-details" element={<ApplicationDetails />} />
         <Route path="/favorite-projects" element={<FavoriteProjects />} />
         <Route path="/members" element={<Members />} />
         <Route path="/settings" element={<Settings />} />

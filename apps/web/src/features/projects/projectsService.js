@@ -334,3 +334,134 @@ export async function approveApplication(uuid_application, projectData = {}) {
 
   return response.data;
 }
+
+/**
+ * Obtiene todas las applications del usuario autenticado
+ * @param {number} page - Número de página
+ * @param {number} limit - Items por página
+ * @returns {Promise<{applications: Array, pagination: object}>}
+ * @throws {ApplicationError}
+ */
+export async function getMyApplications(page = 1, limit = 9) {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/my-applications?page=${page}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+
+  const records = response.data.applications.records;
+  const paginationData = response.data.applications.metadata.pagination;
+
+  const applications = records.map((app) => ({
+    ...app,
+    bannerUrl: app.bannerUrl?.startsWith('http') 
+      ? app.bannerUrl 
+      : app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+  }));
+
+  return {
+    applications,
+    pagination: paginationData,
+  };
+}
+
+/**
+ * Obtiene todos los proyectos aprobados del usuario autenticado
+ * @param {number} page - Número de página
+ * @param {number} limit - Items por página
+ * @returns {Promise<{projects: Array, pagination: object}>}
+ * @throws {ApplicationError}
+ */
+export async function getMyProjects(page = 1, limit = 9) {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/my-projects?page=${page}&limit=${limit}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+
+  const records = response.data.projects.records;
+  const paginationData = response.data.projects.metadata.pagination;
+
+  // Convertir URLs relativas a absolutas
+  const projects = records.map((proj) => ({
+    ...proj,
+    bannerUrl: proj.bannerUrl?.startsWith('http') 
+      ? proj.bannerUrl 
+      : proj.bannerUrl ? `${API_URL}${proj.bannerUrl}` : null,
+  }));
+
+  return {
+    projects,
+    pagination: paginationData,
+  };
+}
+/**
+ * Obtiene los detalles completos de un proyecto específico
+ * @param {string} uuid - UUID del proyecto
+ * @returns {Promise<Object>} Detalles del proyecto
+ * @throws {ApplicationError}
+ */
+export async function getProjectDetails(uuid) {
+  // Hice uso del endpoint de Application porque Project hereda sus datos
+  // El backend aún no tiene GET /project/:uuid implementado
+  
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/${uuid}`,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+
+  const app = response.data.application;
+
+  // Normalizar estructura para ProjectDetails.jsx
+  return {
+    uuid_project: app.uuid_application,
+    title: app.details?.title || 'Sin título',
+    description: app.details?.description || app.details?.shortDescription || 'Sin descripción',
+    shortDescription: app.details?.shortDescription || 'Sin descripción corta',
+    
+    // Banner
+    bannerUrl: app.bannerUrl?.startsWith('http')
+      ? app.bannerUrl
+      : app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+    
+    // Attachments
+    attachments: (app.attachments || []).map(att => ({
+      downloadUrl: att.downloadUrl?.startsWith('http') 
+        ? att.downloadUrl 
+        : `${API_URL}${att.downloadUrl}`,
+      name: att.name,
+      size: att.size,
+      type: att.type,
+    })),
+    
+    // Autor
+    author: {
+      uuid_user: app.author?.uuid_user,
+      firstName: app.author?.fullName?.split(' ')[0] || 'No especificado',
+      lastName: app.author?.fullName?.split(' ').slice(1).join(' ') || '',
+      email: app.author?.email,
+      outsider: app.author?.outsider ? {
+        organizationName: app.author.outsider.organizationName,
+        phoneNumber: app.author.outsider.phoneNumber,
+        location: app.author.outsider.location,
+      } : null,
+    },
+    
+    // Metadata
+    faculties: app.details?.faculties || [],
+    projectTypes: app.details?.projectTypes || [],
+    problemTypes: app.details?.problemTypes || [],
+    
+    // Fechas y estado
+    createdAt: app.createdAt,
+    estimatedDate: app.details?.deadline,
+    status: app.status || 'approved', // Projects son applications aprobadas
+  };
+}

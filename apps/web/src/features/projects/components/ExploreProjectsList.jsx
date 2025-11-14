@@ -28,7 +28,7 @@ const ExploreProjectsList = () => {
   });
 
   const handleProjectClick = (uuid) => {
-    navigate(`/project/${uuid}`);
+    navigate(`/application/${uuid}`);
   };
 
   // Loading state
