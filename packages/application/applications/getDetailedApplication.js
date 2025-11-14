@@ -108,15 +108,18 @@ function _normalizeAuthor(author) {
  */
 function _normalizeDetails(appData) {
   // Flatten the many-to-many relationships
-  const projectTypes = (appData?.applicationProjectType || []).map(
-    (pt) => pt.projectTypeId.name
-  );
-  const faculties = (appData?.applicationFaculty || []).map(
-    (f) => f.facultyTypeId.name
-  );
-  const problemTypes = (appData?.applicationProblemType || []).map(
-    (pt) => pt.problemTypeId.name
-  );
+  const projectTypes = (appData?.applicationProjectType || []).map((pt) => ({
+    id: pt.projectTypeId.project_type_id,
+    name: pt.projectTypeId.name,
+  }));
+  const faculties = (appData?.applicationFaculty || []).map((f) => ({
+    id: f.facultyTypeId.faculty_id,
+    name: f.facultyTypeId.name,
+  }));
+  const problemTypes = (appData?.applicationProblemType || []).map((pt) => ({
+    id: pt.problemTypeId.problem_type_id,
+    name: pt.problemTypeId.name,
+  }));
 
   return {
     title: appData.title,
