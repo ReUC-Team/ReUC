@@ -166,7 +166,7 @@ export async function getApplicationDetails(uuid) {
       ? app.bannerUrl 
       : app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
     
-    // Usar el nombre original del archivo
+    // Attachments
     attachments: (app.attachments || []).map((a) => ({
       downloadUrl: a.downloadUrl?.startsWith('http') 
         ? a.downloadUrl 
@@ -177,27 +177,43 @@ export async function getApplicationDetails(uuid) {
     })),
     
     // Información del autor
+    author: {
+      uuid_user: app.author?.uuid_user,
+      firstName: app.author?.fullName?.split(' ')[0] || 'No especificado',
+      lastName: app.author?.fullName?.split(' ').slice(1).join(' ') || '',
+      email: app.author?.email || null,
+      outsider: app.author?.outsider ? {
+        organizationName: app.author.outsider.organizationName,
+        phoneNumber: app.author.outsider.phoneNumber,
+        location: app.author.outsider.location,
+      } : null,
+    },
+
+    faculties: app.details?.faculties || [],  // [{ id: 1, name: "Ingeniería" }]
+    projectTypes: app.details?.projectTypes || [],  // [{ id: 3, name: "Investigación" }]
+    problemTypes: app.details?.problemTypes || [],  // [{ id: 5, name: "Ambiental" }]
+    
+    facultyIds: (app.details?.faculties || []).map(f => f.id),
+    projectTypeIds: (app.details?.projectTypes || []).map(pt => pt.id),
+    problemTypeIds: (app.details?.problemTypes || []).map(pt => pt.id),
+    
+    
     outsider: {
       firstName: app.author?.fullName?.split(' ')[0] || 'No especificado',
       lastName: app.author?.fullName?.split(' ').slice(1).join(' ') || '',
       email: app.author?.email || null,
-      company: app.author?.organizationName || 'No especificado',
-      phone: app.author?.phoneNumber || 'No especificado',
-      location: app.author?.location || 'No especificado',
+      company: app.author?.outsider?.organizationName || 'No especificado',
+      phone: app.author?.outsider?.phoneNumber || 'No especificado',
+      location: app.author?.outsider?.location || 'No especificado',
     },
     
-    // Facultad
+    // Facultad (legacy)
     faculty: app.details?.faculties?.length > 0 
       ? { 
-          name: app.details.faculties[0], 
-          abbreviation: app.details.faculties[0] 
+          name: app.details.faculties[0].name, 
+          abbreviation: app.details.faculties[0].name 
         }
       : null,
-    
-    // Arrays
-    faculties: app.details?.faculties || [],
-    projectTypes: app.details?.projectTypes || [],
-    problemTypes: app.details?.problemTypes || [],
   };
 }
 

@@ -168,15 +168,21 @@ export default function MyApplicationDetails() {
   const projectInfo = [
     { 
       label: 'Tipo de proyecto', 
-      value: projectTypes.length > 0 ? projectTypes.join(', ') : 'No especificado' 
+      value: projectTypes.length > 0 
+        ? projectTypes.map(pt => pt.name).join(', ')  // Extraer .name
+        : 'No especificado' 
     },
     { 
       label: 'Facultades', 
-      value: faculties.length > 0 ? faculties.join(', ') : 'No especificada' 
+      value: faculties.length > 0 
+        ? faculties.map(f => f.name).join(', ')
+        : 'No especificada' 
     },
     { 
       label: 'Tipo de problemática', 
-      value: problemTypes.length > 0 ? problemTypes.join(', ') : 'No especificado' 
+      value: problemTypes.length > 0 
+        ? problemTypes.map(pt => pt.name).join(', ')
+        : 'No especificado' 
     },
     { 
       label: 'Fecha límite', 

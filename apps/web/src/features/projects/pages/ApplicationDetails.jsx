@@ -7,12 +7,6 @@ import AttachmentCard from '../components/AttachmentCard';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments, approveApplication } from '../projectsService';
 import { Alerts } from '@/shared/alerts';
-import { 
-  PROJECT_TYPE_MAP, 
-  FACULTY_MAP, 
-  PROBLEM_TYPE_MAP, 
-  mapNamesToIds 
-} from '../constants/metadata';
 
 export default function ApplicationDetails() {
   const { uuid } = useParams();
@@ -71,25 +65,23 @@ export default function ApplicationDetails() {
     setIsApproving(true);
     
     try {
-      const projectTypeIds = application.projectTypeIds || 
-        mapNamesToIds(application.projectTypes, PROJECT_TYPE_MAP);
-      
-      const facultyIds = application.facultyIds || 
-        mapNamesToIds(application.faculties, FACULTY_MAP);
-      
-      const problemTypeIds = application.problemTypeIds || 
-        mapNamesToIds(application.problemTypes, PROBLEM_TYPE_MAP);
+      const projectTypeIds = application.projectTypes.map(pt => pt.id);
+      const facultyIds = application.faculties.map(f => f.id);
+      const problemTypeIds = application.problemTypes.map(pt => pt.id);
 
       if (projectTypeIds.length === 0) {
         Alerts.warning('El proyecto debe tener al menos un tipo de proyecto');
+        setIsApproving(false);
         return;
       }
       if (facultyIds.length === 0) {
         Alerts.warning('El proyecto debe tener al menos una facultad');
+        setIsApproving(false);
         return;
       }
       if (problemTypeIds.length === 0) {
         Alerts.warning('El proyecto debe tener al menos un tipo de problemática');
+        setIsApproving(false);
         return;
       }
 
@@ -254,15 +246,21 @@ export default function ApplicationDetails() {
   const projectInfo = [
     { 
       label: 'Tipo de proyecto', 
-      value: projectTypes.length > 0 ? projectTypes.join(', ') : 'No especificado' 
+      value: projectTypes.length > 0 
+        ? projectTypes.map(pt => pt.name).join(', ')  // Extraer .name
+        : 'No especificado' 
     },
     { 
       label: 'Facultades', 
-      value: faculties.length > 0 ? faculties.join(', ') : 'No especificada' 
+      value: faculties.length > 0 
+        ? faculties.map(f => f.name).join(', ')
+        : 'No especificada' 
     },
     { 
       label: 'Tipo de problemática', 
-      value: problemTypes.length > 0 ? problemTypes.join(', ') : 'No especificado' 
+      value: problemTypes.length > 0 
+        ? problemTypes.map(pt => pt.name).join(', ')
+        : 'No especificado' 
     },
     { 
       label: 'Fecha límite', 

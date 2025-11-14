@@ -182,15 +182,27 @@ export default function ProjectDetails() {
   const projectInfo = [
     { 
       label: 'Tipo de proyecto', 
-      value: projectTypes.length > 0 ? projectTypes.join(', ') : 'No especificado' 
+      value: projectTypes.length > 0 
+        ? projectTypes
+            .map(pt => typeof pt === 'object' ? pt.name : pt)  // Soporte para ambos
+            .join(', ')
+        : 'No especificado' 
     },
     { 
       label: 'Facultades', 
-      value: faculties.length > 0 ? faculties.join(', ') : 'No especificada' 
+      value: faculties.length > 0 
+        ? faculties
+            .map(f => typeof f === 'object' ? f.name : f)
+            .join(', ')
+        : 'No especificada' 
     },
     { 
       label: 'Tipo de problemática', 
-      value: problemTypes.length > 0 ? problemTypes.join(', ') : 'No especificado' 
+      value: problemTypes.length > 0 
+        ? problemTypes
+            .map(pt => typeof pt === 'object' ? pt.name : pt)
+            .join(', ')
+        : 'No especificado' 
     },
     { 
       label: 'Fecha estimada', 
