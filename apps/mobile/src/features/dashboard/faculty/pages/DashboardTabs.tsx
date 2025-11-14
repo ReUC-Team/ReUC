@@ -1,4 +1,4 @@
-// apps/mobile/src/features/dashboards/external/pages/DashboardTabs.tsx
+// apps/mobile/src/features/dashboards/faculty/pages/DashboardTabs.tsx
 
 import React from 'react'
 import { useWindowDimensions } from 'react-native'
@@ -6,19 +6,19 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { useThemedStyles, useThemedPalette } from '../../../../hooks/useThemedStyles'
 import { createDashboardTabsStyles } from '../../../../styles/components/dashboard/DashboardTabs.styles'
 
-// Componentes de External Dashboard
-import ExternalProjectStats from '../components/ExternalProjectStats'
-import RequestedProjects from '../components/RequestedProjects'
-import RecentActivity from '../components/RecentActivity'
-import ProjectSummary from '../components/ProjectSummary'
-import Projects from '../../shared/components/Projects' // ← AGREGADO
+// Componentes de Faculty Dashboard
+import FacultyProjectStats from '../components/FacultyProjectStats'
+import PendingRequests from '../components/PendingRequests'
+import LinkedStudents from '../components/LinkedStudents'
+import UploadedLinks from '../components/UploadedLinks'
+import Projects from '../../shared/components/Projects'
 
 type TabParamList = {
-  Estadísticas: undefined
+  Inicio: undefined
   Solicitudes: undefined
-  Recientes: undefined
-  Actividad: undefined
-  Resumen: undefined
+  Estudiantes: undefined
+  Proyectos: undefined
+  Enlaces: undefined
 }
 
 const Tab = createMaterialTopTabNavigator<TabParamList>()
@@ -36,7 +36,7 @@ const DashboardTabs: React.FC = () => {
 
   const handleContactStudents = (project: any) => {
     console.log('Contactar estudiantes:', project)
-    // TODO: Abrir modal de contacto
+    // TODO: Abrir modal de contacto o navegar
   }
 
   const handleUploadComment = (project: any) => {
@@ -51,7 +51,7 @@ const DashboardTabs: React.FC = () => {
 
   return (
     <Tab.Navigator
-      initialRouteName="Estadísticas"
+      initialRouteName="Inicio"
       screenOptions={{
         swipeEnabled: true,
         tabBarScrollEnabled: true,
@@ -60,12 +60,12 @@ const DashboardTabs: React.FC = () => {
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: palette.primary,
         tabBarInactiveTintColor: palette.textSecondary,
-        tabBarPressColor: palette.primary + '20', 
+        tabBarPressColor: palette.primary + '20',
       }}
     >
       <Tab.Screen
-        name="Estadísticas"
-        component={ExternalProjectStats}
+        name="Inicio"
+        component={FacultyProjectStats}
         options={{
           tabBarLabel: 'Inicio',
           tabBarAccessibilityLabel: 'Ver estadísticas del panel'
@@ -74,15 +74,24 @@ const DashboardTabs: React.FC = () => {
 
       <Tab.Screen
         name="Solicitudes"
-        component={RequestedProjects}
+        component={PendingRequests}
         options={{
           tabBarLabel: 'Solicitudes',
-          tabBarAccessibilityLabel: 'Ver proyectos solicitados'
+          tabBarAccessibilityLabel: 'Ver solicitudes pendientes'
         }}
       />
 
       <Tab.Screen
-        name="Recientes"
+        name="Estudiantes"
+        component={LinkedStudents}
+        options={{
+          tabBarLabel: 'Estudiantes',
+          tabBarAccessibilityLabel: 'Ver estudiantes vinculados'
+        }}
+      />
+
+      <Tab.Screen
+        name="Proyectos"
         options={{
           tabBarLabel: 'Proyectos',
           tabBarAccessibilityLabel: 'Ver proyectos recientes'
@@ -90,7 +99,7 @@ const DashboardTabs: React.FC = () => {
       >
         {() => (
           <Projects
-            dashboardType="external"
+            dashboardType="faculty"
             onProjectClick={handleProjectClick}
             onContactStudents={handleContactStudents}
             onUploadComment={handleUploadComment}
@@ -100,20 +109,11 @@ const DashboardTabs: React.FC = () => {
       </Tab.Screen>
 
       <Tab.Screen
-        name="Actividad"
-        component={RecentActivity}
+        name="Enlaces"
+        component={UploadedLinks}
         options={{
-          tabBarLabel: 'Actividad',
-          tabBarAccessibilityLabel: 'Ver actividad reciente'
-        }}
-      />
-
-      <Tab.Screen
-        name="Resumen"
-        component={ProjectSummary}
-        options={{
-          tabBarLabel: 'Resumen',
-          tabBarAccessibilityLabel: 'Ver resumen de proyectos'
+          tabBarLabel: 'Enlaces',
+          tabBarAccessibilityLabel: 'Ver enlaces subidos'
         }}
       />
     </Tab.Navigator>

@@ -21,18 +21,63 @@
     },
     "projectTypes": {
       "type": "array",
-      "items": { "type": "string" },
-      "example": ["Investigation", "Social Service"]
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The unique identifier for the project type.",
+            "example": 32
+          },
+          "name": {
+            "type": "string",
+            "description": "The display name of the project type.",
+            "example": "Servicio Social Constitucional"
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "description": "A list of project types associated with the application."
     },
     "faculties": {
       "type": "array",
-      "items": { "type": "string" },
-      "example": ["Engineering", "Medicine"]
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The unique identifier for the faculty.",
+            "example": 21
+          },
+          "name": {
+            "type": "string",
+            "description": "The display name of the faculty.",
+            "example": "FECAM"
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "description": "A list of faculties associated with the application."
     },
     "problemTypes": {
       "type": "array",
-      "items": { "type": "string" },
-      "example": ["Water Scarcity", "Public Health"]
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The unique identifier for the problem type.",
+            "example": 29
+          },
+          "name": {
+            "type": "string",
+            "description": "The display name of the problem type.",
+            "example": "Logistica"
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "description": "A list of problem types associated with the application."
     }
   }
 }

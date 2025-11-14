@@ -1,4 +1,5 @@
-// apps/mobile/src/features/auth/services/authService.ts
+// apps/mobile/src/features/auth/services/authServiceNative.ts
+
 import { Platform } from 'react-native'
 import { API_URL, MOBILE_API_KEY } from '@env'
 import { tokenStorage } from '../utils/tokenStorage'
@@ -49,6 +50,7 @@ export async function register(data: RegisterData) {
 /**
  * Inicia sesión
  * Lanza excepciones estructuradas en caso de error
+ * Solo guarda tokens, NO retorna usuario (se obtiene con getSession)
  */
 export async function login(email: string, password: string) {
   const res = await fetch(`${API_URL}/mobile/auth/login`, {
@@ -75,7 +77,10 @@ export async function login(email: string, password: string) {
   const { accessToken, refreshToken } = bodyRes.data.tokens
   await tokenStorage.saveTokens(accessToken, refreshToken)
 
-  return { user: bodyRes.data.user, tokens: bodyRes.data.tokens }
+  console.log('✅ Tokens saved successfully')
+
+  
+  return { tokens: bodyRes.data.tokens }
 }
 
 /**
@@ -83,7 +88,6 @@ export async function login(email: string, password: string) {
  * Lanza excepciones estructuradas en caso de error
  * 
  * NOTA: Esta función es usada internamente por client.ts
- * No necesitas llamarla manualmente
  */
 export async function refreshAccessToken(): Promise<string> {
   const refreshToken = await tokenStorage.getRefreshToken()
@@ -122,15 +126,27 @@ export async function refreshAccessToken(): Promise<string> {
 }
 
 /**
- * Obtiene la sesión actual del usuario
+ * Obtiene la sesión actual del usuario desde /auth/me
+ * Retorna el usuario completo con rol
  * Lanza excepciones estructuradas en caso de error
  */
-export async function getSession(accessToken: string) {
+export async function getSession() {
+  const accessToken = await tokenStorage.getAccessToken()
+
+  if (!accessToken) {
+    throw createErrorFromResponse({
+      code: 'AUTHENTICATION_FAILURE',
+      message: 'No access token available',
+      status: 401
+    })
+  }
+
   const res = await fetch(`${API_URL}/auth/me`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${accessToken}`,
       'x-api-key': MOBILE_API_KEY,
+      'User-Agent': userAgent,
     },
   })
 
@@ -143,7 +159,19 @@ export async function getSession(accessToken: string) {
     })
   }
 
-  return bodyRes.data
+  
+  const roleData = bodyRes.data.role
+
+  const userData = {
+    uuid: bodyRes.data.user, 
+    email: roleData.email || roleData.institutionalEmail || '', 
+    role: roleData.name, 
+    roleDetails: roleData, 
+  }
+
+  console.log(' Session loaded:', userData)
+
+  return userData
 }
 
 /**
