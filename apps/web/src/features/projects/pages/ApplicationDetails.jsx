@@ -53,22 +53,27 @@ export default function ApplicationDetails() {
   }; 
 
   const handleApprove = async () => {
-    const confirmed = window.confirm(
-      '¿Estás seguro de que deseas aprobar este proyecto?\n\n' +
-      'Esta acción creará un nuevo proyecto activo basado en esta solicitud.'
-    );
+    const result = await Alerts.confirm({
+      title: '¿Aprobar este proyecto?',
+      text: 'Esta acción creará un nuevo proyecto activo basado en esta solicitud. El proyecto quedará disponible en "Mis Proyectos".',
+      confirmText: 'Sí, aprobar',
+      cancelText: 'Cancelar',
+    });
 
-    if (!confirmed) {
+    // Si el usuario cancela, salir
+    if (!result.isConfirmed) {
       return;
     }
 
     setIsApproving(true);
     
     try {
+      // Extraer IDs directamente del backend
       const projectTypeIds = application.projectTypes.map(pt => pt.id);
       const facultyIds = application.faculties.map(f => f.id);
       const problemTypeIds = application.problemTypes.map(pt => pt.id);
 
+      // Validaciones
       if (projectTypeIds.length === 0) {
         Alerts.warning('El proyecto debe tener al menos un tipo de proyecto');
         setIsApproving(false);
@@ -95,15 +100,30 @@ export default function ApplicationDetails() {
         problemType: problemTypeIds,
       };
 
-      const response = await approveApplication(uuid, projectData);
+      // Mostrar loading mientras se aprueba
+      const loadingAlert = Alerts.loading('Aprobando proyecto...');
 
-      console.log('Proyecto aprobado:', response);
+      try {
+        const response = await approveApplication(uuid, projectData);
+        
+        // Cerrar loading
+        loadingAlert.close();
 
-      Alerts.success('¡Proyecto aprobado exitosamente!');
-      
-      setTimeout(() => {
-        navigate('/my-projects');
-      }, 1500);
+        console.log('Proyecto aprobado:', response);
+
+        // Mostrar éxito
+        Alerts.success('¡Proyecto aprobado exitosamente!');
+        
+        // Redirigir después de 1.5 segundos
+        setTimeout(() => {
+          navigate('/my-projects');
+        }, 1500);
+        
+      } catch (error) {
+        // Cerrar loading en caso de error
+        loadingAlert.close();
+        throw error; // Re-lanzar para el catch externo
+      }
       
     } catch (error) {
       console.error('Error al aprobar proyecto:', error);

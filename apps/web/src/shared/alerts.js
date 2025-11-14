@@ -9,8 +9,8 @@ const toastConfig = {
   showConfirmButton: false,
   timer: 3000,
   timerProgressBar: true,
-  background: '#ffffff',
-  color: '#2ECC71'
+  // background: '#ffffff',
+  // color: '#2ECC71'
 };
 
 export const Alerts = {
@@ -64,8 +64,8 @@ export const Alerts = {
       cancelButtonColor: '#d33',
       confirmButtonText: options.confirmText || 'Sí, continuar',
       cancelButtonText: options.cancelText || 'Cancelar',
-      background: '#1a1a1a',
-      color: '#ffffff'
+      background: '#ffffff',
+      color: '##1a1a1a'
     });
   },
 
