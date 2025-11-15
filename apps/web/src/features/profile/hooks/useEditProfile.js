@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Alerts } from "@/shared/alerts";
 import { updateProfile } from "../profileService.js";
 import { 
@@ -10,23 +9,36 @@ import {
 
 const useEditProfile = (onClose, profile) => {
   const [form, setForm] = useState({
-    firstName: profile?.firstName || "",
-    middleName: profile?.middleName || "",
-    lastName: profile?.lastName || "",
-    organizationName: profile?.organizationName || "",
-    phoneNumber: profile?.phoneNumber || "",
-    location: profile?.location || "",
-    description: profile?.description || "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    organizationName: "",
+    phoneNumber: "",
+    location: "",
+    description: "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
-  const navigate = useNavigate();
+
+  // Cargar valores del perfil cuando el componente monta o profile cambia
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        firstName: profile.firstName || "",
+        middleName: profile.middleName || "",
+        lastName: profile.lastName || "",
+        organizationName: profile.organizationName || "",
+        phoneNumber: profile.phoneNumber || "",
+        location: profile.location || "",
+        description: profile.description || "",
+      });
+    }
+  }, [profile]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Limpiar error del campo cuando el usuario empieza a escribir
     if (fieldErrors[name]) {
       setFieldErrors(prev => {
         const newErrors = { ...prev };
@@ -35,14 +47,13 @@ const useEditProfile = (onClose, profile) => {
       });
     }
 
-    setForm({
-      ...form,
+    setForm(prev => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const handlePhoneChange = (value) => {
-    // Limpiar error del campo
     if (fieldErrors.phoneNumber) {
       setFieldErrors(prev => {
         const newErrors = { ...prev };
@@ -51,7 +62,7 @@ const useEditProfile = (onClose, profile) => {
       });
     }
     
-    setForm({ ...form, phoneNumber: value });
+    setForm(prev => ({ ...prev, phoneNumber: value }));
   };
 
   const handleLocationChange = (selectedOption) => {
@@ -63,7 +74,7 @@ const useEditProfile = (onClose, profile) => {
       });
     }
     
-    setForm({ ...form, location: selectedOption.label });
+    setForm(prev => ({ ...prev, location: selectedOption.label }));
   };
 
   const handleSubmit = async (e) => {
@@ -71,27 +82,28 @@ const useEditProfile = (onClose, profile) => {
     setIsLoading(true);
     setFieldErrors({});
 
-
     try {
+      const loadingAlert = Alerts.loading("Actualizando perfil...");
+
       await updateProfile(form);
 
-
+      loadingAlert.close();
       Alerts.success("¡Perfil actualizado correctamente!");
+      
       onClose();
       
-      // Recargar la página para obtener los datos actualizados
+      // Recargar después de cerrar el modal
       setTimeout(() => {
         window.location.reload();
-      }, 500);
+      }, 300);
 
     } catch (error) {
+      console.error("Error updating profile:", error);
 
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
           const processedErrors = processFieldErrors(error.details);
           setFieldErrors(processedErrors);
-          
-          
           Alerts.error("Por favor revisa los campos marcados");
         } else {
           Alerts.error(getDisplayMessage(error));

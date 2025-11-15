@@ -71,6 +71,7 @@ export async function update({ uuidUser, role, body }) {
         firstName: updatedUser.firstName,
         middleName: updatedUser.middleName,
         lastName: updatedUser.lastName,
+        email: updatedUser.email,
         status: updatedUser.userStatus?.name,
         ...roleData,
       },
