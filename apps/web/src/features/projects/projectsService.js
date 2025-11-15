@@ -365,7 +365,7 @@ export async function approveApplication(uuid_application, projectData = {}) {
  */
 export async function getMyApplications(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/my-applications?page=${page}&limit=${limit}`,
+    `${API_URL}/application/my-applications?page=${page}&perPage=${limit}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -397,7 +397,7 @@ export async function getMyApplications(page = 1, limit = 9) {
  */
 export async function getMyProjects(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/project/my-projects?page=${page}&limit=${limit}`,
+    `${API_URL}/project/my-projects?page=${page}&perPage=${limit}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
