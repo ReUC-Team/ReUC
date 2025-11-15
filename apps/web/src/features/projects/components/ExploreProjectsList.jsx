@@ -10,7 +10,7 @@ const ExploreProjectsList = () => {
   const {
     applications,
     faculties,
-    selectedFacultyId,
+    selectedFacultyName,
     pagination,
     isLoading,
     error,
@@ -18,7 +18,7 @@ const ExploreProjectsList = () => {
     handlePageChange,
   } = useExploreApplications();
 
-  // Filtrar por búsqueda local (título o descripción)
+  // Filtrar por búsqueda local
   const filteredApplications = applications.filter((app) => {
     const searchLower = search.toLowerCase();
     return (
@@ -31,8 +31,8 @@ const ExploreProjectsList = () => {
     navigate(`/application/${uuid}`);
   };
 
-  // Loading state
   if (isLoading) {
+    // ...existing loading state...
     return (
       <div className="w-full flex flex-col items-center">
         <div className="w-96 h-12 bg-gray-200 rounded-full mb-6 animate-pulse"></div>
@@ -58,8 +58,8 @@ const ExploreProjectsList = () => {
     );
   }
 
-  // Error state
   if (error) {
+    // ...existing error state...
     return (
       <div className="w-full flex flex-col items-center justify-center py-20">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
@@ -86,21 +86,25 @@ const ExploreProjectsList = () => {
         className="w-96 px-5 py-3 rounded-full border border-gray-300 mb-6 shadow-sm focus:outline-none focus:ring-2 focus:ring-lime-500"
       />
 
-      {/* Filtros por facultad */}
+      {/* Filtros por facultad - Cambio: usar abbreviation o name */}
       <div className="flex gap-4 flex-wrap justify-center mb-10">
-        {faculties.map(({ faculty_id, name, abbreviation }) => (
-          <button
-            key={faculty_id}
-            onClick={() => handleFacultyFilter(faculty_id)}
-            className={`px-5 py-2 rounded-full text-sm font-semibold transition cursor-pointer ${
-              selectedFacultyId === faculty_id
-                ? 'bg-lime-700 text-white'
-                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-            }`}
-          >
-            {abbreviation || name}
-          </button>
-        ))}
+        {faculties.map(({ faculty_id, name, abbreviation }) => {
+          const displayName = abbreviation || name;
+          
+          return (
+            <button
+              key={faculty_id}
+              onClick={() => handleFacultyFilter(displayName)}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition cursor-pointer ${
+                selectedFacultyName === displayName
+                  ? 'bg-lime-700 text-white'
+                  : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+              }`}
+            >
+              {displayName}
+            </button>
+          );
+        })}
       </div>
 
       {/* Lista de proyectos */}
@@ -116,7 +120,7 @@ const ExploreProjectsList = () => {
             <p className="text-gray-500">
               {search
                 ? "Intenta con otros términos de búsqueda"
-                : selectedFacultyId
+                : selectedFacultyName
                 ? "No hay proyectos disponibles para esta facultad"
                 : "Aún no hay proyectos publicados"}
             </p>
