@@ -1,10 +1,12 @@
 import { TeamMember } from "./TeamMember.js";
+import { validateTeamComposition } from "./teamCompositionService.js";
 import * as DomainError from "../errors/index.js";
 import { teamMemberRepo } from "@reuc/infrastructure/teamMemberRepo.js";
+import { projectRepo } from "@reuc/infrastructure/projectRepo.js";
 import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
 
 /**
- * Creates a team for a project by adding multiple members.
+ * Creates a team for a project, enforcing all business rules.
  * @param {object} params
  * @param {string} params.uuidProject - The UUID of the project.
  * @param {Array<{ uuidUser: string, roleId: number }>} params.members - Array of members to add.
@@ -23,8 +25,18 @@ export async function createTeam({ uuidProject, members }) {
         })
     );
 
-    const teamMemberPrimitives = teamMembers.map((tm) => tm.toPrimitives());
+    const projectData = await projectRepo.getConstraintsForProject(uuidProject);
+    if (!projectData || !projectData.projectType) {
+      throw new DomainError.BusinessRuleError(
+        `No ${uuidProject} found or has no valid project type.`,
+        { details: { field: "uuidProject", rule: "not_found" } }
+      );
+    }
 
+    const constraints = projectData.projectType.roleConstraints;
+    validateTeamComposition(teamMembers, constraints);
+
+    const teamMemberPrimitives = teamMembers.map((tm) => tm.toPrimitives());
     return await teamMemberRepo.createTeam(teamMemberPrimitives);
   } catch (err) {
     if (err instanceof InfrastructureError.ForeignKeyConstraintError) {
