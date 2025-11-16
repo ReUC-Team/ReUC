@@ -56,6 +56,7 @@ model User {
   outsider  Outsider?
 
   application Application[]
+  teamMembers Team_Member[]
 
   @@index([email])
   @@map("Users")
@@ -199,16 +200,18 @@ model Project {
   description          String
   estimatedEffortHours Int?     @map("estimated_effort_hours")
   estimatedDate        DateTime @map("estimated_date")
+  projectTypeId        Int      @map("project_type_id")
   statusId             Int?
   createdAt            DateTime @default(now()) @map("created_at")
   updatedAt            DateTime @updatedAt @map("updated_at")
 
   application   Application     @relation(fields: [uuidApplication], references: [uuid_application])
+  projectType   Project_Type    @relation(fields: [projectTypeId], references: [project_type_id])
   projectStatus Project_Status? @relation(fields: [statusId], references: [project_status_id])
 
-  projectProjectTypes Project_Project_Type[]
   projectFaculties    Project_Faculty[]
   projectProblemTypes Project_Problem_Type[]
+  teamMembers         Team_Member[]
 
   @@index([uuidApplication])
   @@index([createdAt])
@@ -231,20 +234,36 @@ model Faculty {
 }
 
 model Project_Type {
-  project_type_id     Int      @id @default(autoincrement())
-  name                String   @unique
-  estimatedTime       String   @map("estimated_time")
-  minTeamMembersSize  Int      @map("min_team_members_size")
-  maxTeamMembersSize  Int      @map("max_team_members_size")
-  minTeamAdvisorsSize Int      @map("min_team_advisors_size")
-  maxTeamAdvisorsSize Int      @map("max_team_advisors_size")
-  createdAt           DateTime @default(now()) @map("created_at")
-  updatedAt           DateTime @updatedAt @map("updated_at")
+  project_type_id    Int      @id @default(autoincrement())
+  name               String   @unique
+  description        String?
+  minEstimatedMonths Int?     @map("min_estimated_months")
+  maxEstimatedMonths Int?     @map("max_estimated_months")
+  requiredHours      Int?     @map("required_hours")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
+  roleConstraints        Project_Type_Role_Constraint[]
   applicationProjectType Application_Project_Type[]
-  projectProjectTypes    Project_Project_Type[]
+  projects               Project[]
 
   @@map("Project_Types")
+}
+
+model Project_Type_Role_Constraint {
+  constraint_id Int      @id @default(autoincrement())
+  projectTypeId Int      @map("project_type_id")
+  teamRoleId    Int      @map("team_role_id")
+  minCount      Int      @map("min_count")
+  maxCount      Int?     @map("max_count")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  projectType Project_Type @relation(fields: [projectTypeId], references: [project_type_id])
+  teamRole    Team_Role    @relation(fields: [teamRoleId], references: [team_role_id])
+
+  @@unique([projectTypeId, teamRoleId])
+  @@map("Project_Type_Role_Constraints")
 }
 
 model Problem_Type {
@@ -309,6 +328,19 @@ model Project_Status {
   @@map("Project_Statuses")
 }
 
+model Team_Role {
+  team_role_id Int      @id @default(autoincrement())
+  name         String   @unique
+  description  String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  teamMembers     Team_Member[]
+  roleConstraints Project_Type_Role_Constraint[]
+
+  @@map("Team_Roles")
+}
+
 // ================== LINKING TABLES ==================
 
 model Application_Project_Type {
@@ -347,17 +379,6 @@ model Application_Problem_Type {
   @@map("Application_Problem_Types")
 }
 
-model Project_Project_Type {
-  uuidProject   String @map("uuid_project")
-  projectTypeId Int    @map("project_type_id")
-
-  project     Project      @relation(fields: [uuidProject], references: [uuid_project])
-  projectType Project_Type @relation(fields: [projectTypeId], references: [project_type_id])
-
-  @@id([uuidProject, projectTypeId])
-  @@map("Project_Project_Types")
-}
-
 model Project_Faculty {
   uuidProject String @map("uuid_project")
   facultyId   Int    @map("faculty_id")
@@ -378,6 +399,21 @@ model Project_Problem_Type {
 
   @@id([uuidProject, problemTypeId])
   @@map("Project_Problem_Types")
+}
+
+model Team_Member {
+  uuid_team_member String   @id @default(uuid())
+  uuidProject      String   @map("uuid_project")
+  uuidUser         String   @map("uuid_user")
+  roleId           Int      @map("team_role_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  project Project   @relation(fields: [uuidProject], references: [uuid_project])
+  user    User      @relation(fields: [uuidUser], references: [uuid_user])
+  role    Team_Role @relation(fields: [roleId], references: [team_role_id])
+
+  @@unique([uuidProject, uuidUser])
+  @@map("Team_Members")
 }
 
 // ================== OTHERS MODELS ==================

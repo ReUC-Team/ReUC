@@ -60,7 +60,7 @@ function validateSignedNumber(value, fieldName) {
 }
 
 /**
- * Validates the entire payload for creating a new application, including the body and any uploaded files.
+ * Validates the entire payload for creating a new application.
  * This function acts as a gatekeeper to ensure all data is well-formed before being passed to the domain layer.
  * @param {string} uuidApplication - The UUID of the application to approve.
  * @param {object} body - The request body payload.
@@ -147,5 +147,49 @@ export function validateGetProjectsQuery({
 
   if (allErrors.length > 0) {
     throw new ValidationError("Invalid query parameters.", allErrors);
+  }
+}
+
+/**
+ * Validates the entire payload for creating a new team for a project.
+ * @param {string} uuidProject - The UUID of the project.
+ * @param {object} body - The request body payload.
+ * @param {Array<{ uuidUser: string, roleId: number }>} body.members - Array of members to add.
+ *
+ * @throws {ValidationError} If the payload is invalid.
+ */
+export function validateTeamCreationPayload(uuidProject, body) {
+  const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidProject, "uuidProject"));
+
+  // ---- Body Validation ----
+  if (!body.members || !Array.isArray(body.members)) {
+    allErrors.push({
+      field: "members",
+      rule: "missing_or_invalid",
+    });
+  } else if (body.members.length === 0) {
+    allErrors.push({
+      field: "members",
+      rule: "min_length",
+      expected: 1,
+    });
+  } else {
+    body.members.forEach((member, i) => {
+      allErrors.push(
+        ...validateUuid(member.uuidUser, `members[${i}].uuidUser`)
+      );
+
+      allErrors.push(
+        ...validateSignedNumber(member.roleId, `members[${i}].roleId`)
+      );
+    });
+  }
+
+  if (allErrors.length > 0) {
+    throw new ValidationError("Input validation failed.", {
+      details: allErrors,
+    });
   }
 }
