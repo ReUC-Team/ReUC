@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
           // Decodificar el token para obtener la información del usuario
           const decoded = jwtDecode(token);
           
-          // El rol viene en formato "professor:uuid" según tu backend
+          // El rol viene en formato "professor:uuid_role" según tu backend
           const userRole = decoded.role?.split(':')[0] || null;
           
           setUser({
@@ -59,8 +59,8 @@ export const AuthProvider = ({ children }) => {
       const userRole = decoded.role?.split(':')[0] || null;
       
       setUser({
-        ...userData,
         uuid: userData.uuid_user,
+        email: userData.email,
         role: userRole
       });
       setRole(userRole);
@@ -81,6 +81,10 @@ export const AuthProvider = ({ children }) => {
     } finally {
       // Limpiar estado local siempre
       sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('dashboardProfileModalShown');
+      sessionStorage.removeItem('profileModalShown');
+      sessionStorage.clear();
+      
       setUser(null);
       setRole(null);
     }
@@ -92,12 +96,12 @@ export const AuthProvider = ({ children }) => {
     isLoading,
     login,
     logout,
-    // ✅ Helpers para verificar roles
+    // Helpers para verificar roles
     isStudent: role === 'student',
     isProfessor: role === 'professor',
     isOutsider: role === 'outsider',
     isAdmin: role === 'admin',
-    // ✅ Helper para verificar si está autenticado
+    // Helper para verificar si está autenticado
     isAuthenticated: !!user && !!role,
   };
 

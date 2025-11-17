@@ -31,18 +31,23 @@ export async function getExploreApplicationsMetadata() {
 
 /**
  * Explora aplicaciones con filtros opcionales
- * @param {number|null} facultyId - ID de facultad para filtrar
+ * @param {string|null} facultyName - Nombre/abreviación de facultad para filtrar (ej: "FIE")
  * @param {number} page - Número de página (empieza en 1)
  * @param {number} limit - Items por página
  * @returns {Promise<{applications: Array, pagination: object}>}
  * @throws {ApplicationError}
  */
-export async function exploreApplications(facultyId = null, page = 1, limit = 9) {
-  let url = `${API_URL}/application/explore?page=${page}&limit=${limit}`;
+export async function exploreApplications(facultyName = null, page = 1, limit = 9) {
+  // Construir URL base
+  let url = `${API_URL}/application/explore`;
   
-  if (facultyId) {
-    url += `&facultyId=${facultyId}`;
+  // Si hay facultad, agregarla al path
+  if (facultyName) {
+    url += `/${facultyName}`;
   }
+  
+  // Agregar query params de paginación
+  url += `?page=${page}&perPage=${limit}`;
 
   const response = await fetchWithAuthAndAutoRefresh(url, {
     method: "GET",
@@ -360,7 +365,7 @@ export async function approveApplication(uuid_application, projectData = {}) {
  */
 export async function getMyApplications(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/my-applications?page=${page}&limit=${limit}`,
+    `${API_URL}/application/my-applications?page=${page}&perPage=${limit}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -392,7 +397,7 @@ export async function getMyApplications(page = 1, limit = 9) {
  */
 export async function getMyProjects(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/project/my-projects?page=${page}&limit=${limit}`,
+    `${API_URL}/project/my-projects?page=${page}&perPage=${limit}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },

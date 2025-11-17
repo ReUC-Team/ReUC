@@ -59,6 +59,7 @@ export async function getByUuids({ uuidUser, role }) {
         firstName: userData.firstName,
         middleName: userData.middleName,
         lastName: userData.lastName,
+        email: userData.email,
         status: userData.userStatus?.name,
         ...roleData,
       },

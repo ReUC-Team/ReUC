@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../authService.js";
+import { useAuth } from "@/context/AuthContext.jsx";
 import { 
   ValidationError, 
   AuthenticationError,
@@ -15,13 +16,13 @@ const useLogin = () => {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState({}); // Errores por campo
+  const [fieldErrors, setFieldErrors] = useState({}); 
   const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Limpiar error del campo al escribir
     if (fieldErrors[name]) {
       setFieldErrors(prev => {
         const newErrors = { ...prev };
@@ -39,18 +40,19 @@ const useLogin = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setFieldErrors({}); // Limpiar errores previos
+    setFieldErrors({});
 
     try {
-      // Mostrar carga
       const loadingAlert = Alerts.loading("Iniciando sesión...");
 
-      // Llamar al servicio (ahora lanza excepciones)
-      const { user } = await login(form);
+      // Llamar al servicio que retorna { user, accessToken }
+      const { user, accessToken } = await login(form);
       
       loadingAlert.close();
 
-      // Éxito - Navegar según rol
+      // Actualizar el contexto de autenticación
+      authLogin(user, accessToken);
+
       Alerts.success("¡Bienvenido a ReUC!");
 
       // Navegación según rol
@@ -67,7 +69,6 @@ const useLogin = () => {
     } catch (error) {
       console.error("Login error:", error);
 
-      // Manejo específico por tipo de error
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
           const processedErrors = processFieldErrors(error.details);
@@ -77,10 +78,8 @@ const useLogin = () => {
           Alerts.error(getDisplayMessage(error));
         }
       } else if (error instanceof AuthenticationError) {
-        // Error de credenciales inválidas
         Alerts.error("Credenciales incorrectas. Verifica tu correo y contraseña.");
       } else {
-        // Otros errores (red, servidor, etc.)
         Alerts.error(getDisplayMessage(error));
       }
     } finally {

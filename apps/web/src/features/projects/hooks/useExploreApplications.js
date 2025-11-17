@@ -6,7 +6,7 @@ import { getDisplayMessage, AuthenticationError } from "@/utils/errorHandler";
 export default function useExploreApplications() {
   const [applications, setApplications] = useState([]);
   const [faculties, setFaculties] = useState([]);
-  const [selectedFacultyId, setSelectedFacultyId] = useState(null);
+  const [selectedFacultyName, setSelectedFacultyName] = useState(null); // Cambio: guardar nombre en lugar de ID
   const [pagination, setPagination] = useState({
     page: 1,
     perPage: 9,
@@ -24,7 +24,6 @@ export default function useExploreApplications() {
         setFaculties(metadata.metadata.faculties || []);
       } catch (err) {
         console.error("Error loading faculties:", err);
-        // No bloqueamos la UI si falla la metadata
       }
     };
 
@@ -39,7 +38,7 @@ export default function useExploreApplications() {
 
       try {
         const data = await exploreApplications(
-          selectedFacultyId,
+          selectedFacultyName,
           pagination.page,
           pagination.perPage
         );
@@ -67,14 +66,15 @@ export default function useExploreApplications() {
     };
 
     fetchApplicationsData();
-  }, [selectedFacultyId, pagination.page, pagination.perPage]);
+  }, [selectedFacultyName, pagination.page, pagination.perPage]);
 
-  const handleFacultyFilter = (facultyId) => {
+  // Cambio: ahora recibe el nombre de la facultad
+  const handleFacultyFilter = (facultyName) => {
     // Si ya está seleccionada, la quitamos (mostrar todas)
-    if (selectedFacultyId === facultyId) {
-      setSelectedFacultyId(null);
+    if (selectedFacultyName === facultyName) {
+      setSelectedFacultyName(null);
     } else {
-      setSelectedFacultyId(facultyId);
+      setSelectedFacultyName(facultyName);
     }
     // Reset a página 1 al cambiar filtro
     setPagination((prev) => ({ ...prev, page: 1 }));
@@ -83,7 +83,6 @@ export default function useExploreApplications() {
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= pagination.totalPages) {
       setPagination((prev) => ({ ...prev, page: newPage }));
-      // Scroll al inicio de la lista
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -91,7 +90,7 @@ export default function useExploreApplications() {
   return {
     applications,
     faculties,
-    selectedFacultyId,
+    selectedFacultyName,
     pagination,
     isLoading,
     error,
