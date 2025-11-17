@@ -69,7 +69,7 @@ function validateSignedNumber(value, fieldName) {
  * @param {string} body.description - A detailed description of the project's problem and solution.
  * @param {string|number} [body.estimatedEffortHours] - The project estimated hours to be complete.
  * @param {string|Date} body.estimatedDate - The project estimated date in 'YYYY-MM-DD' format.
- * @param {string|number|Array<string|number>} [body.projectType] - A single ID or array of IDs for associated project types.
+ * @param {string|number} body.projectTypeId - A single ID for associated project type.
  * @param {string|number|Array<string|number>} [body.problemType] - A single ID or array of IDs for associated problem types.
  * @param {string|number|Array<string|number>} [body.faculty] - A single ID or array of IDs for associated faculties.
  * @param {string} [body.problemTypeOther] - A user-defined problem type if 'other' is selected.
@@ -95,12 +95,7 @@ export function validateCreationPayload(uuidApplication, body) {
   }
 
   allErrors.push(...validateDate(body.estimatedDate, "estimatedDate"));
-
-  if (body.projectType !== undefined) {
-    allErrors.push(
-      ...validateNumberOrNumberArray(body.projectType, "projectType")
-    );
-  }
+  allErrors.push(...validateSignedNumber(body.projectTypeId, "projectTypeId"));
 
   if (body.problemType !== undefined) {
     allErrors.push(

@@ -13,7 +13,7 @@ import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
  * @param {string} params.project.description - A detailed description of the project's problem and solution.
  * @param {string|number} [params.project.estimatedEffortHours] - The project estimated hours to be complete.
  * @param {string|Date} params.project.estimatedDate - The project estimated date in 'YYYY-MM-DD' format.
- * @param {string|number|Array<string|number>} [params.project.projectType] - A single ID or array of IDs for associated project types.
+ * @param {string|number} params.project.projectTypeId - A single ID for associated project type.
  * @param {string|number|Array<string|number>} [params.project.problemType] - A single ID or array of IDs for associated problem types.
  * @param {string|number|Array<string|number>} [params.project.faculty] - A single ID or array of IDs for associated faculties.
  * @param {string} [params.project.problemTypeOther] - A user-defined problem type if 'other' is selected.
@@ -27,7 +27,6 @@ export async function createProject({ uuidApplication, project }) {
     const newProject = new Project({
       ...project,
       uuidApplication: uuidApplication,
-      projectProjectType: project.projectType,
       projectFaculty: project.faculty,
       projectProblemType: project.problemType,
       projectCustomProblemType: project.problemTypeOther,
