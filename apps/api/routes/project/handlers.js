@@ -69,3 +69,17 @@ export async function createProjectTeamHandler(req, res) {
     data: result,
   });
 }
+
+/**
+ * Handles fetching the metadata required for the team creation form.
+ */
+export async function getTeamCreationFormDataHandler(req, res) {
+  const { uuid } = req.params;
+
+  const result = await project.getTeamCreationFormData(uuid);
+
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+}
