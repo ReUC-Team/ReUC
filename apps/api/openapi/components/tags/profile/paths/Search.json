@@ -1,0 +1,60 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Search User Profiles",
+    "description": "Searches for user profiles (Students and Professors only) by a keyword. \n\n- Requires **\"professor\"** role.",
+    "tags": ["Profile"],
+    "security": [
+      {
+        "BearerAuth": []
+      }
+    ],
+    "parameters": [
+      {
+        "name": "q",
+        "in": "query",
+        "description": "The search keyword (searches by name or email).",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 3,
+          "example": "zama"
+        }
+      },
+      {
+        "name": "limit",
+        "in": "query",
+        "description": "Max number of results to return for autocomplete.",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "example": 10
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Search successful. Returns a list of matching profiles.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/SearchProfilesSuccess.json"
+            }
+          }
+        }
+      },
+      "400": {
+        "$ref": "../../../responses/Error400.json"
+      },
+      "401": {
+        "$ref": "../../../responses/Error401.json"
+      },
+      "403": {
+        "$ref": "../../../responses/Error403.json"
+      },
+      "500": {
+        "$ref": "../../../responses/Error500.json"
+      }
+    }
+  }
+}

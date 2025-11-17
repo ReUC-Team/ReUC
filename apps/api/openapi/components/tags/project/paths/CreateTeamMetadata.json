@@ -1,0 +1,38 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Get Team Creation Metadata",
+    "description": "Retrieves the data needed to build the 'Create Team' form for a *specific* project.\n\nThis includes the list of allowed roles (e.g., 'Member', 'Advisor') and their min/max count constraints.\n\n- Requires **\"professor\"** role.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "description": "The unique identifier (UUID) of the project.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Team metadata retrieved successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/CreateTeamMetadataSuccess.json"
+            }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}
