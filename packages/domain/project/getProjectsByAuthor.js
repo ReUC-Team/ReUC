@@ -16,7 +16,7 @@ export async function getProjectsByAuthor({ uuidAuthor, page, perPage }) {
     const pageNum = Number(page) >= 1 ? Number(page) : undefined;
     const perPageNum = Number(perPage) >= 1 ? Number(perPage) : undefined;
 
-    return await projectRepo.getByUuidAuthor({
+    return await projectRepo.getAllByAuthor({
       uuidAuthor,
       page: pageNum,
       perPage: perPageNum,
