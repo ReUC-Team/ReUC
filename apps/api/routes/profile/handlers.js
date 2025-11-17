@@ -54,3 +54,17 @@ export async function getProfileStatusHandler(req, res) {
     data: { status },
   });
 }
+
+/**
+ * Handles searching of an user's profile.
+ */
+export async function getSearchProfilesHandler(req, res) {
+  const { q, limit } = req.query;
+
+  const records = await profile.searchProfiles(q, { limit });
+
+  return res.status(200).json({
+    success: true,
+    data: { records },
+  });
+}
