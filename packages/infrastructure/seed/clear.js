@@ -37,8 +37,10 @@ async function clearDatabase() {
   await prisma.file_Link.deleteMany();
   await prisma.file.deleteMany();
   // ------- CATALOGS -------
-  await prisma.faculty.deleteMany();
+  await prisma.project_Type_Role_Constraint.deleteMany();
+  await prisma.team_Role.deleteMany();
   await prisma.project_Type.deleteMany();
+  await prisma.faculty.deleteMany();
   await prisma.problem_Type.deleteMany();
   await prisma.user_Status.deleteMany();
   await prisma.student_Status.deleteMany();
