@@ -60,7 +60,7 @@ function validateSignedNumber(value, fieldName) {
 }
 
 /**
- * Validates the entire payload for creating a new application, including the body and any uploaded files.
+ * Validates the entire payload for creating a new application.
  * This function acts as a gatekeeper to ensure all data is well-formed before being passed to the domain layer.
  * @param {string} uuidApplication - The UUID of the application to approve.
  * @param {object} body - The request body payload.
@@ -69,7 +69,7 @@ function validateSignedNumber(value, fieldName) {
  * @param {string} body.description - A detailed description of the project's problem and solution.
  * @param {string|number} [body.estimatedEffortHours] - The project estimated hours to be complete.
  * @param {string|Date} body.estimatedDate - The project estimated date in 'YYYY-MM-DD' format.
- * @param {string|number|Array<string|number>} [body.projectType] - A single ID or array of IDs for associated project types.
+ * @param {string|number} body.projectTypeId - A single ID for associated project type.
  * @param {string|number|Array<string|number>} [body.problemType] - A single ID or array of IDs for associated problem types.
  * @param {string|number|Array<string|number>} [body.faculty] - A single ID or array of IDs for associated faculties.
  * @param {string} [body.problemTypeOther] - A user-defined problem type if 'other' is selected.
@@ -95,12 +95,7 @@ export function validateCreationPayload(uuidApplication, body) {
   }
 
   allErrors.push(...validateDate(body.estimatedDate, "estimatedDate"));
-
-  if (body.projectType !== undefined) {
-    allErrors.push(
-      ...validateNumberOrNumberArray(body.projectType, "projectType")
-    );
-  }
+  allErrors.push(...validateSignedNumber(body.projectTypeId, "projectTypeId"));
 
   if (body.problemType !== undefined) {
     allErrors.push(
@@ -147,5 +142,49 @@ export function validateGetProjectsQuery({
 
   if (allErrors.length > 0) {
     throw new ValidationError("Invalid query parameters.", allErrors);
+  }
+}
+
+/**
+ * Validates the entire payload for creating a new team for a project.
+ * @param {string} uuidProject - The UUID of the project.
+ * @param {object} body - The request body payload.
+ * @param {Array<{ uuidUser: string, roleId: number }>} body.members - Array of members to add.
+ *
+ * @throws {ValidationError} If the payload is invalid.
+ */
+export function validateTeamCreationPayload(uuidProject, body) {
+  const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidProject, "uuidProject"));
+
+  // ---- Body Validation ----
+  if (!body.members || !Array.isArray(body.members)) {
+    allErrors.push({
+      field: "members",
+      rule: "missing_or_invalid",
+    });
+  } else if (body.members.length === 0) {
+    allErrors.push({
+      field: "members",
+      rule: "min_length",
+      expected: 1,
+    });
+  } else {
+    body.members.forEach((member, i) => {
+      allErrors.push(
+        ...validateUuid(member.uuidUser, `members[${i}].uuidUser`)
+      );
+
+      allErrors.push(
+        ...validateSignedNumber(member.roleId, `members[${i}].roleId`)
+      );
+    });
+  }
+
+  if (allErrors.length > 0) {
+    throw new ValidationError("Input validation failed.", {
+      details: allErrors,
+    });
   }
 }

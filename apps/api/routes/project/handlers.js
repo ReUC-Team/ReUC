@@ -52,3 +52,34 @@ export async function getMyProjectsHandler(req, res) {
     },
   });
 }
+
+/**
+ * Handles the creation/aprove of a project/application
+ */
+export async function createProjectTeamHandler(req, res) {
+  const { uuid } = req.params;
+
+  const result = await project.createTeam({
+    uuidProject: uuid,
+    body: req.body,
+  });
+
+  return res.status(201).json({
+    success: true,
+    data: result,
+  });
+}
+
+/**
+ * Handles fetching the metadata required for the team creation form.
+ */
+export async function getTeamCreationFormDataHandler(req, res) {
+  const { uuid } = req.params;
+
+  const result = await project.getTeamCreationFormData(uuid);
+
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+}

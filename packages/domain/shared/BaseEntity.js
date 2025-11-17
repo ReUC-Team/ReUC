@@ -77,6 +77,34 @@ export class BaseEntity {
   }
 
   /**
+   * Normalize an input into a number and validate.
+   *
+   * @param {(number|string|undefined)} [input] - The value to normalize/validate.
+   * @param {string} [fieldName] - The name of the field used in validation error.
+   *
+   * @returns {number} An array of numeric values.
+   * @throws {ValidationError} If any value cannot be converted to a valid number.
+   */
+  parseAndValidateNumber(input = undefined, fieldName = "Unknown") {
+    const allErrors = [];
+    const num = Number(input);
+
+    if (isNaN(num)) {
+      throw new ValidationError(
+        `Field '${fieldName}' contains an invalid non-numeric value.`,
+        {
+          details: {
+            field: fieldName,
+            rule: "invalid_characters",
+          },
+        }
+      );
+    }
+
+    return num;
+  }
+
+  /**
    * Normalize a string by trimming whitespace and converting to lowercase.
    * @param {string|undefined|null} value - The value to normalize to a string.
    *

@@ -10,7 +10,7 @@ export class Project extends BaseEntity {
     "description",
     "estimatedEffortHours",
     "estimatedDate",
-    "projectProjectType",
+    "projectTypeId",
     "projectFaculty",
     "projectProblemType",
     "projectCustomProblemType",
@@ -25,6 +25,7 @@ export class Project extends BaseEntity {
       "shortDescription",
       "description",
       "estimatedDate",
+      "projectTypeId",
     ];
 
     const missingFields = [];
@@ -74,8 +75,8 @@ export class Project extends BaseEntity {
       }
     }
 
-    this.projectProjectType = this.parseAndValidateNumberArray(
-      this.projectProjectType,
+    this.projectTypeId = this.parseAndValidateNumber(
+      this.projectTypeId,
       "Project Type"
     );
     this.projectFaculty = this.parseAndValidateNumberArray(

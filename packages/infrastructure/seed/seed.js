@@ -7,9 +7,10 @@ import { studentSeedData } from "./student.seed.js";
 import { professorSeedData } from "./professor.seed.js";
 import { problemTypeSeedData } from "./problemType.seed.js";
 import { professorRoleSeedData } from "./professorRole.seed.js";
-import { projectTypeSeedData } from "./projectType.seed.js";
+import { seedProjectTypeModel } from "./projectType.seed.js";
 import { studentStatusSeedData } from "./studentStatus.seed.js";
 import { userStatusSeedData } from "./userStatus.seed.js";
+import { teamRoleSeedData } from "./teamRole.seed.js";
 
 const prisma = new PrismaClient();
 
@@ -28,19 +29,31 @@ async function runTask(taskName, task) {
  */
 async function clearDatabase() {
   // Start from tables that have foreign keys and move towards the tables they reference.
-  await prisma.file_Link.deleteMany();
+  await prisma.team_Member.deleteMany();
+  // ------- PROJECT -------
+  await prisma.project_Faculty.deleteMany();
+  await prisma.project_Problem_Type.deleteMany();
+  // await prisma.project_Project_Type.deleteMany();
+  await prisma.project.deleteMany();
+  // ------- APPLICATION -------
   await prisma.application_Faculty.deleteMany();
   await prisma.application_Problem_Type.deleteMany();
   await prisma.application_Project_Type.deleteMany();
   await prisma.application.deleteMany();
+  // ------- USER -------
   await prisma.admin.deleteMany();
   await prisma.student.deleteMany();
-  await prisma.faculty.deleteMany();
   await prisma.outsider.deleteMany();
   await prisma.professor.deleteMany();
   await prisma.user.deleteMany();
+  // ------- FILES -------
+  await prisma.file_Link.deleteMany();
   await prisma.file.deleteMany();
+  // ------- CATALOGS -------
+  await prisma.project_Type_Role_Constraint.deleteMany();
+  await prisma.team_Role.deleteMany();
   await prisma.project_Type.deleteMany();
+  await prisma.faculty.deleteMany();
   await prisma.problem_Type.deleteMany();
   await prisma.user_Status.deleteMany();
   await prisma.student_Status.deleteMany();
@@ -53,13 +66,14 @@ async function clearDatabase() {
  */
 async function seedCatalogs() {
   await Promise.all([
-    prisma.project_Type.createMany({ data: projectTypeSeedData }),
     prisma.problem_Type.createMany({ data: problemTypeSeedData }),
     prisma.user_Status.createMany({ data: userStatusSeedData }),
     prisma.student_Status.createMany({ data: studentStatusSeedData }),
     prisma.professor_Role.createMany({ data: professorRoleSeedData }),
     prisma.faculty.createMany({ data: facultySeedData }),
+    prisma.team_Role.createMany({ data: teamRoleSeedData }),
   ]);
+  await seedProjectTypeModel();
 }
 
 /**

@@ -30,6 +30,15 @@ export const projectRepo = {
     } catch (err) {
       // 3. Translate and re-throw database errors
       if (isPrismaError(err)) {
+        if (err.code === "P2002") {
+          const field = err.meta.target[0];
+
+          throw new InfrastructureError.UniqueConstraintError(
+            `A project with this ${field} already is a approved.`,
+            { details: { field, rule: "unique_constraint" } }
+          );
+        }
+
         if (err.code === "P2003") {
           const field = err.meta.constraint;
 
@@ -130,7 +139,7 @@ export const projectRepo = {
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
-  async getByUuidAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
+  async getAllByAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
     try {
       const where = { application: { uuidAuthor } };
       const sort = { createdAt: "asc" };
@@ -186,6 +195,50 @@ export const projectRepo = {
       );
     }
   },
+  /**
+   * Finds ONLY the role constraints for a given project's type.
+   * This is a specific query for domain validation.
+   * @param {string} uuidProject - The UUID of the project.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async getConstraintsForProject(uuidProject) {
+    try {
+      return await db.project.findUnique({
+        where: { uuid_project: uuidProject },
+        select: {
+          projectType: {
+            select: {
+              roleConstraints: {
+                select: {
+                  projectTypeId: true,
+                  teamRoleId: true,
+                  minCount: true,
+                  maxCount: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while querying project constraints: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (projectRepo.getConstraintsForProject) with UUID ${uuidProject}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while quering project constraints",
+        { cause: err }
+      );
+    }
+  },
 };
 
 /**
@@ -197,7 +250,7 @@ export const projectRepo = {
 function _buildProjectCreateData(project) {
   const {
     uuidApplication,
-    projectProjectType = [],
+    projectTypeId,
     projectFaculty = [],
     projectProblemType = [],
     projectCustomProblemType = null,
@@ -207,11 +260,7 @@ function _buildProjectCreateData(project) {
   const createData = {
     ...projectData,
     application: { connect: { uuid_application: uuidApplication } },
-    projectProjectTypes: {
-      create: projectProjectType.map((id) => ({
-        projectType: { connect: { project_type_id: id } },
-      })),
-    },
+    projectType: { connect: { project_type_id: projectTypeId } },
     projectFaculties: {
       create: projectFaculty.map((id) => ({
         faculty: { connect: { faculty_id: id } },

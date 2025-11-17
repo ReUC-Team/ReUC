@@ -16,7 +16,7 @@ export async function getApplicationsByAuthor({ uuidAuthor, page, perPage }) {
     const pageNum = Number(page) >= 1 ? Number(page) : undefined;
     const perPageNum = Number(perPage) >= 1 ? Number(perPage) : undefined;
 
-    return await applicationRepo.getByUuidAuthor({
+    return await applicationRepo.getAllByAuthor({
       uuidAuthor,
       page: pageNum,
       perPage: perPageNum,

@@ -15,11 +15,21 @@ export const projectTypeRepo = {
         select: {
           project_type_id: true,
           name: true,
-          estimatedTime: true,
-          minTeamAdvisorsSize: true,
-          maxTeamAdvisorsSize: true,
-          minTeamMembersSize: true,
-          maxTeamMembersSize: true,
+          minEstimatedMonths: true,
+          maxEstimatedMonths: true,
+          requiredHours: true,
+          roleConstraints: {
+            select: {
+              teamRole: {
+                select: {
+                  team_role_id: true,
+                  name: true,
+                },
+              },
+              minCount: true,
+              maxCount: true,
+            },
+          },
         },
         orderBy: { name: "asc" },
       });

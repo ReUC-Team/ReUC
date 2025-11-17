@@ -13,7 +13,7 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @param {string} params.body.description - A detailed description of the project's problem and solution.
  * @param {string|number} [params.body.estimatedEffortHours] - The project estimated hours to be complete.
  * @param {string|Date} params.body.estimatedDate - The project estimated date in 'YYYY-MM-DD' format.
- * @param {string|number|Array<string|number>} [params.body.projectType] - A single ID or array of IDs for associated project types.
+ * @param {string|number} params.body.projectTypeId - A single ID for associated project type.
  * @param {string|number|Array<string|number>} [params.body.problemType] - A single ID or array of IDs for associated problem types.
  * @param {string|number|Array<string|number>} [params.body.faculty] - A single ID or array of IDs for associated faculties.
  * @param {string} [params.body.problemTypeOther] - A user-defined problem type if 'other' is selected.
