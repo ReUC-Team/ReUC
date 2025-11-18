@@ -239,6 +239,145 @@ export const projectRepo = {
       );
     }
   },
+  /**
+   * Retrieves a full detailed project data and relations
+   * @param {string} uuid - The UUID of the project to search for.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async getDetailedProject(uuid) {
+    try {
+      const projectData = await db.project.findUnique({
+        where: { uuid_project: uuid },
+        select: {
+          // --- Author OR Organization ---
+          application: {
+            select: {
+              author: {
+                select: {
+                  uuid_user: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                  email: true,
+                  professor: {
+                    select: {
+                      universityId: true,
+                      professorRole: {
+                        select: {
+                          professor_role_id: true,
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                  outsider: {
+                    select: {
+                      organizationName: true,
+                      phoneNumber: true,
+                      location: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          // --- Application Details ---
+          uuidApplication: true,
+          title: true,
+          shortDescription: true,
+          description: true,
+          estimatedEffortHours: true,
+          estimatedDate: true,
+          createdAt: true,
+          projectType: {
+            select: {
+              name: true,
+              maxEstimatedMonths: true,
+              minEstimatedMonths: true,
+              requiredHours: true,
+            },
+          },
+          projectStatus: {
+            select: {
+              project_status_id: true,
+              name: true,
+              description: true,
+            },
+          },
+          // --- Related Types (Many-to-Many) ---
+          projectFaculties: {
+            select: {
+              faculty: {
+                select: {
+                  faculty_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          projectProblemTypes: {
+            select: {
+              problemType: {
+                select: {
+                  problem_type_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          teamMembers: {
+            select: {
+              uuid_team_member: true,
+              user: {
+                select: {
+                  uuid_user: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                  email: true,
+                  student: {
+                    select: {
+                      universityId: true,
+                    },
+                  },
+                  professor: {
+                    select: {
+                      universityId: true,
+                    },
+                  },
+                },
+              },
+              role: {
+                select: {
+                  team_role_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return projectData;
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while querying project details: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (projectRepo.getDetailedProject) with UUID ${uuid}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while quering project",
+        { cause: err }
+      );
+    }
+  },
 };
 
 /**

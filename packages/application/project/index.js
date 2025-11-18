@@ -3,6 +3,7 @@ import { myProjects } from "./myProjects.js";
 import { getProjects } from "./getProjects.js";
 import { createTeam } from "./createTeam.js";
 import { getTeamCreationFormData } from "./getTeamCreationFormData.js";
+import { getDetailedProject } from "./getDetailedProject.js";
 
 /**
  * The 'project' entity in the application layer, grouping all project
@@ -14,6 +15,7 @@ const project = {
   getProjects,
   createTeam,
   getTeamCreationFormData,
+  getDetailedProject,
 };
 
 export default project;
