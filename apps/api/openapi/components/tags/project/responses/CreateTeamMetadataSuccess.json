@@ -1,0 +1,51 @@
+{
+  "description": "Successful response containing the metadata for team creation.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "metadata:": {
+              "type": "object",
+              "properties": {
+                "allowedRoles": {
+                  "type": "array",
+                  "description": "The list of roles allowed for this project, with their constraints.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "teamRoleId": {
+                        "type": "number",
+                        "description": "The ID of the team role.",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The display name of the role.",
+                        "example": "Miembro"
+                      },
+                      "minCount": {
+                        "type": "number",
+                        "description": "The minimum number of members required for this role.",
+                        "example": 4
+                      },
+                      "maxCount": {
+                        "type": "number",
+                        "nullable": true,
+                        "description": "The maximum number of members allowed for this role. `null` means no limit.",
+                        "example": 5
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

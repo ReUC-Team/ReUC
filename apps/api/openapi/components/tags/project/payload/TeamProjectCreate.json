@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "description": "Payload for creating a new team for a project.",
+  "properties": {
+    "members": {
+      "type": "array",
+      "description": "An array of members to add to the team.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "uuidUser": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The UUID of the user to add.",
+            "example": "d290f1ee-6c54-4b01-90e6-d701748f0851"
+          },
+          "roleId": {
+            "type": "number",
+            "description": "The ID of the role for this user.",
+            "example": 1
+          }
+        },
+        "required": ["uuidUser", "roleId"]
+      },
+      "minItems": 1
+    }
+  },
+  "required": ["members"]
+}

@@ -169,6 +169,9 @@
     "/mobile/profile/edit": {
       "$ref": "./components/tags/profile/paths/MobileEdit.json"
     },
+    "/profile/search": {
+      "$ref": "./components/tags/profile/paths/Search.json"
+    },
 
     "/file/public/{uuid}": {
       "$ref": "./components/tags/file/paths/GetPublicAsset.json"
@@ -226,6 +229,15 @@
     },
     "/project/{uuid}": {
       "$ref": "./components/tags/project/paths/GetProject.json"
+    },
+    "/project/{uuid}/team/metadata": {
+      "$ref": "./components/tags/project/paths/CreateTeamMetadata.json"
+    },
+    "/project/{uuid}/team/create": {
+      "$ref": "./components/tags/project/paths/WebCreateTeam.json"
+    },
+    "/mobile/project/{uuid}/team/create": {
+      "$ref": "./components/tags/project/paths/MobileCreateTeam.json"
     }
   }
 }
