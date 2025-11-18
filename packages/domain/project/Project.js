@@ -25,7 +25,7 @@ export class Project extends BaseEntity {
       "shortDescription",
       "description",
       "estimatedDate",
-      "projectTypeId",
+      // ✅ NO VALIDAR projectTypeId aquí, se valida después como número
     ];
 
     const missingFields = [];
@@ -45,6 +45,19 @@ export class Project extends BaseEntity {
         { details: missingFields }
       );
 
+    // ✅ VALIDAR projectTypeId ANTES de parsear
+    if (!this.projectTypeId) {
+      throw new DomainError.ValidationError(
+        "Project type is required.",
+        {
+          details: [{
+            field: "projectTypeId",
+            rule: "missing_or_empty"
+          }]
+        }
+      );
+    }
+
     this.estimatedDate = new Date(this.estimatedDate);
     if (isNaN(this.estimatedDate.getTime())) {
       throw new DomainError.ValidationError(
@@ -63,7 +76,7 @@ export class Project extends BaseEntity {
       this.estimatedEffortHours = Number(this.estimatedEffortHours);
       if (isNaN(this.estimatedEffortHours)) {
         throw new DomainError.ValidationError(
-          "Estimated effort hours must be a valid numer.",
+          "Estimated effort hours must be a valid number.",
           {
             details: {
               field: "estimatedEffortHours",
@@ -75,6 +88,7 @@ export class Project extends BaseEntity {
       }
     }
 
+    // ✅ PARSEAR Y VALIDAR NÚMEROS
     this.projectTypeId = this.parseAndValidateNumber(
       this.projectTypeId,
       "Project Type"

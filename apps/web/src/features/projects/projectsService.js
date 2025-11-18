@@ -329,6 +329,22 @@ export async function downloadAllAttachments(attachments) {
 export async function approveApplication(uuid_application, projectData = {}) {
   const csrfToken = await getCSRFToken();
 
+  // ✅ CORRECCIÓN: El backend espera estos nombres de campos
+  const payload = {
+    uuidApplication: uuid_application,
+    title: projectData.title,
+    shortDescription: projectData.shortDescription,
+    description: projectData.description,
+    estimatedDate: projectData.estimatedDate,
+    
+    // ✅ CAMBIOS CRÍTICOS:
+    projectTypeId: projectData.projectType?.[0] || null,  // ← Tomar el primer elemento (singular)
+    facultyIds: projectData.faculty || [],                 // ← Renombrar a facultyIds (plural)
+    problemTypeIds: projectData.problemType || [],         // ← Renombrar a problemTypeIds (plural)
+  };
+
+  console.log("📤 Payload enviado a /project/create:", payload);
+
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/create`,
     {
@@ -337,19 +353,7 @@ export async function approveApplication(uuid_application, projectData = {}) {
         "Content-Type": "application/json",
         "csrf-token": csrfToken,
       },
-      body: JSON.stringify({
-        uuidApplication: uuid_application,
-        // Heredar datos de la Application o usar valores modificados
-        title: projectData.title,
-        shortDescription: projectData.shortDescription,
-        description: projectData.description,
-        estimatedEffortHours: projectData.estimatedEffortHours,
-        estimatedDate: projectData.estimatedDate,
-        projectType: projectData.projectType,
-        faculty: projectData.faculty,
-        problemType: projectData.problemType,
-        problemTypeOther: projectData.problemTypeOther,
-      }),
+      body: JSON.stringify(payload),
     }
   );
 
