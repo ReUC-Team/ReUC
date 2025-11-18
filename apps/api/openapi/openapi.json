@@ -67,6 +67,9 @@
       "ObjectApplication": {
         "$ref": "./components/tags/application/common/ObjectRecords.json"
       },
+      "ObjectAttachment": {
+        "$ref": "./components/tags/application/common/ObjectAttachment.json"
+      },
 
       "ResponseRecordsPaginated": {
         "$ref": "./components/tags/common/Objects/RecordsPaginated.json"
@@ -220,6 +223,9 @@
     },
     "/project/my-projects": {
       "$ref": "./components/tags/project/paths/GetMyProjects.json"
+    },
+    "/project/{uuid}": {
+      "$ref": "./components/tags/project/paths/GetProject.json"
     }
   }
 }
