@@ -83,3 +83,24 @@ export async function getTeamCreationFormDataHandler(req, res) {
     data: result,
   });
 }
+
+/**
+ * Handles fetching a single, detailed project by its UUID.
+ */
+export async function getDetailedProjectHandler(req, res) {
+  const user = req.user;
+  const { uuid } = req.params;
+
+  const detailedProject = await project.getDetailedProject(
+    user.uuid_user,
+    config.jwt,
+    uuid
+  );
+
+  return res.status(200).json({
+    success: true,
+    data: {
+      project: detailedProject,
+    },
+  });
+}

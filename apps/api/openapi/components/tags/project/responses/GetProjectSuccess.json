@@ -1,0 +1,42 @@
+{
+  "description": "Successful retrieval of detailed project data.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "project": {
+              "type": "object",
+              "description": "The detailed project object.",
+              "properties": {
+                "author": {
+                  "$ref": "../common/ObjectProjectAuthor.json"
+                },
+                "details": {
+                  "$ref": "../common/ObjectProjectDetails.json"
+                },
+                "bannerUrl": {
+                  "type": "string",
+                  "format": "uri-relative",
+                  "description": "The relative URL path for the project banner (inherited from application).",
+                  "example": "/file/view/123e4567?ticket=xyz",
+                  "nullable": true
+                },
+                "appAttachments": {
+                  "type": "array",
+                  "description": "A list of file attachments inherited from the original application.",
+                  "items": {
+                    "$ref": "../../application/common/ObjectAttachment.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

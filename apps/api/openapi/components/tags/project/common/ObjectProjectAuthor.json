@@ -1,0 +1,42 @@
+{
+  "type": "object",
+  "description": "The project author's information.",
+  "properties": {
+    "uuid_user": {
+      "type": "string",
+      "format": "uuid",
+      "example": "a1b2c3d4-e89b-12d3-a456-42661417400a"
+    },
+    "fullName": {
+      "type": "string",
+      "example": "Dr. Jane Doe"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "example": "jane.doe@university.edu"
+    },
+    "universityId": {
+      "type": "string",
+      "description": "The ID of the student or professor. Null for outsiders.",
+      "example": "20185678",
+      "nullable": true
+    },
+    "roleName": {
+      "type": "string",
+      "description": "The descriptive role (e.g., 'Professor - Coordinator' or 'outsider').",
+      "example": "professor",
+      "nullable": true
+    },
+    "outsider": {
+      "type": "object",
+      "nullable": true,
+      "description": "Specific details if the author is an outsider.",
+      "properties": {
+        "organizationName": { "type": "string", "nullable": true },
+        "phoneNumber": { "type": "string", "nullable": true },
+        "location": { "type": "string", "nullable": true }
+      }
+    }
+  }
+}
