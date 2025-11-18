@@ -1,0 +1,36 @@
+{
+  "get": {
+    "summary": "(Web - Mobile) Get a single detailed project",
+    "description": "Retrieves all details for a single project, including the author, team members, status, and file attachments.\n - Requires **\"professor\"**, **\"student\"**, or **\"outsider\"** role.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "required": true,
+        "description": "The unique identifier (UUID) of the project.",
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "123e4567-e89b-12d3-a456-426614174000"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successfully retrieved the detailed project.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/GetProjectSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

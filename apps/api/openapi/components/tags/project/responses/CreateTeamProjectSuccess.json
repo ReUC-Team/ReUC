@@ -1,0 +1,22 @@
+{
+  "description": "Successful response after creating the team, returning the count of members added.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "The number of team members successfully created.",
+              "example": 3
+            }
+          },
+          "required": ["count"]
+        }
+      }
+    }
+  ]
+}

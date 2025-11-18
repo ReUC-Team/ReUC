@@ -8,6 +8,7 @@ import {
   getProjectsHandler,
   createProjectTeamHandler,
   getTeamCreationFormDataHandler,
+  getDetailedProjectHandler,
 } from "./handlers.js";
 
 export const projectRouter = express.Router();
@@ -41,4 +42,9 @@ projectRouter.get(
   "/:uuid/team/metadata",
   requireRole("professor"),
   asyncHandler(getTeamCreationFormDataHandler)
+);
+projectRouter.get(
+  "/:uuid",
+  requireRole(["outsider", "professor", "student"]),
+  asyncHandler(getDetailedProjectHandler)
 );
