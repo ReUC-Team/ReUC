@@ -9,6 +9,8 @@ import {
   createProjectTeamHandler,
   getTeamCreationFormDataHandler,
   getDetailedProjectHandler,
+  updateTeamMemberHandler,
+  deleteTeamMemberHandler,
 } from "./handlers.js";
 
 export const projectRouter = express.Router();
@@ -47,4 +49,16 @@ projectRouter.get(
   "/:uuid",
   requireRole(["outsider", "professor", "student"]),
   asyncHandler(getDetailedProjectHandler)
+);
+projectRouter.patch(
+  "/:uuid/team/members/:uuidUser",
+  csrfProtection,
+  requireRole("professor"),
+  asyncHandler(updateTeamMemberHandler)
+);
+projectRouter.delete(
+  "/:uuid/team/members/:uuidUser",
+  csrfProtection,
+  requireRole("professor"),
+  asyncHandler(deleteTeamMemberHandler)
 );

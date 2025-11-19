@@ -1,0 +1,45 @@
+{
+  "description": "Successful response returning the updated team member details.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "teamMember": {
+              "type": "object",
+              "description": "The updated team member object.",
+              "properties": {
+                "uuidProject": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "uuidUser": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "role": {
+                  "type": "object",
+                  "description": "The member role object.",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "example": "Advisor"
+                    },
+                    "team_role_id": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": ["teamMember"]
+        }
+      }
+    }
+  ]
+}

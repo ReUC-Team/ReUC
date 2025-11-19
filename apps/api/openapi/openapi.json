@@ -238,6 +238,12 @@
     },
     "/mobile/project/{uuid}/team/create": {
       "$ref": "./components/tags/project/paths/MobileCreateTeam.json"
+    },
+    "/project/{uuid}/team/members/{uuidUser}": {
+      "$ref": "./components/tags/project/paths/WebTeamMember.json"
+    },
+    "/mobile/project/{uuid}/team/members/{uuidUser}": {
+      "$ref": "./components/tags/project/paths/MobileTeamMember.json"
     }
   }
 }

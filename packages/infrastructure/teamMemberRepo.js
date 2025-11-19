@@ -102,4 +102,128 @@ export const teamMemberRepo = {
       );
     }
   },
+  /**
+   * Updates a Project Member Role.
+   * @param {object} params
+   * @param {string} params.uuidProject - The unique identifier UUID of the project team.
+   * @param {string} params.uuidUser - The unique identifier UUID of the team member user to update.
+   * @param {number} params.roleId - The new role id of the team role.
+   *
+   * @throws {InfrastructureError.NotFoundError} If record was not found (P2025).
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async updateTeamMemberRole({ uuidProject, uuidUser, roleId }) {
+    try {
+      return await db.team_Member.update({
+        where: {
+          uuidProject_uuidUser: { uuidProject, uuidUser },
+        },
+        data: {
+          roleId,
+        },
+        select: {
+          uuidProject: true,
+          uuidUser: true,
+          role: {
+            select: {
+              team_role_id: true,
+              name: true,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2003") {
+          const field = err.meta.constraint;
+
+          throw new InfrastructureError.ForeignKeyConstraintError(
+            `A team member with this ${field} failed to update on this member.`,
+            { details: { field, rule: "foreign_key_violation" } }
+          );
+        }
+
+        if (err.code === "P2025") {
+          const message = err.meta?.cause || "Record to update not found.";
+
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuidUser} team member found in ${uuidProject} Project to update.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while updating team member role: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      const context = JSON.stringify({
+        uuidProject,
+        uuidUser,
+        roleId,
+      });
+      console.error(
+        `Infrastructure error (teamMemberRepo.updateTeamMemberRole) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while updating team member role.",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Removes a member from a project team.
+   * @param {object} params
+   * @param {string} params.uuidProject - The unique identifier UUID of the project.
+   * @param {string} params.uuidUser - The unique identifier UUID of the user to remove.
+   *
+   * @throws {InfrastructureError.NotFoundError} If the member does not exist (P2025).
+   * @throws {InfrastructureError.DatabaseError} For unexpected database errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async deleteTeamMember({ uuidProject, uuidUser }) {
+    try {
+      return await db.team_Member.delete({
+        where: {
+          uuidProject_uuidUser: {
+            uuidProject,
+            uuidUser,
+          },
+        },
+        select: {
+          uuidProject: true,
+          uuidUser: true,
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2025") {
+          const message = err.meta?.cause || "Record to delete not found.";
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuidUser} team member found in ${uuidProject} Project to delete.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while deleting team member: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      const context = JSON.stringify({ uuidProject, uuidUser });
+      console.error(
+        `Infrastructure error (teamMemberRepo.deleteTeamMember) with CONTEXT ${context}:`,
+        err
+      );
+
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while deleting team member.",
+        { cause: err }
+      );
+    }
+  },
 };

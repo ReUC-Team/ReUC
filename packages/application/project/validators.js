@@ -188,3 +188,35 @@ export function validateTeamCreationPayload(uuidProject, body) {
     });
   }
 }
+
+/**
+ * Validates the entire payload for updateing a team member.
+ * @param {string} uuidProject - The unique identifier UUID of the project team.
+ * @param {string} uuidMemberUser - The unique identifier UUID of the team member user to update.
+ * @param {object} body
+ * @param {number} body.roleId - The new role id of the team role.
+ *
+ * @throws {ValidationError} If the payload is invalid.
+ */
+export function validateMemberUpdate(uuidProject, uuidMemberUser, body) {
+  const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidProject, "uuidProject"));
+  allErrors.push(...validateUuid(uuidMemberUser, "uuidMemberUser"));
+
+  // ---- Body Validation ----
+  if (body.roleId === undefined || body.roleId === null) {
+    allErrors.push({
+      field: "roleId",
+      rule: "missing_or_empty",
+    });
+  } else {
+    allErrors.push(...validateSignedNumber(body.roleId, "roleId"));
+  }
+
+  if (allErrors.length > 0) {
+    throw new ValidationError("Input validation failed.", {
+      details: allErrors,
+    });
+  }
+}

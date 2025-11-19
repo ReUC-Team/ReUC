@@ -104,3 +104,36 @@ export async function getDetailedProjectHandler(req, res) {
     },
   });
 }
+
+/**
+ * Handles the update of a team member
+ */
+export async function updateTeamMemberHandler(req, res) {
+  const { uuid: uuidProject, uuidUser } = req.params;
+
+  const { teamMember } = await project.updateTeamMember(
+    uuidProject,
+    uuidUser,
+    req.body
+  );
+
+  return res.status(200).json({
+    success: true,
+    data: { teamMember },
+  });
+}
+
+/**
+ * Handles the removal of a team member.
+ */
+export async function deleteTeamMemberHandler(req, res) {
+  const { uuid: uuidProject, uuidUser } = req.params;
+
+  await project.deleteTeamMember(uuidProject, uuidUser);
+
+  return res.status(200).json({
+    success: true,
+    data: {},
+    message: "Team member removed successfully.",
+  });
+}
