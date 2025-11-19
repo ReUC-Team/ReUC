@@ -1,0 +1,66 @@
+{
+  "patch": {
+    "summary": "(Mobile) Update Team Member Role",
+    "description": "Updates the role of a specific team member within a project.\n\n- Requires **\"professor\"** role.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "description": "The unique identifier (UUID) of the project.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890"
+        }
+      },
+      {
+        "name": "uuidUser",
+        "in": "path",
+        "description": "The unique identifier (UUID) of the team member (user) to update.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid",
+          "example": "b2c3d4e5-f6a7-8901-b2c3-d4e5f6a78901"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "description": "Payload for updating a project team member's role.",
+            "properties": {
+              "roleId": {
+                "type": "integer",
+                "description": "The new Role ID to assign to the member.",
+                "example": 2
+              }
+            },
+            "required": ["roleId"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Member updated successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/EditTeamMemberSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}
