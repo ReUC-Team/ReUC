@@ -122,3 +122,18 @@ export async function updateTeamMemberHandler(req, res) {
     data: { teamMember },
   });
 }
+
+/**
+ * Handles the removal of a team member.
+ */
+export async function deleteTeamMemberHandler(req, res) {
+  const { uuid: uuidProject, uuidUser } = req.params;
+
+  await project.deleteTeamMember(uuidProject, uuidUser);
+
+  return res.status(200).json({
+    success: true,
+    data: {},
+    message: "Team member removed successfully.",
+  });
+}

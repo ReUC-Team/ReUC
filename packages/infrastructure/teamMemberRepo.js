@@ -174,4 +174,56 @@ export const teamMemberRepo = {
       );
     }
   },
+  /**
+   * Removes a member from a project team.
+   * @param {object} params
+   * @param {string} params.uuidProject - The unique identifier UUID of the project.
+   * @param {string} params.uuidUser - The unique identifier UUID of the user to remove.
+   *
+   * @throws {InfrastructureError.NotFoundError} If the member does not exist (P2025).
+   * @throws {InfrastructureError.DatabaseError} For unexpected database errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async deleteTeamMember({ uuidProject, uuidUser }) {
+    try {
+      return await db.team_Member.delete({
+        where: {
+          uuidProject_uuidUser: {
+            uuidProject,
+            uuidUser,
+          },
+        },
+        select: {
+          uuidProject: true,
+          uuidUser: true,
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2025") {
+          const message = err.meta?.cause || "Record to delete not found.";
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuidUser} team member found in ${uuidProject} Project to delete.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while deleting team member: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      const context = JSON.stringify({ uuidProject, uuidUser });
+      console.error(
+        `Infrastructure error (teamMemberRepo.deleteTeamMember) with CONTEXT ${context}:`,
+        err
+      );
+
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while deleting team member.",
+        { cause: err }
+      );
+    }
+  },
 };

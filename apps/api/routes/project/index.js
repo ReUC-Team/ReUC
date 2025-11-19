@@ -10,6 +10,7 @@ import {
   getTeamCreationFormDataHandler,
   getDetailedProjectHandler,
   updateTeamMemberHandler,
+  deleteTeamMemberHandler,
 } from "./handlers.js";
 
 export const projectRouter = express.Router();
@@ -54,4 +55,10 @@ projectRouter.patch(
   csrfProtection,
   requireRole("professor"),
   asyncHandler(updateTeamMemberHandler)
+);
+projectRouter.delete(
+  "/:uuid/team/members/:uuidUser",
+  csrfProtection,
+  requireRole("professor"),
+  asyncHandler(deleteTeamMemberHandler)
 );

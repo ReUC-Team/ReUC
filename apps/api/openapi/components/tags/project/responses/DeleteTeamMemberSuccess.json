@@ -1,0 +1,15 @@
+{
+  "description": "Successful response indicating the team member was removed.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "Team member removed successfully."
+        }
+      }
+    }
+  ]
+}
