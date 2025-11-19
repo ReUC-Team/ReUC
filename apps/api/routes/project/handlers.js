@@ -104,3 +104,21 @@ export async function getDetailedProjectHandler(req, res) {
     },
   });
 }
+
+/**
+ * Handles the update of a team member
+ */
+export async function updateTeamMemberHandler(req, res) {
+  const { uuid: uuidProject, uuidUser } = req.params;
+
+  const { teamMember } = await project.updateTeamMember(
+    uuidProject,
+    uuidUser,
+    req.body
+  );
+
+  return res.status(200).json({
+    success: true,
+    data: { teamMember },
+  });
+}

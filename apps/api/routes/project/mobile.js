@@ -5,7 +5,11 @@ import {
   requireRole,
 } from "../../middleware/auth.js";
 import asyncHandler from "../../utils/asyncHandler.js";
-import { createProjectHandler, createProjectTeamHandler } from "./handlers.js";
+import {
+  createProjectHandler,
+  createProjectTeamHandler,
+  updateTeamMemberHandler,
+} from "./handlers.js";
 
 export const mobileProjectRouter = express.Router();
 
@@ -19,4 +23,8 @@ mobileProjectRouter.post("/create", asyncHandler(createProjectHandler));
 mobileProjectRouter.post(
   "/:uuid/team/create",
   asyncHandler(createProjectTeamHandler)
+);
+mobileProjectRouter.patch(
+  "/:uuid/team/members/:uuidUser",
+  asyncHandler(updateTeamMemberHandler)
 );
