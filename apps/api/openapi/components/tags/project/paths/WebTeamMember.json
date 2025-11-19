@@ -1,9 +1,9 @@
 {
   "patch": {
-    "summary": "(Mobile) Update Team Member Role",
+    "summary": "(Web) Update Team Member Role",
     "description": "Updates the role of a specific team member within a project.\n\n- Requires **\"professor\"** role.",
     "tags": ["Project"],
-    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
     "parameters": [
       {
         "name": "uuid",
@@ -53,6 +53,43 @@
         "content": {
           "application/json": {
             "schema": { "$ref": "../responses/EditTeamMemberSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  },
+  "delete": {
+    "summary": "(Web) Remove Team Member",
+    "description": "Removes a user from the project team.\n\n- Requires **\"professor\"** role.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "description": "The unique identifier (UUID) of the project.",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      {
+        "name": "uuidUser",
+        "in": "path",
+        "description": "The unique identifier (UUID) of the team member to remove.",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Member removed successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/DeleteTeamMemberSuccess.json" }
           }
         }
       },

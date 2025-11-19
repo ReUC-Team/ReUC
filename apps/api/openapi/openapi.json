@@ -240,10 +240,10 @@
       "$ref": "./components/tags/project/paths/MobileCreateTeam.json"
     },
     "/project/{uuid}/team/members/{uuidUser}": {
-      "$ref": "./components/tags/project/paths/WebEditTeamMember.json"
+      "$ref": "./components/tags/project/paths/WebTeamMember.json"
     },
     "/mobile/project/{uuid}/team/members/{uuidUser}": {
-      "$ref": "./components/tags/project/paths/MobileEditTeamMember.json"
+      "$ref": "./components/tags/project/paths/MobileTeamMember.json"
     }
   }
 }
