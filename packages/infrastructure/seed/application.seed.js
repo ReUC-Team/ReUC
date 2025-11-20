@@ -35,7 +35,7 @@ export const applicationSeedData = (
     ); // 1 to 2 faculties
     const selectedProjectTypes = getRandomSample(
       projectTypes,
-      Math.floor(Math.random() * 3) + 1
+      Math.floor(Math.random() * 1) + 1
     ); // 1 to 3 project types
     const selectedProblemTypes = getRandomSample(
       problemTypes,
