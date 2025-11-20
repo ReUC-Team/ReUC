@@ -9,22 +9,22 @@ export const createExploreProjectsStyles = (palette: ColorPalette, fontMode: str
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#FFFFFF', // ✅ Fondo blanco
+      backgroundColor: palette.background,
     },
     headerContainer: {
-      backgroundColor: '#FFFFFF',
+      backgroundColor: palette.background,
       overflow: 'hidden',
     },
     header: {
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.lg,
-      alignItems: 'center', // ✅ Centrado
+      alignItems: 'center', 
     },
     title: {
       fontSize: typography.xl3,
       fontWeight: '700',
       color: palette.text,
-      textAlign: 'center', // ✅ Centrado
+      textAlign: 'center', 
     },
     titleAccent: {
       color: palette.primary,

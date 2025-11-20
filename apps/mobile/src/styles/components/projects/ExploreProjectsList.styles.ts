@@ -12,7 +12,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       justifyContent: 'center',
       alignItems: 'center',
       paddingVertical: spacing.xxl,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: palette.background,
     },
     loadingText: {
       marginTop: spacing.md,
@@ -25,7 +25,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       alignItems: 'center',
       paddingVertical: spacing.xxl,
       paddingHorizontal: spacing.md,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: palette.background,
     },
     errorText: {
       marginTop: spacing.md,
@@ -68,12 +68,12 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       color: palette.text,
       marginHorizontal: spacing.md,
       marginBottom: spacing.sm,
-      textAlign: 'center', // ✅ Centrado
+      textAlign: 'center', 
     },
     filtersContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'center', // ✅ Centrado
+      justifyContent: 'center', 
       gap: spacing.xs,
       paddingHorizontal: spacing.md,
     },
@@ -98,7 +98,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
     },
     listContent: {
       paddingBottom: spacing.xxl,
-      backgroundColor: '#FFFFFF',
+      backgroundColor: 'palette.background',
     },
     cardWrapper: {
       paddingHorizontal: spacing.md,
