@@ -83,10 +83,12 @@ const handleApproveSuccess = (projectUuid) => {
 
 // Línea 84-145: REEMPLAZAR handleApprove
 
+// Línea 84-145: REEMPLAZAR handleApprove
+
 const handleApprove = async () => {
   const result = await Alerts.confirm({
     title: '¿Aprobar este proyecto?',
-    text: 'Esta acción creará un nuevo proyecto activo basado en esta solicitud SIN modificaciones. El proyecto quedará disponible en "Mis Proyectos".',
+    text: 'Esta acción creará un nuevo proyecto activo basado en esta solicitud SIN modificaciones.',
     confirmText: 'Sí, aprobar',
     cancelText: 'Cancelar',
   });
@@ -98,7 +100,7 @@ const handleApprove = async () => {
   setIsApproving(true);
   
   try {
-    // Extraer IDs directamente del backend
+    // Extraer IDs de los arrays
     const projectTypeIds = application.projectTypes.map(pt => pt.id);
     const facultyIds = application.faculties.map(f => f.id);
     const problemTypeIds = application.problemTypes.map(pt => pt.id);
@@ -139,7 +141,7 @@ const handleApprove = async () => {
       
       loadingAlert.close();
 
-      console.log('✅ Proyecto aprobado:', response);
+      console.log('✅ Respuesta del backend:', response);
 
       // ✅ Extraer UUID del proyecto creado
       const projectUuid = response?.project?.uuid_project;

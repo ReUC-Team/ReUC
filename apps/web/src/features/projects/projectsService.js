@@ -321,8 +321,6 @@ export async function downloadAllAttachments(attachments) {
   return { successful, failed, errors };
 }
 
-// Línea 277-330: REEMPLAZAR función approveApplication
-
 /**
  * Aprueba una Application y crea un Project
  * @param {string} uuid_application - UUID de la Application a aprobar
@@ -333,21 +331,29 @@ export async function downloadAllAttachments(attachments) {
 export async function approveApplication(uuid_application, projectData = {}) {
   const csrfToken = await getCSRFToken();
 
-  // ✅ CORRECCIÓN: El backend espera estos nombres de campos
+  // ✅ Construir payload solo con campos que tengan valor
   const payload = {
     uuidApplication: uuid_application,
     title: projectData.title,
     shortDescription: projectData.shortDescription,
     description: projectData.description,
     estimatedDate: projectData.estimatedDate,
-    
-    // ✅ CAMBIOS CRÍTICOS:
-    projectTypeId: projectData.projectType?.[0] || null,  // ← Tomar el primer elemento (singular)
-    facultyIds: projectData.faculty || [],                 // ← Renombrar a facultyIds (plural)
-    problemTypeIds: projectData.problemType || [],         // ← Renombrar a problemTypeIds (plural)
+    projectTypeId: projectData.projectType?.[0] || null, // ✅ Solo el primer tipo
+    facultyIds: projectData.faculty || [],
+    problemTypeIds: projectData.problemType || [],
   };
 
-  console.log("📤 Payload enviado a /project/create:", payload);
+  // ✅ Solo agregar problemTypeOther si existe
+  if (projectData.problemTypeOther !== undefined && projectData.problemTypeOther !== null) {
+    payload.problemTypeOther = projectData.problemTypeOther;
+  }
+
+  // ✅ Solo agregar estimatedEffortHours si existe
+  if (projectData.estimatedEffortHours !== undefined) {
+    payload.estimatedEffortHours = projectData.estimatedEffortHours;
+  }
+
+  console.log("📤 [projectsService] Payload final:", payload);
 
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/create`,
@@ -361,6 +367,9 @@ export async function approveApplication(uuid_application, projectData = {}) {
     }
   );
 
+  console.log("✅ [projectsService] Respuesta completa del backend:", response);
+
+  // ✅ Retornar response.data (contiene { project: {...} })
   return response.data;
 }
 
@@ -428,6 +437,9 @@ export async function getMyProjects(page = 1, limit = 9) {
     pagination: paginationData,
   };
 }
+
+// Línea 416-490: REEMPLAZAR función getProjectDetails
+
 /**
  * Obtiene los detalles completos de un proyecto específico
  * @param {string} uuid - UUID del proyecto
@@ -435,33 +447,39 @@ export async function getMyProjects(page = 1, limit = 9) {
  * @throws {ApplicationError}
  */
 export async function getProjectDetails(uuid) {
-  // Hice uso del endpoint de Application porque Project hereda sus datos
-  // El backend aún no tiene GET /project/:uuid implementado
-  
   const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/${uuid}`,
+    `${API_URL}/project/${uuid}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     }
   );
 
-  const app = response.data.application;
+  const proj = response.data.project;
 
-  // Normalizar estructura para ProjectDetails.jsx
+  console.log("✅ [getProjectDetails] Respuesta del backend:", proj);
+
+  // ✅ Extraer datos correctamente según la estructura real del backend
+  const details = proj.details || {};
+  const author = proj.author || {};
+
   return {
-    uuid_project: app.uuid_application,
-    title: app.details?.title || 'Sin título',
-    description: app.details?.description || app.details?.shortDescription || 'Sin descripción',
-    shortDescription: app.details?.shortDescription || 'Sin descripción corta',
+    // IDs
+    uuid_project: proj.uuid_project,
+    uuidApplication: proj.uuidApplication,
+
+    // Información básica del proyecto
+    title: details.title || 'Sin título',
+    description: details.description || 'Sin descripción',
+    shortDescription: details.shortDescription || 'Sin descripción corta',
     
-    // Banner
-    bannerUrl: app.bannerUrl?.startsWith('http')
-      ? app.bannerUrl
-      : app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+    // Banner con URL absoluta
+    bannerUrl: proj.bannerUrl?.startsWith('http')
+      ? proj.bannerUrl
+      : proj.bannerUrl ? `${API_URL}${proj.bannerUrl}` : null,
     
-    // Attachments
-    attachments: (app.attachments || []).map(att => ({
+    // Attachments con URLs absolutas
+    attachments: (proj.appAttachments || []).map(att => ({
       downloadUrl: att.downloadUrl?.startsWith('http') 
         ? att.downloadUrl 
         : `${API_URL}${att.downloadUrl}`,
@@ -472,29 +490,51 @@ export async function getProjectDetails(uuid) {
     
     // Autor
     author: {
-      uuid_user: app.author?.uuid_user,
-      firstName: app.author?.fullName?.split(' ')[0] || 'No especificado',
-      lastName: app.author?.fullName?.split(' ').slice(1).join(' ') || '',
-      email: app.author?.email,
-      outsider: app.author?.outsider ? {
-        organizationName: app.author.outsider.organizationName,
-        phoneNumber: app.author.outsider.phoneNumber,
-        location: app.author.outsider.location,
+      uuid_user: author.uuid_user,
+      firstName: author.fullName?.split(' ')[0] || 'No especificado',
+      lastName: author.fullName?.split(' ').slice(1).join(' ') || '',
+      fullName: author.fullName || 'No especificado',
+      email: author.email,
+      universityId: author.universityId,
+      roleName: author.roleName,
+      outsider: author.outsider ? {
+        organizationName: author.outsider.organizationName,
+        phoneNumber: author.outsider.phoneNumber,
+        location: author.outsider.location,
       } : null,
     },
     
-    // Metadata
-    faculties: app.details?.faculties || [],
-    projectTypes: app.details?.projectTypes || [],
-    problemTypes: app.details?.problemTypes || [],
+    // ✅ Metadata del proyecto (extraído de details)
+    projectTypes: details.projectType ? [{
+      name: details.projectType.name,
+      minEstimatedMonths: details.projectType.minEstimatedMonths,
+      maxEstimatedMonths: details.projectType.maxEstimatedMonths,
+      requiredHours: details.projectType.requiredHours,
+    }] : [],
     
-    // Fechas y estado
-    createdAt: app.createdAt,
-    estimatedDate: app.details?.deadline,
-    status: app.status || 'approved', // Projects son applications aprobadas
+    faculties: details.faculties || [],
+    
+    problemTypes: details.problemTypes || [],
+    
+    // ✅ Team members (extraído de details.teamMembers)
+    teamMembers: (details.teamMembers || []).map(member => ({
+      uuid_user: member.uuid_user,
+      fullName: member.fullName,
+      email: member.email,
+      universityId: member.universityId,
+      role: member.role,
+    })),
+    
+    // Estado del proyecto
+    status: details.status?.name || 'approved',
+    statusDescription: details.status?.description,
+    
+    // Fechas
+    createdAt: details.createdAt,
+    estimatedDate: details.estimatedDate,
+    estimatedEffortHours: details.estimatedEffortHours,
   };
 }
-
 /**
  * Edita una Application existente (solo metadata)
  * @param {string} uuid - UUID de la Application

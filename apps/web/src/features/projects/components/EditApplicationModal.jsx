@@ -13,6 +13,8 @@ import useFormProjectMetadata from '../hooks/useFormProjectMetadata';
 export default function EditApplicationModal({ isOpen, onClose, uuid, application, onSuccess }) {
   const { form, fieldErrors, isLoading, handleChange, handleSubmit, initializeForm } = 
     useEditApplication(uuid, (projectUuid) => {
+      console.log("✅ [EditApplicationModal] Proyecto creado con UUID:", projectUuid);
+      
       // ✅ Cerrar modal antes de llamar a onSuccess
       onClose();
       

@@ -124,7 +124,7 @@ export default function useEditApplication(uuid, onSuccess) {
     return errors;
   };
 
-// Línea 127-195: REEMPLAZAR handleSubmit
+// Línea 165-195: REEMPLAZAR handleSubmit
 
 const handleSubmit = async (e, applicationData) => {
   e.preventDefault();
@@ -172,10 +172,10 @@ const handleSubmit = async (e, applicationData) => {
 
     console.log("📤 Enviando proyecto con datos EDITADOS:", projectData);
 
-    // ✅ CORRECCIÓN: Capturar respuesta del backend
+    // ✅ Llamar al endpoint de aprobación (POST /project/create)
     const response = await approveApplication(uuid, projectData);
     
-    console.log("✅ Respuesta del backend:", response);
+    console.log("✅ Respuesta del servicio:", response);
 
     // ✅ Extraer UUID del proyecto creado
     const projectUuid = response?.project?.uuid_project;
@@ -185,9 +185,11 @@ const handleSubmit = async (e, applicationData) => {
       throw new Error("No se pudo obtener el UUID del proyecto creado");
     }
 
+    console.log("✅ UUID del proyecto creado:", projectUuid);
+
     // ✅ Pasar UUID al callback de éxito
     if (onSuccess) {
-      onSuccess(projectUuid); // ✅ Pasar UUID del proyecto
+      onSuccess(projectUuid);
     }
 
   } catch (error) {

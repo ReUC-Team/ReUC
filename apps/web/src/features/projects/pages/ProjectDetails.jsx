@@ -115,21 +115,34 @@ export default function ProjectDetails() {
     );
   }
 
-  // Extraer datos del proyecto
-  const {
-    title,
-    description,
-    shortDescription,
-    bannerUrl,
-    faculties = [],
-    author,
-    projectTypes = [],
-    problemTypes = [],
-    status,
-    createdAt,
-    estimatedDate,
-    attachments = [],
-  } = project;
+const {
+  title,
+  description,
+  shortDescription,
+  bannerUrl,
+  faculties = [],
+  author,
+  projectTypes = [],
+  problemTypes = [],
+  status,
+  statusDescription,
+  createdAt,
+  estimatedDate,
+  estimatedEffortHours,
+  teamMembers = [],
+  attachments = [],
+} = project;
+
+console.log("📊 [ProjectDetails] Datos del proyecto:", {
+  title,
+  projectTypes,
+  faculties,
+  problemTypes,
+  estimatedDate,
+  createdAt,
+  status,
+  teamMembers
+});
 
   // Obtener datos del autor
   const authorFirstName = author?.firstName || 'No especificado';
@@ -148,78 +161,100 @@ export default function ProjectDetails() {
   const authorRole = isOutsider ? 'Outsider' : 'Profesor';
 
   // Información del autor
-  const authorInfo = [
+// Línea 120-130: ACTUALIZAR authorInfo
+
+const authorInfo = [
+  { 
+    label: 'Nombre', 
+    value: author?.fullName || 'No especificado' 
+  },
+  { 
+    label: 'Correo', 
+    value: author?.email || 'No especificado' 
+  },
+  { 
+    label: 'Matrícula', 
+    value: author?.universityId || 'No especificada' 
+  },
+  { 
+    label: 'Tipo de usuario', 
+    value: author?.roleName === 'professor' ? 'Profesor' :
+           author?.roleName === 'student' ? 'Estudiante' :
+           author?.roleName === 'outsider' ? 'Externo' :
+           author?.roleName || 'No especificado'
+  },
+  ...(author?.outsider ? [
     { 
-      label: 'Nombre', 
-      value: authorFullName
+      label: 'Organización', 
+      value: author.outsider.organizationName 
     },
     { 
-      label: 'Tipo de usuario', 
-      value: authorRole
+      label: 'Teléfono', 
+      value: author.outsider.phoneNumber 
     },
-    ...(isOutsider ? [
-      { 
-        label: 'Organización', 
-        value: organizationName
-      },
-      { 
-        label: 'Teléfono de contacto', 
-        value: phoneNumber
-      },
-      { 
-        label: 'Ubicación', 
-        value: location
-      },
-    ] : [
-      {
-        label: 'Información',
-        value: 'Proyecto creado por un profesor'
-      }
-    ]),
-  ];
+    { 
+      label: 'Ubicación', 
+      value: author.outsider.location 
+    },
+  ] : [
+    { 
+      label: 'Información', 
+      value: author?.roleName === 'professor' 
+        ? 'Proyecto creado por un profesor' 
+        : author?.roleName === 'student'
+        ? 'Proyecto creado por un estudiante'
+        : 'Proyecto creado por un usuario externo'
+    }
+  ])
+];
 
   // Información del proyecto
-  const projectInfo = [
-    { 
-      label: 'Tipo de proyecto', 
-      value: projectTypes.length > 0 
-        ? projectTypes
-            .map(pt => typeof pt === 'object' ? pt.name : pt)  // Soporte para ambos
-            .join(', ')
-        : 'No especificado' 
-    },
-    { 
-      label: 'Facultades', 
-      value: faculties.length > 0 
-        ? faculties
-            .map(f => typeof f === 'object' ? f.name : f)
-            .join(', ')
-        : 'No especificada' 
-    },
-    { 
-      label: 'Tipo de problemática', 
-      value: problemTypes.length > 0 
-        ? problemTypes
-            .map(pt => typeof pt === 'object' ? pt.name : pt)
-            .join(', ')
-        : 'No especificado' 
-    },
-    { 
-      label: 'Fecha estimada', 
-      value: formatDate(estimatedDate) 
-    },
-    { 
-      label: 'Fecha de creación', 
-      value: formatDate(createdAt) 
-    },
-    { 
-      label: 'Estado', 
-      value: status === 'in_progress' ? 'En Progreso' : 
-             status === 'completed' ? 'Completado' : 
-             status === 'approved' ? 'Aprobado' : 
-             status === 'pending' ? 'Pendiente' : status
-    },
-  ];
+// Línea 80-110: ACTUALIZAR projectInfo
+
+const projectInfo = [
+  { 
+    label: 'Tipo de proyecto', 
+    value: projectTypes.length > 0 
+      ? projectTypes.map(pt => pt.name).join(', ')
+      : 'No especificado' 
+  },
+  { 
+    label: 'Facultades', 
+    value: faculties.length > 0 
+      ? faculties.map(f => f.name).join(', ')
+      : 'No especificada' 
+  },
+  { 
+    label: 'Tipo de problemática', 
+    value: problemTypes.length > 0 
+      ? problemTypes.map(pt => pt.name).join(', ')
+      : 'No especificado' 
+  },
+  { 
+    label: 'Fecha estimada', 
+    value: estimatedDate ? formatDate(estimatedDate) : 'No especificada'
+  },
+  { 
+    label: 'Horas estimadas', 
+    value: estimatedEffortHours ? `${estimatedEffortHours} horas` : 'No especificadas'
+  },
+  { 
+    label: 'Fecha de creación', 
+    value: createdAt ? formatDate(createdAt) : 'No especificada'
+  },
+  { 
+    label: 'Estado', 
+    value: status || 'Aprobado'
+  },
+];
+
+// Línea 140-160: ACTUALIZAR teamInfo
+
+// ✅ Información del equipo
+const teamInfo = teamMembers.map(member => ({
+  label: member.role || 'Miembro',
+  value: `${member.fullName || 'Sin nombre'} (${member.email}) - ${member.universityId || 'Sin matrícula'}`
+}));
 
   // Función para contactar
   const handleContact = () => {
@@ -291,6 +326,16 @@ export default function ProjectDetails() {
             Información del <span className="text-lime-700">proyecto</span>
           </h2>
           <ProjectInfoCard items={projectInfo} />
+
+          {/* ✅ Sección de Equipo (si hay miembros) */}
+{project.teamMembers && project.teamMembers.length > 0 && (
+  <>
+    <h2 className="text-3xl font-bold mb-3 mt-8">
+      Equipo del <span className="text-lime-700">proyecto</span>
+    </h2>
+    <ProjectInfoCard items={teamInfo} />
+  </>
+)}
 
           {/* Botones de acción */}
           <div className="flex flex-col gap-3 pt-6 w-11/12">
