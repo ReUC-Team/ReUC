@@ -11,10 +11,12 @@ import {
   Animated,
   Dimensions,
 } from 'react-native'
-import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { useThemedStyles } from '../hooks/useThemedStyles'
 import { createLeftSidebarStyles } from '../styles/components/header/LeftSidebar.styles'
+import { useAuth } from '../context/AuthContext'
+import { getSidebarProjectRoutes } from '../config/projectRoutesConfig'
 
 type Props = {
   isVisible: boolean
@@ -24,25 +26,31 @@ type Props = {
 
 type MenuItem = {
   icon: string
-  iconType: 'ionicons' | 'material'
   label: string
   screen: string
 }
 
-const menuItems: MenuItem[] = [
-  { icon: 'list-outline',      iconType: 'ionicons', label: 'Solicitar un proyecto', screen: 'RequestProject' },
-  { icon: 'search-outline',    iconType: 'ionicons', label: 'Explorar proyectos',    screen: 'ExploreProjects' },
-  { icon: 'folder-outline',    iconType: 'ionicons', label: 'Mis proyectos',         screen: 'MyProjects' },
-  { icon: 'star-outline',      iconType: 'ionicons', label: 'Mis favoritos',         screen: 'FavoriteProjects' },
-  { icon: 'people-outline',    iconType: 'ionicons', label: 'Miembros',              screen: 'Members' },
-  { icon: 'document-text-outline', iconType: 'ionicons', label: 'Documentos',        screen: 'Documents' },
-  { icon: 'notifications-outline', iconType: 'ionicons', label: 'Notificaciones',    screen: 'Notifications' },
-]
-
-export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
+const LeftSidebar: React.FC<Props> = ({ isVisible, onClose, onNavigate }) => {
   const styles = useThemedStyles(createLeftSidebarStyles)
-  const navigation = useNavigation<any>() 
+  const navigation = useNavigation<any>()
+  const { user } = useAuth()
   const slideAnim = useRef(new Animated.Value(-Dimensions.get('window').width)).current
+
+  // Obtener rutas de proyectos según el rol del usuario
+  const projectRoutes = getSidebarProjectRoutes(user?.role || 'outsider')
+
+  // Construir menú dinámico basado en el rol
+  const menuItems: MenuItem[] = [
+    // Siempre mostrar Dashboard
+    { icon: 'home-outline', label: 'Inicio', screen: 'Dashboard' },
+
+    // Rutas de proyectos basadas en rol
+    ...projectRoutes.map((route) => ({
+      icon: route.icon,
+      label: route.label,
+      screen: route.screen,
+    })),
+  ]
 
   useEffect(() => {
     if (isVisible) {
@@ -60,41 +68,17 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
     }
   }, [isVisible])
 
-  const renderIcon = (item: MenuItem) => {
-    if (item.iconType === 'ionicons') {
-      return (
-        <Ionicons
-          name={item.icon as any}
-          size={24}
-          style={styles.menuIcon}
-        />
-      )
-    }
-    return (
-      <MaterialIcons
-        name={item.icon as any}
-        size={24}
-        style={styles.menuIcon}
-      />
-    )
-  }
-
   const handleMenuPress = (item: MenuItem) => {
     if (onNavigate) {
       onNavigate(item.screen)
     } else {
-      navigation.navigate(item.screen) 
+      navigation.navigate(item.screen)
     }
     onClose()
   }
 
   return (
-    <Modal
-      visible={isVisible}
-      transparent
-      animationType="none"
-      onRequestClose={onClose}
-    >
+    <Modal visible={isVisible} transparent animationType="none" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
@@ -108,29 +92,39 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
             >
               {/* Header del Sidebar */}
               <View style={styles.header}>
-                <Text style={styles.logo}>
-                  Re<Text style={{ color: styles.logoAccent.color }}>UC</Text>
-                </Text>
-                <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                  <Ionicons name="close" size={24} style={styles.closeIcon} />
-                </TouchableOpacity>
+                <View style={styles.headerContent}>
+                  <Text style={styles.logo}>
+                    Re<Text style={styles.logoAccent}>UC</Text>
+                  </Text>
+                  <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                    <Ionicons name="close" size={28} style={styles.closeIcon} />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               {/* Menu Items */}
-              <ScrollView style={styles.menuContainer}>
-                {menuItems.map((item, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.menuItem}
-                    onPress={() => handleMenuPress(item)}
-                  >
-                    <View style={styles.menuItemContent}>
-                      {renderIcon(item)}
-                      <Text style={styles.menuText}>{item.label}</Text>
-                    </View>
-                  </TouchableOpacity>
-                ))}
+              <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
+                <View style={styles.menuSection}>
+                  <Text style={styles.sectionTitle}>NAVEGACIÓN</Text>
+                  {menuItems.map((item, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.menuItem}
+                      onPress={() => handleMenuPress(item)}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.menuItemContent}>
+                        <View style={styles.iconContainer}>
+                          <Ionicons name={item.icon as any} size={22} style={styles.menuIcon} />
+                        </View>
+                        <Text style={styles.menuText}>{item.label}</Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={18} style={styles.chevronIcon} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </ScrollView>
+
             </Animated.View>
           </TouchableWithoutFeedback>
         </View>
@@ -138,3 +132,5 @@ export default function LeftSidebar({ isVisible, onClose, onNavigate }: Props) {
     </Modal>
   )
 }
+
+export default LeftSidebar

@@ -42,12 +42,12 @@ export default function useLoginNative() {
       
       console.log('✅ Login successful, tokens saved')
       
-      // 2. Cargar usuario completo desde /auth/me (incluye rol)
+      // 2. Cargar usuario completo desde /auth/me 
       await refreshUser()
       
       console.log('✅ User session loaded')
       
-      // 3. Navegar al dashboard (el router decidirá cuál mostrar)
+      // 3. Navegar al dashboard 
       nav.navigate('Dashboard')
 
     } catch (error: any) {
