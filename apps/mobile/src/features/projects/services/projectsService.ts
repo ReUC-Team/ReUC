@@ -23,9 +23,6 @@ export async function getCSRFToken(): Promise<string> {
  * Obtiene metadata para crear una aplicación (facultades, tipos de proyecto, banners, etc.)
  */
 export async function getCreateMetadata() {
-  console.log('📋 getCreateMetadata called')
-  console.log('📋 API_URL:', API_URL)
-  console.log('📋 Full URL:', `${API_URL}/application/metadata/create`)
 
   try {
     const response = await fetchWithAuthAndAutoRefresh(
@@ -464,5 +461,47 @@ export async function toggleFavorite(projectId: string) {
     return { success: true, data: bodyRes.data }
   } catch (error: any) {
     return { success: false, err: error.message }
+  }
+}
+
+export async function approveApplication(
+  uuid_application: string,
+  projectData?: any
+): Promise<any> {
+  const csrfToken = await getCSRFToken()
+
+  const bodyData = {
+    uuidApplication: uuid_application,
+    projectType: projectData?.projectType || [], 
+    title: projectData?.title,
+    shortDescription: projectData?.shortDescription,
+    description: projectData?.description,
+    estimatedEffortHours: projectData?.estimatedEffortHours,
+    estimatedDate: projectData?.estimatedDate,
+    faculty: projectData?.faculty,
+    problemType: projectData?.problemType,
+    problemTypeOther: projectData?.problemTypeOther,
+  }
+
+  console.log(' Body being sent:', JSON.stringify(bodyData, null, 2))
+
+  try {
+    const response = await fetchWithAuthAndAutoRefresh(
+      `${API_URL}/project/create`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'csrf-token': csrfToken,
+        },
+        body: JSON.stringify(bodyData),
+      }
+    )
+
+    console.log(' Response from API:', JSON.stringify(response, null, 2))
+    return response.data
+  } catch (error) {
+    console.error(' Error in approveApplication:', error)
+    throw error
   }
 }

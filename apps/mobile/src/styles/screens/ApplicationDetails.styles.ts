@@ -14,7 +14,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
     header: {
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.lg,
-        alignItems: 'center',
+      alignItems: 'center',
     },
     title: {
       fontSize: typography.xl3,
@@ -77,5 +77,68 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+    },
+
+    // ============================================
+    // ESTILOS DE BOTONES DE ACCIÓN
+    // ============================================
+    actionsContainer: {
+      marginTop: spacing.lg,
+      gap: spacing.sm,
+      marginBottom: spacing.xl,
+    },
+    
+    approveButton: {
+      backgroundColor: palette.primary,
+      paddingVertical: spacing.md,
+      borderRadius: 8,
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: spacing.xs,
+    },
+    approveButtonDisabled: {
+      opacity: 0.6,
+    },
+    approveButtonText: {
+      color: palette.onPrimary,
+      fontSize: typography.base,
+      fontWeight: '600',
+    },
+    
+    downloadAllButton: {
+      backgroundColor: palette.gray,
+      paddingVertical: spacing.md,
+      borderRadius: 8,
+      alignItems: 'center',
+      flexDirection: 'row',
+      justifyContent: 'center',
+      gap: spacing.xs,
+    },
+    downloadAllButtonDisabled: {
+      opacity: 0.5,
+    },
+    downloadAllButtonText: {
+      color: palette.onPrimary,
+      fontSize: typography.base,
+      fontWeight: '600',
+    },
+    
+    contactButton: {
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      borderColor: palette.primary,
+      paddingVertical: spacing.md,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    contactButtonDisabled: {
+      opacity: 0.5,
+      borderColor: palette.gray,
+    },
+    contactButtonText: {
+      color: palette.primary,
+      fontSize: typography.base,
+      fontWeight: '600',
     },
   })
