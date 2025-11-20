@@ -176,7 +176,7 @@ export async function getApplicationDetails(uuid) {
       downloadUrl: a.downloadUrl?.startsWith('http') 
         ? a.downloadUrl 
         : `${API_URL}${a.downloadUrl}`,
-      name: a.name, // ← Este es el nombre ORIGINAL del archivo
+      name: a.name,
       size: a.size,
       type: a.type,
     })),
@@ -194,9 +194,9 @@ export async function getApplicationDetails(uuid) {
       } : null,
     },
 
-    faculties: app.details?.faculties || [],  // [{ id: 1, name: "Ingeniería" }]
-    projectTypes: app.details?.projectTypes || [],  // [{ id: 3, name: "Investigación" }]
-    problemTypes: app.details?.problemTypes || [],  // [{ id: 5, name: "Ambiental" }]
+    faculties: app.details?.faculties || [],  
+    projectTypes: app.details?.projectTypes || [],
+    problemTypes: app.details?.problemTypes || [],
     
     facultyIds: (app.details?.faculties || []).map(f => f.id),
     projectTypeIds: (app.details?.projectTypes || []).map(pt => pt.id),
@@ -265,7 +265,7 @@ export async function downloadFile(downloadUrl, fileName, mimeType, forceDownloa
     const objectUrl = URL.createObjectURL(blob);
     
     link.href = objectUrl;
-    link.download = fileName; // Usa el nombre ORIGINAL
+    link.download = fileName;
     link.style.display = 'none';
     
     document.body.appendChild(link);
@@ -329,7 +329,6 @@ export async function downloadAllAttachments(attachments) {
 export async function approveApplication(uuid_application, projectData = {}) {
   const csrfToken = await getCSRFToken();
 
-  // ✅ CORRECCIÓN: El backend espera estos nombres de campos
   const payload = {
     uuidApplication: uuid_application,
     title: projectData.title,
@@ -337,13 +336,10 @@ export async function approveApplication(uuid_application, projectData = {}) {
     description: projectData.description,
     estimatedDate: projectData.estimatedDate,
     
-    // ✅ CAMBIOS CRÍTICOS:
-    projectTypeId: projectData.projectType?.[0] || null,  // ← Tomar el primer elemento (singular)
-    facultyIds: projectData.faculty || [],                 // ← Renombrar a facultyIds (plural)
-    problemTypeIds: projectData.problemType || [],         // ← Renombrar a problemTypeIds (plural)
+    projectTypeId: projectData.projectType?.[0] || null,  
+    facultyIds: projectData.faculty || [],                
+    problemTypeIds: projectData.problemType || [],         
   };
-
-  console.log("📤 Payload enviado a /project/create:", payload);
 
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/create`,
