@@ -25,7 +25,6 @@ export class Project extends BaseEntity {
       "shortDescription",
       "description",
       "estimatedDate",
-      // ✅ NO VALIDAR projectTypeId aquí, se valida después como número
     ];
 
     const missingFields = [];
@@ -67,6 +66,20 @@ export class Project extends BaseEntity {
             field: "estimatedDate",
             rule: "invalid_format",
             expected: "YYYY-MM-DD",
+          },
+        }
+      );
+    }
+
+    this.projectTypeId = Number(this.projectTypeId);
+    if (isNaN(this.projectTypeId)) {
+      throw new DomainError.ValidationError(
+        "Project Type Id must be a valid numer.",
+        {
+          details: {
+            field: "projectTypeId",
+            rule: "invalid_format",
+            expected: "number",
           },
         }
       );

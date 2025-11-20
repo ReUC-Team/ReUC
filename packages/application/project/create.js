@@ -24,7 +24,7 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  */
 export async function create({ body }) {
   // 1) Pull the application UUID out of the incoming payload — this is the primary foreign key
-  const { uuidApplication, ...remainingFields } = body;
+  const { uuidApplication, projectType, ...remainingFields } = body;
   const bodyPayload = remainingFields; // Remove uuidApplication from the body payload
 
   // 2) Sanitize the problemType: remove the user-selected "otro" sentinel (Spanish: "other")
@@ -35,11 +35,17 @@ export async function create({ body }) {
     ? []
     : bodyPayload.problemType;
 
+  /**
+   * @todo TEMP FIX FOR 20/11/25 REPAIR FOR LATER FETAURES
+   */
+  const fixedProjectType = projectType[0];
+
   // 3) Prepare a temporary body for validation that substitutes the sanitized problemType.
   //    This prevents the validator from rejecting the payload due to the "otro" marker.
   const bodyForValidation = {
     ...bodyPayload,
     problemType: filteredProblemType,
+    projectTypeId: fixedProjectType, // FIX LATER ^TODO
   };
 
   // 4) Run domain-level validation with the cleaned payload and the application UUID.
@@ -49,6 +55,7 @@ export async function create({ body }) {
   //    but override problemType with the filtered array so only valid IDs are persisted.
   const { problemType, ...projectData } = bodyPayload;
   projectData.problemType = filteredProblemType;
+  projectData.projectTypeId = fixedProjectType; // FIX LATER ^TODO
 
   // 6) Invoke the domain create operation and return the newly created project.
   try {
