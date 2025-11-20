@@ -7,6 +7,10 @@ import { typography } from '../../theme/typography'
 
 export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: palette.background,
+    },
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
@@ -68,12 +72,12 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       color: palette.text,
       marginHorizontal: spacing.md,
       marginBottom: spacing.sm,
-      textAlign: 'center', 
+      textAlign: 'center',
     },
     filtersContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'center', 
+      justifyContent: 'center',
       gap: spacing.xs,
       paddingHorizontal: spacing.md,
     },
@@ -96,16 +100,11 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
     filterTagTextActive: {
       color: palette.onPrimary,
     },
-    listContent: {
-      paddingBottom: spacing.xxl,
-      backgroundColor: 'palette.background',
-    },
     cardWrapper: {
       paddingHorizontal: spacing.md,
-      marginBottom: spacing.xs,
+      marginBottom: spacing.sm,
     },
     emptyContainer: {
-      flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingVertical: spacing.xxl,
@@ -130,6 +129,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       alignItems: 'center',
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.md,
+      marginTop: spacing.md,
     },
     paginationButton: {
       backgroundColor: palette.primary,
@@ -155,6 +155,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       fontSize: typography.sm,
       color: palette.textSecondary,
       textAlign: 'center',
-      paddingBottom: spacing.md,
+      paddingVertical: spacing.md,
+      paddingBottom: spacing.xxl,
     },
   })

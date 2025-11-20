@@ -11,20 +11,17 @@ export const createExploreProjectsStyles = (palette: ColorPalette, fontMode: str
       flex: 1,
       backgroundColor: palette.background,
     },
-    headerContainer: {
-      backgroundColor: palette.background,
-      overflow: 'hidden',
-    },
     header: {
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.lg,
-      alignItems: 'center', 
+      alignItems: 'center',
+      backgroundColor: palette.background,
     },
     title: {
       fontSize: typography.xl3,
       fontWeight: '700',
       color: palette.text,
-      textAlign: 'center', 
+      textAlign: 'center',
     },
     titleAccent: {
       color: palette.primary,
