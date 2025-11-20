@@ -30,6 +30,15 @@ export const projectRepo = {
     } catch (err) {
       // 3. Translate and re-throw database errors
       if (isPrismaError(err)) {
+        if (err.code === "P2002") {
+          const field = err.meta.target[0];
+
+          throw new InfrastructureError.UniqueConstraintError(
+            `A project with this ${field} already is a approved.`,
+            { details: { field, rule: "unique_constraint" } }
+          );
+        }
+
         if (err.code === "P2003") {
           const field = err.meta.constraint;
 
@@ -130,7 +139,7 @@ export const projectRepo = {
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
-  async getByUuidAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
+  async getAllByAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
     try {
       const where = { application: { uuidAuthor } };
       const sort = { createdAt: "asc" };
@@ -186,6 +195,189 @@ export const projectRepo = {
       );
     }
   },
+  /**
+   * Finds ONLY the role constraints for a given project's type.
+   * This is a specific query for domain validation.
+   * @param {string} uuidProject - The UUID of the project.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async getConstraintsForProject(uuidProject) {
+    try {
+      return await db.project.findUnique({
+        where: { uuid_project: uuidProject },
+        select: {
+          projectType: {
+            select: {
+              roleConstraints: {
+                select: {
+                  projectTypeId: true,
+                  teamRoleId: true,
+                  minCount: true,
+                  maxCount: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while querying project constraints: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (projectRepo.getConstraintsForProject) with UUID ${uuidProject}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while quering project constraints",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Retrieves a full detailed project data and relations
+   * @param {string} uuid - The UUID of the project to search for.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async getDetailedProject(uuid) {
+    try {
+      const projectData = await db.project.findUnique({
+        where: { uuid_project: uuid },
+        select: {
+          // --- Author OR Organization ---
+          application: {
+            select: {
+              author: {
+                select: {
+                  uuid_user: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                  email: true,
+                  professor: {
+                    select: {
+                      universityId: true,
+                      professorRole: {
+                        select: {
+                          professor_role_id: true,
+                          name: true,
+                        },
+                      },
+                    },
+                  },
+                  outsider: {
+                    select: {
+                      organizationName: true,
+                      phoneNumber: true,
+                      location: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          // --- Application Details ---
+          uuidApplication: true,
+          title: true,
+          shortDescription: true,
+          description: true,
+          estimatedEffortHours: true,
+          estimatedDate: true,
+          createdAt: true,
+          projectType: {
+            select: {
+              name: true,
+              maxEstimatedMonths: true,
+              minEstimatedMonths: true,
+              requiredHours: true,
+            },
+          },
+          projectStatus: {
+            select: {
+              project_status_id: true,
+              name: true,
+              description: true,
+            },
+          },
+          // --- Related Types (Many-to-Many) ---
+          projectFaculties: {
+            select: {
+              faculty: {
+                select: {
+                  faculty_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          projectProblemTypes: {
+            select: {
+              problemType: {
+                select: {
+                  problem_type_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+          teamMembers: {
+            select: {
+              uuid_team_member: true,
+              user: {
+                select: {
+                  uuid_user: true,
+                  firstName: true,
+                  middleName: true,
+                  lastName: true,
+                  email: true,
+                  student: {
+                    select: {
+                      universityId: true,
+                    },
+                  },
+                  professor: {
+                    select: {
+                      universityId: true,
+                    },
+                  },
+                },
+              },
+              role: {
+                select: {
+                  team_role_id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return projectData;
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while querying project details: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (projectRepo.getDetailedProject) with UUID ${uuid}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while quering project",
+        { cause: err }
+      );
+    }
+  },
 };
 
 /**
@@ -197,7 +389,7 @@ export const projectRepo = {
 function _buildProjectCreateData(project) {
   const {
     uuidApplication,
-    projectProjectType = [],
+    projectTypeId,
     projectFaculty = [],
     projectProblemType = [],
     projectCustomProblemType = null,
@@ -207,11 +399,7 @@ function _buildProjectCreateData(project) {
   const createData = {
     ...projectData,
     application: { connect: { uuid_application: uuidApplication } },
-    projectProjectTypes: {
-      create: projectProjectType.map((id) => ({
-        projectType: { connect: { project_type_id: id } },
-      })),
-    },
+    projectType: { connect: { project_type_id: projectTypeId } },
     projectFaculties: {
       create: projectFaculty.map((id) => ({
         faculty: { connect: { faculty_id: id } },

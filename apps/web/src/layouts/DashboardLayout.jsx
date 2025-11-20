@@ -2,18 +2,19 @@ import { Outlet } from 'react-router-dom'
 import Sidebar from '@/components/Sidebar'
 import Header from '@/components/Header/Header'
 import Timeline from '@/components/Timeline'
+
 const DashboardLayout = () => {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex gap-3">
+      <div className="flex flex-1">
         <Sidebar />
-        <div className="flex flex-1">
+        <main className="flex-1 p-6 overflow-x-hidden relative top-25">
           <Outlet />
-        </div>
-        <Timeline />
-      </main>
-    </>
+        </main>
+        {/* <Timeline /> */}
+      </div>
+    </div>
   )
 }
 

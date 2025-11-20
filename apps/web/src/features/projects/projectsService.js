@@ -31,18 +31,23 @@ export async function getExploreApplicationsMetadata() {
 
 /**
  * Explora aplicaciones con filtros opcionales
- * @param {number|null} facultyId - ID de facultad para filtrar
+ * @param {string|null} facultyName - Nombre/abreviación de facultad para filtrar (ej: "FIE")
  * @param {number} page - Número de página (empieza en 1)
  * @param {number} limit - Items por página
  * @returns {Promise<{applications: Array, pagination: object}>}
  * @throws {ApplicationError}
  */
-export async function exploreApplications(facultyId = null, page = 1, limit = 9) {
-  let url = `${API_URL}/application/explore?page=${page}&limit=${limit}`;
+export async function exploreApplications(facultyName = null, page = 1, limit = 9) {
+  // Construir URL base
+  let url = `${API_URL}/application/explore`;
   
-  if (facultyId) {
-    url += `&facultyId=${facultyId}`;
+  // Si hay facultad, agregarla al path
+  if (facultyName) {
+    url += `/${facultyName}`;
   }
+  
+  // Agregar query params de paginación
+  url += `?page=${page}&perPage=${limit}`;
 
   const response = await fetchWithAuthAndAutoRefresh(url, {
     method: "GET",
@@ -328,29 +333,21 @@ export async function downloadAllAttachments(attachments) {
 export async function approveApplication(uuid_application, projectData = {}) {
   const csrfToken = await getCSRFToken();
 
-  // ✅ Construir payload solo con campos que tengan valor
+  // ✅ CORRECCIÓN: El backend espera estos nombres de campos
   const payload = {
     uuidApplication: uuid_application,
     title: projectData.title,
     shortDescription: projectData.shortDescription,
     description: projectData.description,
     estimatedDate: projectData.estimatedDate,
-    projectType: projectData.projectType,
-    faculty: projectData.faculty,
-    problemType: projectData.problemType,
+    
+    // ✅ CAMBIOS CRÍTICOS:
+    projectTypeId: projectData.projectType?.[0] || null,  // ← Tomar el primer elemento (singular)
+    facultyIds: projectData.faculty || [],                 // ← Renombrar a facultyIds (plural)
+    problemTypeIds: projectData.problemType || [],         // ← Renombrar a problemTypeIds (plural)
   };
 
-  // ✅ Solo agregar problemTypeOther si existe
-  if (projectData.problemTypeOther !== undefined && projectData.problemTypeOther !== null) {
-    payload.problemTypeOther = projectData.problemTypeOther;
-  }
-
-  // ✅ Solo agregar estimatedEffortHours si existe
-  if (projectData.estimatedEffortHours !== undefined) {
-    payload.estimatedEffortHours = projectData.estimatedEffortHours;
-  }
-
-  console.log("📤 [projectsService] Payload final:", payload);
+  console.log("📤 Payload enviado a /project/create:", payload);
 
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/create`,
@@ -376,7 +373,7 @@ export async function approveApplication(uuid_application, projectData = {}) {
  */
 export async function getMyApplications(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/my-applications?page=${page}&limit=${limit}`,
+    `${API_URL}/application/my-applications?page=${page}&perPage=${limit}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -408,7 +405,7 @@ export async function getMyApplications(page = 1, limit = 9) {
  */
 export async function getMyProjects(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/project/my-projects?page=${page}&limit=${limit}`,
+    `${API_URL}/project/my-projects?page=${page}&perPage=${limit}`,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },

@@ -6,6 +6,7 @@ import {
   editProfileHandler,
   getProfileHandler,
   getProfileStatusHandler,
+  getSearchProfilesHandler,
 } from "./handlers.js";
 
 export const profileRouter = express.Router();
@@ -19,3 +20,8 @@ const csrfProtection = csurf({ cookie: true });
 profileRouter.get("/get", asyncHandler(getProfileHandler));
 profileRouter.patch("/edit", csrfProtection, asyncHandler(editProfileHandler));
 profileRouter.get("/status", asyncHandler(getProfileStatusHandler));
+profileRouter.get(
+  "/search",
+  requireRole("professor"),
+  asyncHandler(getSearchProfilesHandler)
+);

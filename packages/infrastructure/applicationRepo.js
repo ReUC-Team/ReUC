@@ -186,6 +186,9 @@ export const applicationRepo = {
    * Retrieves a full detailed application, with application data, file_links BANNER and
    * ATTACHMENT.
    * @param {string} uuid - The UUID of the application to search for.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
   async getDetailedApplication(uuid) {
     try {
@@ -276,7 +279,7 @@ export const applicationRepo = {
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
-  async getByUuidAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
+  async getAllByAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
     try {
       const where = { uuidAuthor };
       const sort = { createdAt: "asc" };

@@ -1,0 +1,58 @@
+{
+  "description": "Successful response containing the list of matching user profiles.",
+  "allOf": [
+    {
+      "$ref": "../../../responses/data/ResponseSuccess.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "records": {
+              "type": "array",
+              "description": "A list of user profiles matching the search.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "uuidUser": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "a1b2c3d4-e5f6-7890-a1b2-c3d4e5f67890"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "user@example.com"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "example": "Alexander"
+                  },
+                  "middleName": {
+                    "type": "string",
+                    "nullable": true,
+                    "example": "V"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Stiles"
+                  },
+                  "universityId": {
+                    "type": "string",
+                    "nullable": true,
+                    "description": "The university ID (if the user is a Student or Professor).",
+                    "example": "S123456"
+                  }
+                },
+                "required": ["uuidUser", "email", "firstName", "lastName"]
+              }
+            }
+          },
+          "required": ["records"]
+        }
+      }
+    }
+  ]
+}

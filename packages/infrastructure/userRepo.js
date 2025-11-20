@@ -178,6 +178,73 @@ export const userRepo = {
       );
     }
   },
+  /**
+   * Searches for users by a keyword.
+   * - The query is case-insensitive and searches against firstName,
+   * lastName, middleName, and email.
+   * - This search ONLY returns users who are Students or Professors.
+   * @param {string} query - The search term.
+   * @param {object} [options]
+   * @param {number} [options.limit] - For a query limited for a fast autocomplete response
+   *
+   * @throws {InfrastructureError.DatabaseError} For unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For unexpected errors.
+   */
+  async search(query, { limit = 20 }) {
+    try {
+      return await db.user.findMany({
+        where: {
+          AND: [
+            // 1. The text search condition
+            {
+              OR: [
+                { firstName: { contains: query, mode: "insensitive" } },
+                { lastName: { contains: query, mode: "insensitive" } },
+                { middleName: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+              ],
+            },
+            // 2. The role eligibility condition
+            {
+              OR: [
+                { student: { isNot: null } },
+                { professor: { isNot: null } },
+              ],
+            },
+            // 3. Explicitly exclude non-eligible roles
+            { admin: { is: null } },
+            { outsider: { is: null } },
+          ],
+        },
+        select: {
+          uuid_user: true,
+          email: true,
+          firstName: true,
+          middleName: true,
+          lastName: true,
+          student: { select: { universityId: true } },
+          professor: { select: { universityId: true } },
+        },
+        take: limit,
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while searching users: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      console.error(
+        `Infrastructure error (userRepo.search) with QUERY ${query}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while searching users.",
+        { cause: err }
+      );
+    }
+  },
 };
 
 /**
