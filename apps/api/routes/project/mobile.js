@@ -9,6 +9,7 @@ import {
   createProjectHandler,
   createProjectTeamHandler,
   updateTeamMemberHandler,
+  deleteTeamMemberHandler,
 } from "./handlers.js";
 
 export const mobileProjectRouter = express.Router();
@@ -27,4 +28,8 @@ mobileProjectRouter.post(
 mobileProjectRouter.patch(
   "/:uuid/team/members/:uuidUser",
   asyncHandler(updateTeamMemberHandler)
+);
+mobileProjectRouter.delete(
+  "/:uuid/team/members/:uuidUser",
+  asyncHandler(deleteTeamMemberHandler)
 );

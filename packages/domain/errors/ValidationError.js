@@ -11,7 +11,5 @@ export default class ValidationError extends DomainError {
     options = {}
   ) {
     super(message, { ...options, errorCode: "VALIDATION_FAILED" });
-
-    this.details = details;
   }
 }
