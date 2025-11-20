@@ -47,8 +47,9 @@ export default function useLoginNative() {
       
       console.log('✅ User session loaded')
       
-      // 3. Navegar al dashboard 
-      nav.navigate('Dashboard')
+      // 3. NO navegar manualmente
+      // El AppNavigator detectará que user !== null
+      // y automáticamente mostrará el DashboardStack
 
     } catch (error: any) {
       console.error('❌ Login error:', error)

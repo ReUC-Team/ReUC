@@ -7,14 +7,12 @@ import { typography } from '../../theme/typography'
 
 export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
-    container: {
-      flex: 1,
-    },
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingVertical: spacing.xxl,
+      backgroundColor: '#FFFFFF',
     },
     loadingText: {
       marginTop: spacing.md,
@@ -27,6 +25,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       alignItems: 'center',
       paddingVertical: spacing.xxl,
       paddingHorizontal: spacing.md,
+      backgroundColor: '#FFFFFF',
     },
     errorText: {
       marginTop: spacing.md,
@@ -37,12 +36,13 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
     searchContainer: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: palette.background,
+      backgroundColor: palette.surface,
       borderRadius: 24,
       borderWidth: 1,
       borderColor: palette.grayLight,
       paddingHorizontal: spacing.md,
       marginHorizontal: spacing.md,
+      marginTop: spacing.md,
       marginBottom: spacing.md,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 1 },
@@ -59,25 +59,37 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       fontSize: typography.base,
       color: palette.text,
     },
-    filtersContainer: {
+    filtersSection: {
       marginBottom: spacing.md,
     },
-    filtersList: {
+    filtersTitle: {
+      fontSize: typography.base,
+      fontWeight: '600',
+      color: palette.text,
+      marginHorizontal: spacing.md,
+      marginBottom: spacing.sm,
+      textAlign: 'center', // ✅ Centrado
+    },
+    filtersContainer: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center', // ✅ Centrado
+      gap: spacing.xs,
       paddingHorizontal: spacing.md,
-      gap: spacing.sm,
     },
     filterTag: {
       backgroundColor: palette.graybtn,
       paddingVertical: spacing.xs,
       paddingHorizontal: spacing.md,
       borderRadius: 20,
-      marginRight: spacing.xs,
+      marginHorizontal: spacing.xxs,
+      marginVertical: spacing.xxs,
     },
     filterTagActive: {
       backgroundColor: palette.primary,
     },
     filterTagText: {
-      fontSize: typography.base,
+      fontSize: typography.sm,
       fontWeight: '600',
       color: palette.onGBtn,
     },
@@ -85,8 +97,12 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       color: palette.onPrimary,
     },
     listContent: {
+      paddingBottom: spacing.xxl,
+      backgroundColor: '#FFFFFF',
+    },
+    cardWrapper: {
       paddingHorizontal: spacing.md,
-      paddingBottom: spacing.md,
+      marginBottom: spacing.xs,
     },
     emptyContainer: {
       flex: 1,
@@ -101,6 +117,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       color: palette.text,
       marginTop: spacing.md,
       marginBottom: spacing.xs,
+      textAlign: 'center',
     },
     emptySubtitle: {
       fontSize: typography.base,

@@ -11,12 +11,14 @@ import {
   Animated,
   Dimensions,
   Switch,
+  Alert,
 } from 'react-native'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native' 
 import { useThemedStyles } from '../hooks/useThemedStyles'
 import { createRightSidebarStyles } from '../styles/components/header/RightSidebar.styles'
 import { useTheme } from '../context/ThemeContext'
+import useLogout from '../features/auth/hooks/useLogout'
 import Avatar from './Avatar'
 
 type Props = {
@@ -72,6 +74,7 @@ export default function RightSidebar({
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
   const { themeMode, setThemeMode } = useTheme()
+  const { handleLogout, isLoading: isLoggingOut } = useLogout()
 
   const [accessibilitySettings, setAccessibilitySettings] = useState({
     darkMode: themeMode === 'dark',
@@ -161,6 +164,31 @@ export default function RightSidebar({
       }
       onClose()
     }
+  }
+
+  /**
+   * Maneja el logout con confirmación
+   */
+  const handleLogoutPress = () => {
+    Alert.alert(
+      '¿Cerrar sesión?',
+      '¿Estás seguro de que quieres salir?',
+      [
+        {
+          text: 'Cancelar',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Cerrar sesión',
+          onPress: async () => {
+            onClose()
+            await handleLogout()
+          },
+          style: 'destructive',
+        },
+      ]
+    )
   }
 
   const renderAccessibilitySubmenu = () => (
@@ -265,15 +293,18 @@ export default function RightSidebar({
 
               {/* Logout Button */}
               <TouchableOpacity
-                style={styles.logoutButton}
-                onPress={() => handleMenuPress('Logout')}
+                style={[styles.logoutButton, isLoggingOut && { opacity: 0.6 }]}
+                onPress={handleLogoutPress}
+                disabled={isLoggingOut}
               >
                 <Ionicons
                   name="log-out-outline"
                   size={24}
                   style={styles.logoutIcon}
                 />
-                <Text style={styles.logoutText}>Cerrar sesión</Text>
+                <Text style={styles.logoutText}>
+                  {isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
+                </Text>
               </TouchableOpacity>
             </Animated.View>
           </TouchableWithoutFeedback>

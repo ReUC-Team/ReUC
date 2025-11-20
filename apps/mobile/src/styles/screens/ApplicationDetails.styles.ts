@@ -9,11 +9,12 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: palette.surface,
+      backgroundColor: palette.background,
     },
     header: {
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.lg,
+        alignItems: 'center',
     },
     title: {
       fontSize: typography.xl3,

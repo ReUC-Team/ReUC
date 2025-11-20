@@ -1,4 +1,5 @@
 // apps/mobile/App.tsx
+
 import 'react-native-gesture-handler'
 import React, { useEffect, useState, useCallback } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -43,7 +44,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayoutRootView}>
       <ThemeProvider>
-        <AuthProvider> {/* ← NUEVO */}
+        <AuthProvider>
           <ProfileProvider>
             <AppNavigator />
             <Toast />

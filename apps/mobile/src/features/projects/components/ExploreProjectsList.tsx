@@ -1,7 +1,15 @@
 // apps/mobile/src/features/projects/components/ExploreProjectsList.tsx
 
 import React, { useState } from 'react'
-import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native'
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Animated,
+} from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Ionicons } from '@expo/vector-icons'
 import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles'
@@ -9,7 +17,11 @@ import { createExploreProjectsListStyles } from '../../../styles/components/proj
 import useExploreApplications from '../hooks/useExploreApplications'
 import ProjectCard from './ProjectCard'
 
-const ExploreProjectsList: React.FC = () => {
+interface ExploreProjectsListProps {
+  scrollY: Animated.Value
+}
+
+const ExploreProjectsList: React.FC<ExploreProjectsListProps> = ({ scrollY }) => {
   const styles = useThemedStyles(createExploreProjectsListStyles)
   const palette = useThemedPalette()
   const navigation = useNavigation<any>()
@@ -58,47 +70,57 @@ const ExploreProjectsList: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
-      {/* Barra de búsqueda */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color={palette.textSecondary} style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar proyectos..."
-          placeholderTextColor={palette.textSecondary}
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+    <Animated.FlatList
+      data={filteredApplications}
+      keyExtractor={(item) => item.uuid_application}
+      onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
+        useNativeDriver: true,
+      })}
+      scrollEventThrottle={16}
+      showsVerticalScrollIndicator={false}
+      ListHeaderComponent={
+        <View>
+          {/* Barra de búsqueda */}
+          <View style={styles.searchContainer}>
+            <Ionicons
+              name="search-outline"
+              size={20}
+              color={palette.textSecondary}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Buscar proyectos..."
+              placeholderTextColor={palette.textSecondary}
+              value={search}
+              onChangeText={setSearch}
+            />
+          </View>
 
-      {/* Filtros por facultad */}
-      <View style={styles.filtersContainer}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={faculties}
-          keyExtractor={(item) => item.faculty_id.toString()}
-          renderItem={({ item }) => {
-            const displayName = item.abbreviation || item.name
-            const isSelected = selectedFacultyName === displayName
+          {/* Filtros por facultad */}
+          <View style={styles.filtersSection}>
+            <View style={styles.filtersContainer}>
+              {faculties.map((faculty) => {
+                const displayName = faculty.abbreviation || faculty.name
+                const isSelected = selectedFacultyName === displayName
 
-            return (
-              <TouchableOpacity
-                style={[styles.filterTag, isSelected && styles.filterTagActive]}
-                onPress={() => handleFacultyFilter(displayName)}
-              >
-                <Text style={[styles.filterTagText, isSelected && styles.filterTagTextActive]}>
-                  {displayName}
-                </Text>
-              </TouchableOpacity>
-            )
-          }}
-          contentContainerStyle={styles.filtersList}
-        />
-      </View>
-
-      {/* Lista de proyectos */}
-      {filteredApplications.length === 0 ? (
+                return (
+                  <TouchableOpacity
+                    key={faculty.faculty_id}
+                    style={[styles.filterTag, isSelected && styles.filterTagActive]}
+                    onPress={() => handleFacultyFilter(displayName)}
+                  >
+                    <Text style={[styles.filterTagText, isSelected && styles.filterTagTextActive]}>
+                      {displayName}
+                    </Text>
+                  </TouchableOpacity>
+                )
+              })}
+            </View>
+          </View>
+        </View>
+      }
+      ListEmptyComponent={
         <View style={styles.emptyContainer}>
           <Ionicons name="folder-open-outline" size={48} color={palette.textSecondary} />
           <Text style={styles.emptyTitle}>No se encontraron proyectos</Text>
@@ -110,59 +132,65 @@ const ExploreProjectsList: React.FC = () => {
               : 'Aún no hay proyectos publicados'}
           </Text>
         </View>
-      ) : (
-        <>
-          <FlatList
-            data={filteredApplications}
-            keyExtractor={(item) => item.uuid_application}
-            renderItem={({ item }) => (
-              <ProjectCard
-                uuid={item.uuid_application}
-                title={item.title}
-                description={item.shortDescription}
-                image={item.bannerUrl ? { uri: item.bannerUrl } : require('../../../../../web/src/assets/project.webp')}
-                onDetailsClick={() => handleProjectClick(item.uuid_application)}
-              />
-            )}
-            contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
+      }
+      renderItem={({ item }) => (
+        <View style={styles.cardWrapper}>
+          <ProjectCard
+            uuid={item.uuid_application}
+            title={item.title}
+            description={item.shortDescription}
+            image={
+              item.bannerUrl
+                ? { uri: item.bannerUrl }
+                : require('../../../../../web/src/assets/project.webp')
+            }
+            onDetailsClick={() => handleProjectClick(item.uuid_application)}
           />
-
-          {/* Paginación */}
-          {pagination.totalPages > 1 && (
-            <View style={styles.paginationContainer}>
-              <TouchableOpacity
-                style={[styles.paginationButton, pagination.page === 1 && styles.paginationButtonDisabled]}
-                onPress={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page === 1}
-              >
-                <Text style={styles.paginationButtonText}>Anterior</Text>
-              </TouchableOpacity>
-
-              <Text style={styles.paginationText}>
-                Página {pagination.page} de {pagination.totalPages}
-              </Text>
-
-              <TouchableOpacity
-                style={[
-                  styles.paginationButton,
-                  pagination.page >= pagination.totalPages && styles.paginationButtonDisabled,
-                ]}
-                onPress={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page >= pagination.totalPages}
-              >
-                <Text style={styles.paginationButtonText}>Siguiente</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Contador de resultados */}
-          <Text style={styles.resultsText}>
-            Mostrando {filteredApplications.length} de {pagination.filteredItems} proyectos
-          </Text>
-        </>
+        </View>
       )}
-    </View>
+      ListFooterComponent={
+        filteredApplications.length > 0 ? (
+          <View>
+            {/* Paginación */}
+            {pagination.totalPages > 1 && (
+              <View style={styles.paginationContainer}>
+                <TouchableOpacity
+                  style={[
+                    styles.paginationButton,
+                    pagination.page === 1 && styles.paginationButtonDisabled,
+                  ]}
+                  onPress={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page === 1}
+                >
+                  <Text style={styles.paginationButtonText}>Anterior</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.paginationText}>
+                  Página {pagination.page} de {pagination.totalPages}
+                </Text>
+
+                <TouchableOpacity
+                  style={[
+                    styles.paginationButton,
+                    pagination.page >= pagination.totalPages && styles.paginationButtonDisabled,
+                  ]}
+                  onPress={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page >= pagination.totalPages}
+                >
+                  <Text style={styles.paginationButtonText}>Siguiente</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Contador de resultados */}
+            <Text style={styles.resultsText}>
+              Mostrando {filteredApplications.length} de {pagination.filteredItems} proyectos
+            </Text>
+          </View>
+        ) : null
+      }
+      contentContainerStyle={styles.listContent}
+    />
   )
 }
 
