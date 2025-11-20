@@ -31,7 +31,6 @@ export default function useTeamManagement(projectUuid, roles, constraints) {
       const currentCount = pendingMembers.filter((m) => m.roleId === roleId).length;
       const maxCount = constraints[role.name].max;
       
-      // null o Infinity significa sin límite
       if (maxCount !== null && maxCount !== Infinity && currentCount >= maxCount) {
         Alerts.warning(`No puedes agregar más de ${maxCount} ${role.name}(s)`);
         return false;
@@ -39,7 +38,7 @@ export default function useTeamManagement(projectUuid, roles, constraints) {
     }
 
     const newMember = {
-      id: Date.now(), // ID temporal para manejo local
+      id: Date.now(),
       uuidUser: user.uuidUser,
       roleId,
       user: {
@@ -68,7 +67,6 @@ export default function useTeamManagement(projectUuid, roles, constraints) {
    * Actualiza el rol de un miembro pendiente
    */
   const updateMemberRole = (id, newRoleId) => {
-    // Verificar límites
     const role = roles.find((r) => r.id === newRoleId);
     if (role && constraints[role.name]) {
       const currentCount = pendingMembers.filter(
@@ -104,7 +102,6 @@ export default function useTeamManagement(projectUuid, roles, constraints) {
 
       const count = pendingMembers.filter((m) => m.roleId === role.id).length;
 
-      // Validar mínimo
       if (constraint.min > 0 && count < constraint.min) {
         Alerts.warning(
           `Debes agregar al menos ${constraint.min} ${role.name}(s)`
@@ -112,7 +109,6 @@ export default function useTeamManagement(projectUuid, roles, constraints) {
         return false;
       }
 
-      // Validar máximo (si no es null/Infinity)
       if (constraint.max !== null && constraint.max !== Infinity && count > constraint.max) {
         Alerts.warning(
           `No puedes tener más de ${constraint.max} ${role.name}(s)`
@@ -135,13 +131,10 @@ export default function useTeamManagement(projectUuid, roles, constraints) {
     setIsSaving(true);
 
     try {
-      // Formato requerido por el backend
       const payload = pendingMembers.map((m) => ({
         uuidUser: m.uuidUser,
         roleId: m.roleId,
       }));
-
-      console.log("💾 Saving team with payload:", payload);
 
       await createTeam(projectUuid, payload);
       

@@ -35,7 +35,7 @@ export default function AddMemberForm({
     if (selectedRole) {
       const success = onAddMember(selected, selectedRole);
       if (success) {
-        // Mantener el input visible para agregar más
+        // Se mantiene el input visible para agregar más
         setShowInput(true);
       }
     }

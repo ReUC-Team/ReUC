@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { getTeam } from "../teamsService.js";
 
 /**
@@ -12,7 +12,8 @@ export default function useTeamData(projectUuid) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchTeam = async () => {
+  // Se us useCallback para evitar recrear la función
+  const fetchTeam = useCallback(async () => {
     if (!projectUuid) {
       setError("UUID del proyecto no proporcionado");
       setIsLoading(false);
@@ -24,42 +25,23 @@ export default function useTeamData(projectUuid) {
 
     try {
       const teamData = await getTeam(projectUuid);
-      
-      console.log("👥 Team data:", teamData);
-      
+            
       setTeam(teamData);
       setHasTeam(teamData?.members?.length > 0);
       
     } catch (err) {
-      console.log("ℹ️ Info fetching team:", err.message);
-      
-      // Si el endpoint no existe, asumir equipo vacío (no mostrar error)
-      if (err.message?.includes("Endpoint not implemented") || 
-          err.message?.includes("Cannot GET") || 
-          err.message?.includes("<!DOCTYPE")) {
-        console.log("ℹ️ El endpoint GET /team no existe aún. Mostrando formulario para crear equipo.");
-        setTeam({ members: [] });
-        setHasTeam(false);
-        setError(null); // NO mostrar error
-      } else {
-        // Solo mostrar error si es un error real (no 404)
-        console.error("❌ Error real fetching team:", err);
-        setTeam({ members: [] });
-        setHasTeam(false);
-        setError(null); // Por ahora, tampoco mostrar errores reales
-      }
+      console.error("Error fetching team:", err);
+      setTeam({ members: [] });
+      setHasTeam(false);
+      setError(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [projectUuid]);
 
   useEffect(() => {
     fetchTeam();
-  }, [projectUuid]);
+  }, [fetchTeam]);
 
-  const refreshTeam = () => {
-    fetchTeam();
-  };
-
-  return { team, hasTeam, isLoading, error, refreshTeam };
+  return { team, hasTeam, isLoading, error, refreshTeam: fetchTeam };
 }

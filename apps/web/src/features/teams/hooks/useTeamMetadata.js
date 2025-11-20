@@ -28,7 +28,6 @@ export default function useTeamMetadata(projectUuid) {
       try {
         const metadata = await getTeamMetadata(projectUuid);
         
-        console.log("🎯 Metadata RAW:", JSON.stringify(metadata, null, 2));
         
         /**
          * Estructura real del backend:
@@ -56,14 +55,12 @@ export default function useTeamMetadata(projectUuid) {
         const allowedRoles = metadata.metadata?.allowedRoles || [];
         
         if (allowedRoles.length === 0) {
-          console.warn("⚠️ No hay roles disponibles en la metadata");
           setRoles([]);
           setConstraints({});
           setIsLoading(false);
           return;
         }
         
-        console.log("📋 Allowed Roles:", allowedRoles);
         
         // Construir array de roles
         const rolesArray = allowedRoles.map(role => ({
@@ -80,14 +77,12 @@ export default function useTeamMetadata(projectUuid) {
           };
         });
         
-        console.log("✅ Roles procesados:", rolesArray);
-        console.log("✅ Constraints procesados:", constraintsObj);
         
         setRoles(rolesArray);
         setConstraints(constraintsObj);
         
       } catch (err) {
-        console.error("❌ Error fetching team metadata:", err);
+        console.error("Error fetching team metadata:", err);
         const errorMessage = getDisplayMessage(err);
         setError(errorMessage);
         Alerts.error(errorMessage);

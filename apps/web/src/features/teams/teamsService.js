@@ -12,36 +12,41 @@ export async function getTeamMetadata(projectUuid) {
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/${projectUuid}/team/metadata`
   );
-  
-  console.log("📊 Team Metadata Response:", response);
-  
+    
   return response.data;
 }
 
 /**
- * Obtiene el equipo actual del proyecto
+ * Obtiene el equipo actual del proyecto (usando GET /project/:uuid)
  * @param {string} projectUuid - UUID del proyecto
  * @returns {Promise<object>} Equipo con miembros
  */
 export async function getTeam(projectUuid) {
   try {
     const response = await fetchWithAuthAndAutoRefresh(
-      `${API_URL}/project/${projectUuid}/team`
+      `${API_URL}/project/${projectUuid}`
     );
+        
+    // Extraer teamMembers de details
+    const teamMembers = response.data.project?.details?.teamMembers || [];
     
-    console.log("👥 Current Team Response:", response);
+    return {
+      members: teamMembers.map(member => ({
+        uuidUser: member.uuid_user,
+        firstName: member.fullName.split(' ')[0] || '',
+        middleName: '',
+        lastName: member.fullName.split(' ').slice(1).join(' ') || '',
+        email: member.email,
+        universityId: member.universityId,
+        roleName: member.role,
+      }))
+    };
     
-    return response.data;
   } catch (error) {
-    // Si el endpoint no existe, lanzar error específico
-    if (error.message?.includes("Cannot GET") || error.message?.includes("<!DOCTYPE")) {
-      console.warn("⚠️ El endpoint GET /team no está implementado todavía");
-      throw new Error("Endpoint not implemented");
-    }
+    console.error("Error fetching team:", error);
     
     // Si es 404, retornar equipo vacío
-    if (error.statusCode === 404) {
-      console.warn("⚠️ Team not found (404), returning empty team");
+    if (error.statusCode === 404 || error.code === 'NOT_FOUND') {
       return { members: [] };
     }
     
@@ -63,9 +68,7 @@ export async function searchMembers(query, limit = 10) {
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/profile/search?q=${encodeURIComponent(query)}&limit=${limit}`
   );
-  
-  console.log("🔍 Search Members Response:", response);
-  
+    
   return response.data?.records || [];
 }
 
@@ -78,35 +81,7 @@ export async function searchMembers(query, limit = 10) {
 export async function createTeam(projectUuid, members) {
   const csrfToken = await getCSRFToken();
 
-  // Intentar diferentes formatos
-  const payloads = [
-    // Formato 1: Objeto con members
-    { members },
-    // Formato 2: Array directo
-    members,
-    // Formato 3: Con snake_case
-    {
-      members: members.map(m => ({
-        uuid_user: m.uuidUser,
-        role_id: m.roleId,
-      }))
-    },
-    // Formato 4: Array con snake_case
-    members.map(m => ({
-      uuid_user: m.uuidUser,
-      role_id: m.roleId,
-    }))
-  ];
-
-  console.log("🧪 Intentando diferentes formatos de payload:");
-  payloads.forEach((p, i) => {
-    console.log(`Formato ${i + 1}:`, JSON.stringify(p, null, 2));
-  });
-
-  // Por ahora, intentar formato 1
   const payload = { members };
-
-  console.log("📤 Enviando payload:", JSON.stringify(payload, null, 2));
 
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/${projectUuid}/team/create`,
@@ -119,8 +94,56 @@ export async function createTeam(projectUuid, members) {
       body: JSON.stringify(payload),
     }
   );
-  
-  console.log("✅ Create Team Response:", response);
-  
+    
+  return response.data;
+}
+
+/**
+ * Actualiza el rol de un miembro del equipo
+ * @param {string} projectUuid - UUID del proyecto
+ * @param {string} memberUuid - UUID del miembro
+ * @param {number} newRoleId - Nuevo ID del rol
+ * @returns {Promise<object>} Miembro actualizado
+ */
+export async function updateTeamMemberRole(projectUuid, memberUuid, newRoleId) {
+  const csrfToken = await getCSRFToken();
+
+  const payload = { roleId: newRoleId };
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/${projectUuid}/team/members/${memberUuid}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+      body: JSON.stringify(payload),
+    }
+  );
+    
+  return response.data;
+}
+
+/**
+ * Elimina un miembro del equipo
+ * @param {string} projectUuid - UUID del proyecto
+ * @param {string} memberUuid - UUID del miembro a eliminar
+ * @returns {Promise<object>} Respuesta de eliminación
+ */
+export async function deleteTeamMember(projectUuid, memberUuid) {
+  const csrfToken = await getCSRFToken();
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/${projectUuid}/team/members/${memberUuid}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken,
+      },
+    }
+  );
+    
   return response.data;
 }
