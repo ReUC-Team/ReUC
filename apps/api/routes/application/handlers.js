@@ -92,7 +92,6 @@ export async function getDetailedApplicationHandler(req, res) {
     uuid
   );
 
-
   return res.status(200).json({
     success: true,
     data: {
@@ -122,5 +121,22 @@ export async function getMyApplicationsHandler(req, res) {
     data: {
       applications,
     },
+  });
+}
+
+/**
+ * Handles the update of an application application.
+ */
+export async function updateApplicationHandler(req, res) {
+  const { uuid } = req.params;
+
+  const { application: applicationData } = await application.update({
+    uuidApplication: uuid,
+    body: req.body,
+  });
+
+  return res.status(201).json({
+    success: true,
+    data: { application: applicationData },
   });
 }
