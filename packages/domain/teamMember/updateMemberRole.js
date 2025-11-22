@@ -27,23 +27,6 @@ export async function updateMemberRole({
       roleId: newRoleId,
     });
 
-    /**
-     * @todo Make a specific vlidation for update to ensure the bussines rules.
-     *
-     * @example
-     * // Example extracted from teamMember/createTeam.js
-     * const projectData = await projectRepo.getConstraintsForProject(uuidProject);
-     * if (!projectData || !projectData.projectType) {
-     *   throw new DomainError.BusinessRuleError(
-     *     `No ${uuidProject} found or has no valid project type.`,
-     *     { details: { field: "uuidProject", rule: "not_found" } }
-     *   );
-     * }
-     *
-     * const constraints = projectData.projectType.roleConstraints;
-     * validateTeamComposition(teamMembers, constraints);
-     */
-
     const updates = teamMember.toPrimitives();
 
     delete updates.uuid_team_member;

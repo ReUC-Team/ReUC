@@ -113,6 +113,63 @@ export function validateCreationPayload(
 }
 
 /**
+ * Validates the entire payload for updating an application.
+ * @param {string} uuidApplication - The UUID of the application.
+ * @param {object} body - The request body payload.
+ * @param {string} body.title - The main title of the application.
+ * @param {string} body.shortDescription - A brief, one-sentence summary.
+ * @param {string} body.description - A detailed description of the application's problem and solution.
+ * @param {string} body.deadline - The application deadline in 'YYYY-MM-DD' format.
+ * @param {string|string[]} [body.projectType] - A single ID or array of IDs for associated project types.
+ * @param {string|string[]} [body.problemType] - A single ID or array of IDs for associated problem types.
+ * @param {string|string[]} [body.faculty] - A single ID or array of IDs for associated faculties.
+ * @param {string} [body.problemTypeOther] - A user-defined problem type if 'other' is selected.
+ *
+ * @throws {ValidationError} If the payload is invalid.
+ */
+export function validateUpdatePayload(uuidApplication, body) {
+  const allErrors = [];
+
+  allErrors.push(...validateUuid(uuidApplication, "uuidApplication"));
+
+  // ---- Body Validation ----
+  allErrors.push(...validateString(body.title, "title", "title"));
+  allErrors.push(
+    ...validateString(body.shortDescription, "shortDescription", "prose")
+  );
+  allErrors.push(...validateString(body.description, "description", "prose"));
+  allErrors.push(...validateDate(body.deadline, "deadline"));
+
+  if (body.projectType !== undefined) {
+    allErrors.push(
+      ...validateNumberOrNumberArray(body.projectType, "projectType")
+    );
+  }
+
+  if (body.problemType !== undefined) {
+    allErrors.push(
+      ...validateNumberOrNumberArray(body.problemType, "problemType")
+    );
+  }
+
+  if (body.faculty !== undefined) {
+    allErrors.push(...validateNumberOrNumberArray(body.faculty, "faculty"));
+  }
+
+  if (body.problemTypeOther !== undefined) {
+    allErrors.push(
+      ...validateString(body.problemTypeOther, "problemTypeOther", "prose")
+    );
+  }
+
+  if (allErrors.length > 0) {
+    throw new ValidationError("Input validation failed.", {
+      details: allErrors,
+    });
+  }
+}
+
+/**
  * Validates a standard query parameters for get applications.
  *
  * @param {object} params

@@ -25,17 +25,6 @@ export async function createTeam({ uuidProject, members }) {
         })
     );
 
-    const projectData = await projectRepo.getConstraintsForProject(uuidProject);
-    if (!projectData || !projectData.projectType) {
-      throw new DomainError.BusinessRuleError(
-        `No ${uuidProject} found or has no valid project type.`,
-        { details: { field: "uuidProject", rule: "not_found" } }
-      );
-    }
-
-    const constraints = projectData.projectType.roleConstraints;
-    validateTeamComposition(teamMembers, constraints);
-
     const teamMemberPrimitives = teamMembers.map((tm) => tm.toPrimitives());
     return await teamMemberRepo.createTeam(teamMemberPrimitives);
   } catch (err) {
