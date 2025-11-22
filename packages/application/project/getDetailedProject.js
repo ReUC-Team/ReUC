@@ -38,7 +38,8 @@ export async function getDetailedProject(
     const projectData = await getProjectDomain(projectUuid);
 
     // Step 2: Fetch Files using the related application UUID
-    const fileLinks = await getLinksByTarget(projectData.uuidApplication);
+    const appUuid = projectData.uuidApplication;
+    const fileLinks = await getLinksByTarget(appUuid);
 
     // Step 3: Normalize and separate the data.
     const author = _normalizeAuthor(projectData.application.author);
@@ -122,14 +123,21 @@ function _normalizeAuthor(author) {
  * @param {object} appData - The full project data from the domain.
  */
 function _normalizeDetails(projectData) {
+  // Define source of truth for "Definition" data
+  const appSource = projectData.application || {};
+
   // Flatten the many-to-many relationships
-  const faculties = (projectData?.projectFaculties || []).map((f) => ({
-    id: f.faculty.faculty_id,
-    name: f.faculty.name,
+  const faculties = (appSource?.applicationFaculty || []).map((f) => ({
+    id: f.facultyTypeId.faculty_id,
+    name: f.facultyTypeId.name,
   }));
-  const problemTypes = (projectData?.projectProblemTypes || []).map((pt) => ({
-    id: pt.problemType.problem_type_id,
-    name: pt.problemType.name,
+  const problemTypes = (appSource?.applicationProblemType || []).map((pt) => ({
+    id: pt.problemTypeId.problem_type_id,
+    name: pt.problemTypeId.name,
+  }));
+  const projectTypes = (appSource?.applicationProjectType || []).map((pt) => ({
+    id: pt.projectTypeId.project_type_id,
+    name: pt.projectTypeId.name,
   }));
   const teamMembers = (projectData?.teamMembers || []).map((tm) => {
     const user = tm.user;
@@ -147,17 +155,16 @@ function _normalizeDetails(projectData) {
   });
 
   return {
-    title: projectData.title,
-    shortDescription: projectData.shortDescription,
-    description: projectData.description,
-    estimatedEffortHours: projectData.estimatedEffortHours,
-    estimatedDate: projectData.estimatedDate,
+    title: appSource.title,
+    shortDescription: appSource.shortDescription,
+    description: appSource.description,
+    deadline: appSource.deadline,
     status: projectData.projectStatus,
-    projectType: projectData.projectType,
+    projectTypes,
     faculties,
     problemTypes,
     teamMembers,
-    createdAt: projectData.createdAt,
+    createdAt: appSource.createdAt,
   };
 }
 
