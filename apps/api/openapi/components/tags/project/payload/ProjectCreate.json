@@ -1,136 +1,83 @@
 {
   "type": "object",
-  "description": "Payload for creating a new application.",
+  "description": "Payload for approving an application. Includes the application UUID and any updates to its definition.",
+  "required": [
+    "uuidApplication",
+    "title",
+    "shortDescription",
+    "description",
+    "deadline",
+    "projectType"
+  ],
   "properties": {
+    "uuidApplication": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The UUID of the application to approve.",
+      "example": "123e4567-e89b-12d3-a456-426614174000"
+    },
     "title": {
       "type": "string",
-      "example": "New University Project Initiative"
+      "description": "The main title of the project.",
+      "example": "Sistema de Gestión de Residuos"
     },
     "shortDescription": {
       "type": "string",
-      "example": "A brief summary of the project."
+      "description": "A brief, one-sentence summary.",
+      "example": "Una app para optimizar la recolección de basura."
     },
     "description": {
       "type": "string",
-      "example": "Detailed description covering the problem, solution, and impact."
+      "description": "Detailed description covering the problem and solution.",
+      "example": "Este proyecto busca resolver el problema de rutas ineficientes..."
     },
-    "estimatedEffortHours": {
-      "type": "integer",
-      "format": "number",
-      "example": "400",
-      "description": "The estimated total number of work hours required to complete the project."
-    },
-    "estimatedDate": {
+    "deadline": {
       "type": "string",
       "format": "date",
-      "example": "2025-12-31",
-      "description": "The projected completion date when all project milestones and deliverables are expected to be achieved."
+      "description": "The application deadline (YYYY-MM-DD).",
+      "example": "2025-12-31"
     },
     "projectType": {
+      "description": "Associated project type ID(s). Accepts a single ID or an array of IDs. **Must result in a single selection for approval.**",
       "oneOf": [
+        { "type": "string" },
+        { "type": "integer" },
         {
-          "description": "Single ID",
-          "oneOf": [
-            {
-              "type": "string",
-              "example": "1"
-            },
-            {
-              "type": "integer",
-              "example": 1
-            }
-          ]
-        },
-        {
-          "description": "Array of IDs",
-          "oneOf": [
-            {
-              "type": "array",
-              "items": { "type": "integer" },
-              "example": [1, 3]
-            },
-            {
-              "type": "array",
-              "items": { "type": "string" },
-              "example": ["1", "3"]
-            }
-          ]
+          "type": "array",
+          "items": { "oneOf": [{ "type": "string" }, { "type": "integer" }] }
         }
       ],
-      "description": "Associated project type ID(s)."
+      "example": 1
     },
     "problemType": {
+      "description": "Associated problem type ID(s). Accepts a single ID or an array of IDs.",
       "oneOf": [
+        { "type": "string" },
+        { "type": "integer" },
         {
-          "description": "Single ID",
-          "oneOf": [
-            {
-              "type": "string",
-              "example": "5"
-            },
-            {
-              "type": "integer",
-              "example": 5
-            }
-          ]
-        },
-        {
-          "description": "Array of IDs",
-          "oneOf": [
-            {
-              "type": "array",
-              "items": { "type": "integer" },
-              "example": [5, 8]
-            },
-            {
-              "type": "array",
-              "items": { "type": "string" },
-              "example": ["5", "8"]
-            }
-          ]
+          "type": "array",
+          "items": { "oneOf": [{ "type": "string" }, { "type": "integer" }] }
         }
       ],
-      "description": "Associated problem type ID(s)."
+      "example": [1, 2]
     },
     "faculty": {
+      "description": "Associated faculty ID(s). Accepts a single ID or an array of IDs.",
       "oneOf": [
+        { "type": "string" },
+        { "type": "integer" },
         {
-          "description": "Single ID",
-          "oneOf": [
-            {
-              "type": "string",
-              "example": "2"
-            },
-            {
-              "type": "integer",
-              "example": 2
-            }
-          ]
-        },
-        {
-          "description": "Array of IDs",
-          "oneOf": [
-            {
-              "type": "array",
-              "items": { "type": "integer" },
-              "example": [2, 6]
-            },
-            {
-              "type": "array",
-              "items": { "type": "string" },
-              "example": ["2", "6"]
-            }
-          ]
+          "type": "array",
+          "items": { "oneOf": [{ "type": "string" }, { "type": "integer" }] }
         }
       ],
-      "description": "Associated faculty ID(s)."
+      "example": 5
     },
     "problemTypeOther": {
       "type": "string",
-      "description": "User-defined problem type description if 'other' is selected in problemType.",
+      "description": "User-defined problem type description if 'other' is selected.",
       "nullable": true,
-      "example": "Specific issue related to campus logistics."
+      "example": "Innovación Educativa"
     }
-  },
-  "required": ["title", "shortDescription", "description", "estimatedDate"]
+  }
 }

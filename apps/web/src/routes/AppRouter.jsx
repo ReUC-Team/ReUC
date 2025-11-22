@@ -23,6 +23,8 @@ import FavoriteProjects from '@/features/projects/pages/FavoriteProjects';
 // APPLICATIONS
 import MyApplications from "@/features/projects/pages/MyApplications";
 import MyApplicationDetails from "@/features/projects/pages/MyApplicationDetails";
+// TEAMS
+import TeamPage from '@/features/teams/pages/TeamPage'; // NUEVA IMPORTACIÓN
 // MEMBERS
 import Members from '@/features/members/pages/Members'
 //SETTINGS
@@ -50,12 +52,12 @@ const AppRouter = () => {
 
       {/* Rutas Dashboard (protegidas) */}
       <Route element={<DashboardLayout />}>
-        {/* <Route path="/dashboard" element={<DashboardMain />} /> */}
         <Route path="/dashboard" element={<DashboardExternal />} />
         <Route path="/dashboard/student" element={<DashboardStudent />} />
         <Route path="/dashboard/faculty" element={<DashboardFaculty />} />
-        {/* Aquí puedes anidar más rutas como /dashboard/proyectos */}
+        
         <Route path="/profile" element={<ProfilePage />} />
+        
         {/* PROJECTS */}
         <Route path="/request-project" element={<RequestProject />} />
 
@@ -70,14 +72,12 @@ const AppRouter = () => {
         {/* Mis proyectos (Projects aprobados) */}
         <Route path="/my-projects" element={<MyProjects />} />
         <Route path="/my-projects/:uuid" element={<ProjectDetails />} />
+        <Route path="/my-projects/:uuid/team" element={<TeamPage />} /> {/* NUEVA RUTA */}
 
         <Route path="/explore-projects/project-details" element={<ApplicationDetails />} />
         <Route path="/favorite-projects" element={<FavoriteProjects />} />
         <Route path="/members" element={<Members />} />
         <Route path="/settings" element={<Settings />} />
-        {/* HAY QUE MANEJARLA LAS URL CON SLUGS: */}
-        {/* <Link to={`/explore-projects/${project.slug}`}>Ver detalles</Link> */}
-        {/* <Route path="/explore-projects/:slug" element={ProjectDetails} /> */}
       </Route>
 
       {/* Rutas de administrador */}

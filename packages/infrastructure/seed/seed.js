@@ -30,10 +30,6 @@ async function runTask(taskName, task) {
 async function clearDatabase() {
   // Start from tables that have foreign keys and move towards the tables they reference.
   await prisma.team_Member.deleteMany();
-  // ------- PROJECT -------
-  await prisma.project_Faculty.deleteMany();
-  await prisma.project_Problem_Type.deleteMany();
-  // await prisma.project_Project_Type.deleteMany();
   await prisma.project.deleteMany();
   // ------- APPLICATION -------
   await prisma.application_Faculty.deleteMany();

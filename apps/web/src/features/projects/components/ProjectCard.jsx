@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
-import projectImage from '@/assets/project2.webp'
+import projectImage from '@/assets/project2.webp';
 
-const ProjectCard = ({ uuid, title, description, image, isFavorite = false, onFavoriteToggle, onDetailsClick }) => {
+const ProjectCard = ({ 
+  uuid, 
+  title, 
+  description, 
+  image, 
+  isFavorite = false, 
+  onFavoriteToggle, 
+  onDetailsClick,
+  showTeamButton = false, // NUEVA PROP
+  onTeamClick // NUEVA PROP
+}) => {
   const [favorite, setFavorite] = useState(isFavorite);
 
   const handleFavoriteClick = () => {
@@ -16,6 +26,12 @@ const ProjectCard = ({ uuid, title, description, image, isFavorite = false, onFa
   const handleDetailsClick = () => {
     if (onDetailsClick) {
       onDetailsClick(uuid);
+    }
+  };
+
+  const handleTeamClick = () => {
+    if (onTeamClick) {
+      onTeamClick(uuid);
     }
   };
 
@@ -53,12 +69,29 @@ const ProjectCard = ({ uuid, title, description, image, isFavorite = false, onFa
       <div className='p-3'>
         <h3 className="font-bold text-xl mb-1 line-clamp-2">{title}</h3>
         <p className="text-md text-gray-700 mb-4 line-clamp-3">{description}</p>
-        <button
-          onClick={handleDetailsClick}
-          className="inline-block bg-lime-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-lime-700 transition w-full"
-        >
-          Ver detalles
-        </button>
+        
+        {/* BOTONES: Ver detalles y Ver equipo (condicional) */}
+        <div className={`flex gap-3 ${showTeamButton ? 'flex-row' : ''}`}>
+          <button
+            onClick={handleDetailsClick}
+            className={`inline-block bg-lime-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-lime-700 transition ${
+              showTeamButton ? 'flex-1' : 'w-full'
+            }`}
+          >
+            Ver detalles
+          </button>
+
+          {/* NUEVO BOTÓN: Ver Equipo (solo si showTeamButton es true) */}
+          {showTeamButton && (
+            <button
+              onClick={handleTeamClick}
+              className="inline-flex items-center justify-center gap-2 bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-700 transition flex-1"
+              aria-label="Ver equipo del proyecto"
+            >
+              <span>Equipo</span>
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

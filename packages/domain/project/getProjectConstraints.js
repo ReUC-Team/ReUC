@@ -14,14 +14,17 @@ export async function getProjectConstraints(uuidProject) {
   try {
     const projectData = await projectRepo.getConstraintsForProject(uuidProject);
 
-    if (!projectData || !projectData.projectType) {
+    if (!projectData || !projectData?.application?.applicationProjectType) {
       throw new DomainError.NotFoundError(
         `No ${uuidProject} found or has no valid project type.`,
         { details: { field: "uuidProject", rule: "not_found" } }
       );
     }
 
-    return projectData.projectType.roleConstraints;
+    // It should only have one based on the bussiness rules
+    const type = projectData.application.applicationProjectType[0];
+
+    return type.projectTypeId.roleConstraints;
   } catch (err) {
     if (err instanceof DomainError.DomainError) throw err;
 

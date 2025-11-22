@@ -42,7 +42,7 @@ projectRouter.post(
 );
 projectRouter.get(
   "/:uuid/team/metadata",
-  requireRole("professor"),
+  requireRole(["outsider", "professor", "student"]),
   asyncHandler(getTeamCreationFormDataHandler)
 );
 projectRouter.get(
