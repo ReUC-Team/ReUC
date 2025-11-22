@@ -6,7 +6,8 @@ import { AuthenticationError, getDisplayMessage } from '../../../utils/errorHand
 import Toast from 'react-native-toast-message'
 
 interface Project {
-  uuid_application: string // Los proyectos usan el UUID de la aplicación original
+  uuid_application: string  
+  uuid_project: string     
   title: string
   shortDescription: string
   bannerUrl: string | null

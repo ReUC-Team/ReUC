@@ -70,7 +70,6 @@ export async function createApplication(formData: FormData) {
       method: 'POST',
       headers: {
         'csrf-token': csrfToken,
-        // NO incluir Content-Type - fetch lo agrega automáticamente para FormData
       },
       body: formData,
     }
@@ -254,14 +253,19 @@ export async function getMyProjects(page: number = 1, perPage: number = 9) {
   const records = response.data.projects.records
   const paginationData = response.data.projects.metadata.pagination
 
-  // Convertir URLs relativas a absolutas
+  
   const projects = records.map((project: any) => ({
-    ...project,
+    uuid_application: project.uuidApplication,  
+    uuid_project: project.uuid_project,        
+    title: project.title,
+    shortDescription: project.shortDescription,
     bannerUrl: project.bannerUrl?.startsWith('http')
       ? project.bannerUrl
       : project.bannerUrl
       ? `${API_URL}${project.bannerUrl}`
       : null,
+    status: project.status || 'approved',
+    createdAt: project.createdAt,
   }))
 
   return {
@@ -272,15 +276,69 @@ export async function getMyProjects(page: number = 1, perPage: number = 9) {
 
 /**
  * Obtiene los detalles de un proyecto aprobado
- * Nota: Los proyectos heredan datos de su aplicación original
- * @param uuid - UUID del proyecto (que es el mismo UUID de la aplicación original)
+ * @param uuid - UUID del proyecto
  */
 export async function getProjectDetails(uuid: string) {
-  // Los proyectos usan el mismo endpoint que las aplicaciones
-  // porque heredan todos los datos de la aplicación original
-  return await getApplicationDetails(uuid)
-}
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/${uuid}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  )
 
+  const project = response.data.project
+
+  console.log('🔍 Raw project from API:', JSON.stringify(project, null, 2))
+
+  return {
+    uuid_application: project.uuid_application || project.details?.uuid_application,
+    
+    // Información básica
+    title: project.details?.title || 'Sin título',
+    shortDescription: project.details?.shortDescription || 'Sin descripción corta',
+    detailedDescription:
+      project.details?.description ||
+      project.details?.shortDescription ||
+      'Sin descripción',
+
+    // Fechas
+    deadline: project.details?.estimatedDate,
+    createdAt: project.details?.createdAt,
+    status: project.details?.status || 'approved',
+
+    // Banner
+    bannerUrl: project.bannerUrl?.startsWith('http')
+      ? project.bannerUrl
+      : project.bannerUrl
+      ? `${API_URL}${project.bannerUrl}`
+      : null,
+
+    attachments: (project.appAttachments || []).map((a: any) => ({
+      downloadUrl: a.downloadUrl?.startsWith('http')
+        ? a.downloadUrl
+        : `${API_URL}${a.downloadUrl}`,
+      name: a.name,
+      size: a.size,
+      type: a.type,
+    })),
+
+    // Autor
+    author: {
+      fullName: project.author?.fullName || 'No especificado',
+      firstName: project.author?.fullName?.split(' ')[0] || 'No especificado',
+      lastName: project.author?.fullName?.split(' ').slice(1).join(' ') || '',
+      email: project.author?.email || null,
+      organizationName: project.author?.outsider?.organizationName || null,
+      phoneNumber: project.author?.outsider?.phoneNumber || null,
+      location: project.author?.outsider?.location || null,
+    },
+
+    faculties: project.details?.faculties || [],
+    projectTypes: project.details?.projectType ? [project.details.projectType] : [],
+    problemTypes: project.details?.problemTypes || [],
+  }
+}
 /**
  * Descarga un archivo desde una URL
  * @param url - URL del archivo

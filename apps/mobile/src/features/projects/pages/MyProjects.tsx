@@ -27,6 +27,7 @@ const MyProjects: React.FC = () => {
   })
 
   const handleProjectClick = (uuid: string) => {
+    console.log('🔍 Navigating to project with UUID:', uuid)
     navigation.navigate('ProjectDetails', { uuid })
   }
 
@@ -139,10 +140,11 @@ const MyProjects: React.FC = () => {
         <>
           <FlatList
             data={filteredProjects}
-            keyExtractor={(item) => item.uuid_application}
+            keyExtractor={(item) => item.uuid_project}
             renderItem={({ item }) => (
               <ProjectCard
-                uuid={item.uuid_application}
+                key={item.uuid_project}
+                uuid={item.uuid_project}
                 title={item.title}
                 description={item.shortDescription}
                 image={
@@ -150,7 +152,7 @@ const MyProjects: React.FC = () => {
                     ? { uri: item.bannerUrl }
                     : require('../../../../../web/src/assets/project.webp')
                 }
-                onDetailsClick={() => handleProjectClick(item.uuid_application)}
+                onDetailsClick={() => handleProjectClick(item.uuid_project)}
               />
             )}
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
@@ -183,7 +185,7 @@ const MyProjects: React.FC = () => {
               </TouchableOpacity>
 
               <Text style={{ fontSize: 14, fontWeight: '500', color: palette.text }}>
-                Página {pagination.page} de {pagination.totalPages}
+                Página {String(pagination.page)} de {String(pagination.totalPages)}
               </Text>
 
               <TouchableOpacity
@@ -212,7 +214,7 @@ const MyProjects: React.FC = () => {
               paddingBottom: 16,
             }}
           >
-            Mostrando {filteredProjects.length} de {pagination.filteredItems} proyectos
+            Mostrando {String(filteredProjects.length)} de {String(pagination.filteredItems)} proyectos
           </Text>
         </>
       )}

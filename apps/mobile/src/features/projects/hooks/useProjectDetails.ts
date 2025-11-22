@@ -37,7 +37,10 @@ export default function useProjectDetails(uuid: string | undefined) {
   const navigation = useNavigation<any>()
 
   useEffect(() => {
+    console.log('🔍 useProjectDetails - Received UUID:', uuid)
+    
     if (!uuid) {
+      console.error('❌ UUID is undefined!')
       setError('UUID del proyecto no proporcionado')
       setIsLoading(false)
       return
@@ -49,14 +52,16 @@ export default function useProjectDetails(uuid: string | undefined) {
   const fetchProjectDetails = async () => {
     if (!uuid) return
 
+    console.log('📡 Fetching project with UUID:', uuid)
     setIsLoading(true)
     setError(null)
 
     try {
       const data = await getProjectDetails(uuid)
+      console.log('✅ Project data received:', data)
       setProject(data as ProjectDetails)
     } catch (err: any) {
-      console.error('Error fetching project details:', err)
+      console.error('❌ Error fetching project details:', err)
 
       if (err instanceof AuthenticationError) {
         Toast.show({

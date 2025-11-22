@@ -13,7 +13,7 @@ export const mobileApplicationRouter = express.Router();
 mobileApplicationRouter.use(
   requireMobileClient,
   authMiddleware,
-  requireRole("outsider")
+  requireRole(["outsider", "professor"])
 );
 
 mobileApplicationRouter.post(

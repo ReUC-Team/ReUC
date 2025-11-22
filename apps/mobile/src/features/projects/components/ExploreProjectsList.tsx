@@ -5,7 +5,7 @@ import {
   View,
   Text,
   TextInput,
-  FlatList,
+  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native'
@@ -65,7 +65,10 @@ const ExploreProjectsList: React.FC = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Barra de búsqueda */}
       <View style={styles.searchContainer}>
         <Ionicons
@@ -93,7 +96,7 @@ const ExploreProjectsList: React.FC = () => {
 
             return (
               <TouchableOpacity
-                key={faculty.faculty_id}
+                key={`faculty-${faculty.faculty_id}`}
                 style={[styles.filterTag, isSelected && styles.filterTagActive]}
                 onPress={() => handleFacultyFilter(displayName)}
               >
@@ -153,7 +156,7 @@ const ExploreProjectsList: React.FC = () => {
               </TouchableOpacity>
 
               <Text style={styles.paginationText}>
-                Página {pagination.page} de {pagination.totalPages}
+                Página {String(pagination.page)} de {String(pagination.totalPages)}
               </Text>
 
               <TouchableOpacity
@@ -171,11 +174,11 @@ const ExploreProjectsList: React.FC = () => {
 
           {/* Contador de resultados */}
           <Text style={styles.resultsText}>
-            Mostrando {filteredApplications.length} de {pagination.filteredItems} proyectos
+            Mostrando {String(filteredApplications.length)} de {String(pagination.filteredItems)} proyectos
           </Text>
         </>
       )}
-    </View>
+    </ScrollView>
   )
 }
 
