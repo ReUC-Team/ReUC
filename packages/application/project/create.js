@@ -30,6 +30,7 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  *
  * @throws {ApplicationError.ValidationError} If the input data is invalid.
  * @throws {ApplicationError.NotFoundError} If the requesting user entity is not found during project creation.
+ * @throws {ApplicationError.ConflictError} if the application is already approved
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
 export async function create({ uuidRequestingUser, body }) {
