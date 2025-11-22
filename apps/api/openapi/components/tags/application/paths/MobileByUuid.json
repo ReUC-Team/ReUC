@@ -1,0 +1,44 @@
+{
+  "parameters": [
+    {
+      "name": "uuid",
+      "in": "path",
+      "required": true,
+      "description": "The unique identifier (UUID) of the application.",
+      "schema": {
+        "type": "string",
+        "format": "uuid",
+        "example": "123e4567-e89b-12d3-a456-426614174000"
+      }
+    }
+  ],
+  "put": {
+    "summary": "(Mobile) Update an application",
+    "description": "Updates the details and classifications of an existing application.\n - Requires **\"professor\"** role.",
+    "tags": ["Application"],
+    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": { "$ref": "../payload/ApplicationUpdate.json" }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Successfully updated the application.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/UpdateSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

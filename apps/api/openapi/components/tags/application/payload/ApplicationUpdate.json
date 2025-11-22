@@ -1,24 +1,10 @@
 {
   "type": "object",
-  "description": "Payload for approving an application. Includes the application UUID and any updates to its definition.",
-  "required": [
-    "uuidApplication",
-    "title",
-    "shortDescription",
-    "description",
-    "deadline",
-    "projectType"
-  ],
+  "required": ["title", "shortDescription", "description", "deadline"],
   "properties": {
-    "uuidApplication": {
-      "type": "string",
-      "format": "uuid",
-      "description": "The UUID of the application to approve.",
-      "example": "123e4567-e89b-12d3-a456-426614174000"
-    },
     "title": {
       "type": "string",
-      "description": "The main title of the project.",
+      "description": "The main title of the application.",
       "example": "Sistema de Gestión de Residuos"
     },
     "shortDescription": {
@@ -28,7 +14,7 @@
     },
     "description": {
       "type": "string",
-      "description": "Detailed description covering the problem and solution.",
+      "description": "A detailed description of the problem and solution.",
       "example": "Este proyecto busca resolver el problema de rutas ineficientes..."
     },
     "deadline": {
@@ -38,7 +24,7 @@
       "example": "2025-12-31"
     },
     "projectType": {
-      "description": "Associated project type ID(s). Accepts a single ID or an array of IDs. **Must result in a single selection for approval.**",
+      "description": "Associated project type ID(s). Accepts a single ID or an array of IDs.",
       "oneOf": [
         { "type": "string" },
         { "type": "integer" },
@@ -75,8 +61,7 @@
     },
     "problemTypeOther": {
       "type": "string",
-      "description": "User-defined problem type description if 'other' is selected.",
-      "nullable": true,
+      "description": "Custom problem type definition if 'other' is selected.",
       "example": "Innovación Educativa"
     }
   }

@@ -2,107 +2,33 @@ import { BaseEntity } from "../shared/BaseEntity.js";
 import * as DomainError from "../errors/index.js";
 
 export class Project extends BaseEntity {
-  static allowedFields = [
-    "uuid_project",
-    "uuidApplication",
-    "title",
-    "shortDescription",
-    "description",
-    "estimatedEffortHours",
-    "estimatedDate",
-    "projectTypeId",
-    "projectFaculty",
-    "projectProblemType",
-    "projectCustomProblemType",
-  ];
+  static allowedFields = ["uuid_project", "uuidApplication", "statusId"];
 
   constructor(data) {
     super(data, Project.allowedFields);
 
-    const requiredFields = [
-      "uuidApplication",
-      "title",
-      "shortDescription",
-      "description",
-      "estimatedDate",
-      // ✅ NO VALIDAR projectTypeId aquí, se valida después como número
-    ];
-
-    const missingFields = [];
-    for (const field of requiredFields) {
-      const value = this[field];
-      if (typeof value !== "string" || value.trim() === "") {
-        missingFields.push({
-          field,
-          rule: "missing_or_empty",
-        });
-      }
-    }
-
-    if (missingFields.length > 0)
-      throw new DomainError.ValidationError(
-        "Required application fields were missing.",
-        { details: missingFields }
-      );
-
-    // ✅ VALIDAR projectTypeId ANTES de parsear
-    if (!this.projectTypeId) {
-      throw new DomainError.ValidationError(
-        "Project type is required.",
-        {
-          details: [{
-            field: "projectTypeId",
-            rule: "missing_or_empty"
-          }]
-        }
+    if (!this.uuidApplication || typeof this.uuidApplication !== "string") {
+      throw new DomainError.BusinessRuleError(
+        "A Project must be linked to an Application.",
+        { details: { field: "uuidApplication", rule: "missing" } }
       );
     }
 
-    this.estimatedDate = new Date(this.estimatedDate);
-    if (isNaN(this.estimatedDate.getTime())) {
-      throw new DomainError.ValidationError(
-        "Estimated date must be a valid date.",
-        {
-          details: {
-            field: "estimatedDate",
-            rule: "invalid_format",
-            expected: "YYYY-MM-DD",
-          },
-        }
-      );
-    }
-
-    if (this.estimatedEffortHours) {
-      this.estimatedEffortHours = Number(this.estimatedEffortHours);
-      if (isNaN(this.estimatedEffortHours)) {
+    if (this.statusId !== undefined && this.statusId !== null) {
+      const status = Number(this.statusId);
+      if (isNaN(status)) {
         throw new DomainError.ValidationError(
-          "Estimated effort hours must be a valid number.",
+          "Project Status ID must be a valid number.",
           {
             details: {
-              field: "estimatedEffortHours",
-              rule: "invalid_format",
+              field: "statusId",
+              rule: "invalid_type",
               expected: "number",
             },
           }
         );
       }
+      this.statusId = status;
     }
-
-    // ✅ PARSEAR Y VALIDAR NÚMEROS
-    this.projectTypeId = this.parseAndValidateNumber(
-      this.projectTypeId,
-      "Project Type"
-    );
-    this.projectFaculty = this.parseAndValidateNumberArray(
-      this.projectFaculty,
-      "Faculty"
-    );
-    this.projectProblemType = this.parseAndValidateNumberArray(
-      this.projectProblemType,
-      "Problem Type"
-    );
-    this.projectCustomProblemType = this.normalizeString(
-      this.projectCustomProblemType
-    );
   }
 }

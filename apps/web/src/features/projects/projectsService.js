@@ -178,7 +178,7 @@ export async function getApplicationDetails(uuid) {
       downloadUrl: a.downloadUrl?.startsWith('http') 
         ? a.downloadUrl 
         : `${API_URL}${a.downloadUrl}`,
-      name: a.name, // ← Este es el nombre ORIGINAL del archivo
+      name: a.name,
       size: a.size,
       type: a.type,
     })),
@@ -196,9 +196,9 @@ export async function getApplicationDetails(uuid) {
       } : null,
     },
 
-    faculties: app.details?.faculties || [],  // [{ id: 1, name: "Ingeniería" }]
-    projectTypes: app.details?.projectTypes || [],  // [{ id: 3, name: "Investigación" }]
-    problemTypes: app.details?.problemTypes || [],  // [{ id: 5, name: "Ambiental" }]
+    faculties: app.details?.faculties || [],  
+    projectTypes: app.details?.projectTypes || [],
+    problemTypes: app.details?.problemTypes || [],
     
     facultyIds: (app.details?.faculties || []).map(f => f.id),
     projectTypeIds: (app.details?.projectTypes || []).map(pt => pt.id),
@@ -267,7 +267,7 @@ export async function downloadFile(downloadUrl, fileName, mimeType, forceDownloa
     const objectUrl = URL.createObjectURL(blob);
     
     link.href = objectUrl;
-    link.download = fileName; // Usa el nombre ORIGINAL
+    link.download = fileName;
     link.style.display = 'none';
     
     document.body.appendChild(link);
@@ -338,8 +338,9 @@ export async function approveApplication(uuid_application, projectData = {}) {
     shortDescription: projectData.shortDescription,
     description: projectData.description,
     estimatedDate: projectData.estimatedDate,
-    projectTypeId: projectData.projectType?.[0] || null, // ✅ Solo el primer tipo
-    facultyIds: projectData.faculty || [],
+    
+    projectTypeId: projectData.projectType?.[0] || null,  
+    facultyIds: projectData.faculty || [],                
     problemTypeIds: projectData.problemType || [],
   };
 

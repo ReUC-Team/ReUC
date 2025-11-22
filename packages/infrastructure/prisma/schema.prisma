@@ -193,25 +193,16 @@ model Application {
  * number means this is irrelevant, and it should be prioritazed the estimatedDate
  */
 model Project {
-  uuid_project         String   @id @default(uuid())
-  uuidApplication      String   @unique @map("uuid_application")
-  title                String
-  shortDescription     String   @map("short_description")
-  description          String
-  estimatedEffortHours Int?     @map("estimated_effort_hours")
-  estimatedDate        DateTime @map("estimated_date")
-  projectTypeId        Int      @map("project_type_id")
-  statusId             Int?
-  createdAt            DateTime @default(now()) @map("created_at")
-  updatedAt            DateTime @updatedAt @map("updated_at")
+  uuid_project    String   @id @default(uuid())
+  uuidApplication String   @unique @map("uuid_application")
+  statusId        Int?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   application   Application     @relation(fields: [uuidApplication], references: [uuid_application])
-  projectType   Project_Type    @relation(fields: [projectTypeId], references: [project_type_id])
   projectStatus Project_Status? @relation(fields: [statusId], references: [project_status_id])
 
-  projectFaculties    Project_Faculty[]
-  projectProblemTypes Project_Problem_Type[]
-  teamMembers         Team_Member[]
+  teamMembers Team_Member[]
 
   @@index([uuidApplication])
   @@index([createdAt])
@@ -228,7 +219,6 @@ model Faculty {
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   applicationFaculty Application_Faculty[]
-  projectFaculties   Project_Faculty[]
 
   @@map("Faculties")
 }
@@ -245,7 +235,6 @@ model Project_Type {
 
   roleConstraints        Project_Type_Role_Constraint[]
   applicationProjectType Application_Project_Type[]
-  projects               Project[]
 
   @@map("Project_Types")
 }
@@ -274,7 +263,6 @@ model Problem_Type {
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   applicationProblemType Application_Problem_Type[]
-  projectProblemTypes    Project_Problem_Type[]
 
   @@map("Problem_Types")
 }
@@ -331,6 +319,7 @@ model Project_Status {
 model Team_Role {
   team_role_id Int      @id @default(autoincrement())
   name         String   @unique
+  slug         String   @unique
   description  String?
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -377,28 +366,6 @@ model Application_Problem_Type {
   @@id([application, problemType])
   @@index([problemType])
   @@map("Application_Problem_Types")
-}
-
-model Project_Faculty {
-  uuidProject String @map("uuid_project")
-  facultyId   Int    @map("faculty_id")
-
-  project Project @relation(fields: [uuidProject], references: [uuid_project])
-  faculty Faculty @relation(fields: [facultyId], references: [faculty_id])
-
-  @@id([uuidProject, facultyId])
-  @@map("Project_Faculties")
-}
-
-model Project_Problem_Type {
-  uuidProject   String @map("uuid_project")
-  problemTypeId Int    @map("problem_type_id")
-
-  project     Project      @relation(fields: [uuidProject], references: [uuid_project])
-  problemType Problem_Type @relation(fields: [problemTypeId], references: [problem_type_id])
-
-  @@id([uuidProject, problemTypeId])
-  @@map("Project_Problem_Types")
 }
 
 model Team_Member {

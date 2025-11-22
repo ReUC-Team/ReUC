@@ -1,85 +1,112 @@
 import * as ApplicationError from "../errors/index.js";
-import { validateCreationPayload } from "./validators.js";
-import { createProject } from "@reuc/domain/project/createProject.js";
+import { validateUuid } from "../shared/validators.js";
+import { update as updateApplicationService } from "../applications/update.js";
+import { validateProjectCreationRules } from "@reuc/domain/project/validateProjectCreationRules.js";
+import { validateProjectDeadline } from "@reuc/domain/project/validateProjectDeadline.js";
+import { createProject as createProjectDomain } from "@reuc/domain/project/createProject.js";
+import { getProjectTypeById } from "@reuc/domain/projectType/getProjectTypeById.js";
 import * as DomainError from "@reuc/domain/errors/index.js";
 
 /**
- * Creates a new project.
+ * Orchestrates the approval of an application.
+ *
+ * Workflow:
+ * 1. Validate Payload Structure.
+ * 2. Validate Business Rule: Extract Single Project Type ID.
+ * 3. Update Application (Always runs to ensure consistency).
+ * 4. Create Project (Uses the extracted Single ID).
  * @param {object} params
+ * @param {string} params.uuidRequestingUser - The unique identifier UUID of the user
  * @param {object} params.body - The request body payload.
  * @param {string} params.body.uuidApplication - The UUID of the application to approve.
  * @param {string} params.body.title - The main title of the project.
  * @param {string} params.body.shortDescription - A brief, one-sentence summary.
  * @param {string} params.body.description - A detailed description of the project's problem and solution.
- * @param {string|number} [params.body.estimatedEffortHours] - The project estimated hours to be complete.
- * @param {string|Date} params.body.estimatedDate - The project estimated date in 'YYYY-MM-DD' format.
- * @param {string|number} params.body.projectTypeId - A single ID for associated project type.
+ * @param {string|Date} params.body.deadline - The application deadline in 'YYYY-MM-DD' format.
+ * @param {string|number|Array<string|number>} [params.body.projectType] - A single ID or array of IDs for associated project types.
  * @param {string|number|Array<string|number>} [params.body.problemType] - A single ID or array of IDs for associated problem types.
  * @param {string|number|Array<string|number>} [params.body.faculty] - A single ID or array of IDs for associated faculties.
  * @param {string} [params.body.problemTypeOther] - A user-defined problem type if 'other' is selected.
  *
  * @throws {ApplicationError.ValidationError} If the input data is invalid.
- * @throws {ApplicationError.ConflictError} If a conflict occurs (e.g., invalid foreign key).
+ * @throws {ApplicationError.NotFoundError} If the requesting user entity is not found during project creation.
+ * @throws {ApplicationError.ConflictError} if the application is already approved
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
-export async function create({ body }) {
-  // 1) Pull the application UUID out of the incoming payload — this is the primary foreign key
-  const { uuidApplication, ...remainingFields } = body;
-  const bodyPayload = remainingFields; // Remove uuidApplication from the body payload
+export async function create({ uuidRequestingUser, body }) {
+  // 1. Superficial Validation
+  const allErrors = validateUuid(uuidRequestingUser, "uuidRequestingUser");
+  if (allErrors.length > 0)
+    throw new ApplicationError.ValidationError("Input validation failed.", {
+      details: allErrors,
+    });
 
-  // 2) Sanitize the problemType: remove the user-selected "otro" sentinel (Spanish: "other")
-  //    so validation and persistence only see real type IDs. (e.g. ["1", "otro"] -> ["1"])
-  const filteredProblemType = Array.isArray(bodyPayload.problemType)
-    ? bodyPayload.problemType.filter((id) => id !== "otro")
-    : bodyPayload.problemType === "otro"
-    ? []
-    : bodyPayload.problemType;
+  // Extract UUID for cleaner usage
+  const { uuidApplication, ...applicationData } = body;
 
-  // 3) Prepare a temporary body for validation that substitutes the sanitized problemType.
-  //    This prevents the validator from rejecting the payload due to the "otro" marker.
-  const bodyForValidation = {
-    ...bodyPayload,
-    problemType: filteredProblemType,
-  };
-
-  // 4) Run domain-level validation with the cleaned payload and the application UUID.
-  validateCreationPayload(uuidApplication, bodyForValidation);
-
-  // 5) Build the project object to send to the domain layer. Use the original body shape
-  //    but override problemType with the filtered array so only valid IDs are persisted.
-  const { problemType, ...projectData } = bodyPayload;
-  projectData.problemType = filteredProblemType;
-
-  // 6) Invoke the domain create operation and return the newly created project.
   try {
-    const newProject = await createProject({
+    // --- STEP 2: VALIDATE BUSINESS RULE ---
+    // --- STEP 2A: VALIDATE CARDINALITY ---
+    const singleProjectTypeId = validateProjectCreationRules(
+      applicationData.projectType
+    );
+
+    // --- STEP 2B: FETCH PROJECT TYPE CONSTRAINTS ---
+    const projectTypeData = await getProjectTypeById(singleProjectTypeId);
+
+    // --- STEP 2C: VALIDATE DEADLINE (Time Constraints) ---
+    validateProjectDeadline(applicationData.deadline, {
+      minMonths: projectTypeData.minEstimatedMonths,
+      maxMonths: projectTypeData.maxEstimatedMonths,
+    });
+
+    // --- STEP 3: UPDATE APPLICATION ---
+    await updateApplicationService({
       uuidApplication,
-      project: projectData,
+      body: applicationData,
+    });
+
+    // --- STEP 4: CREATE PROJECT ---
+    const newProject = await createProjectDomain({
+      uuidApplication,
+      projectTypeId: singleProjectTypeId,
+      uuidAdvisor: uuidRequestingUser,
     });
 
     return { project: newProject };
   } catch (err) {
+    // 1. Domain Rule Violations (from validateProjectCreationRules)
     if (err instanceof DomainError.BusinessRuleError)
       throw new ApplicationError.ValidationError(
         "The request violates business rules.",
         { details: err.details, cause: err }
       );
 
-    if (err instanceof DomainError.ValidationError)
-      throw new ApplicationError.ValidationError(
-        "The project data is invalid.",
-        {
-          details: err.details,
-          cause: err,
-        }
+    // 2. Re-throw errors from the Update Service (Already ApplicationErrors)
+    if (err instanceof ApplicationError.ApplicationError) throw err;
+
+    // 3. Handle Conflicts (from createProjectDomain)
+    if (err instanceof DomainError.NotFoundError)
+      throw new ApplicationError.NotFoundError(
+        "The requested resource was not found.",
+        { cause: err }
       );
 
+    // 3.1. Handle Conflicts (from createProjectDomain)
+    if (err instanceof DomainError.ConflictError)
+      throw new ApplicationError.ConflictError(
+        "The registration could not be completed due to a conflict with an existing resource.",
+        { cause: err }
+      );
+
+    // 4. Handle Generic Domain Errors
     if (err instanceof DomainError.DomainError)
       throw new ApplicationError.ApplicationError(
         "The request could not be processed due to a server error.",
         { cause: err }
       );
 
+    // 5. Unexpected/System Errors
     console.error(`Project Error (project.create):`, err);
     throw new ApplicationError.ApplicationError(
       "An unexpected error occurred while creating the project.",

@@ -60,67 +60,6 @@ function validateSignedNumber(value, fieldName) {
 }
 
 /**
- * Validates the entire payload for creating a new application.
- * This function acts as a gatekeeper to ensure all data is well-formed before being passed to the domain layer.
- * @param {string} uuidApplication - The UUID of the application to approve.
- * @param {object} body - The request body payload.
- * @param {string} body.title - The main title of the project.
- * @param {string} body.shortDescription - A brief, one-sentence summary.
- * @param {string} body.description - A detailed description of the project's problem and solution.
- * @param {string|number} [body.estimatedEffortHours] - The project estimated hours to be complete.
- * @param {string|Date} body.estimatedDate - The project estimated date in 'YYYY-MM-DD' format.
- * @param {string|number} body.projectTypeId - A single ID for associated project type.
- * @param {string|number|Array<string|number>} [body.problemType] - A single ID or array of IDs for associated problem types.
- * @param {string|number|Array<string|number>} [body.faculty] - A single ID or array of IDs for associated faculties.
- * @param {string} [body.problemTypeOther] - A user-defined problem type if 'other' is selected.
- *
- * @throws {ValidationError} If the payload is invalid.
- */
-export function validateCreationPayload(uuidApplication, body) {
-  const allErrors = [];
-
-  allErrors.push(...validateUuid(uuidApplication, "uuidApplication"));
-
-  // ---- Body Validation ----
-  allErrors.push(...validateString(body.title, "title", "title"));
-  allErrors.push(
-    ...validateString(body.shortDescription, "shortDescription", "prose")
-  );
-  allErrors.push(...validateString(body.description, "description", "prose"));
-
-  if (body.estimatedEffortHours !== undefined) {
-    allErrors.push(
-      ...validateSignedNumber(body.estimatedEffortHours, "estimatedEffortHours")
-    );
-  }
-
-  allErrors.push(...validateDate(body.estimatedDate, "estimatedDate"));
-  allErrors.push(...validateSignedNumber(body.projectTypeId, "projectTypeId"));
-
-  if (body.problemType !== undefined) {
-    allErrors.push(
-      ...validateNumberOrNumberArray(body.problemType, "problemType")
-    );
-  }
-
-  if (body.faculty !== undefined) {
-    allErrors.push(...validateNumberOrNumberArray(body.faculty, "faculty"));
-  }
-
-  if (body.problemTypeOther !== undefined) {
-    allErrors.push(
-      ...validateString(body.problemTypeOther, "problemTypeOther", "prose")
-    );
-  }
-
-  if (allErrors.length > 0) {
-    throw new ValidationError("Input validation failed.", {
-      details: allErrors,
-    });
-  }
-}
-
-/**
  * Validates a standard query parameters for get projects.
  *
  * @param {object} params

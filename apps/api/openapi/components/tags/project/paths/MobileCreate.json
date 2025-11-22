@@ -1,13 +1,13 @@
 {
   "post": {
     "summary": "(Mobile) Create a new project",
-    "description": "Approve an project.\n - Requires **\"professor\"** role.",
+    "description": "Approves an application and creates a project instance.\n - Requires **\"professor\"** role.\n\n**Orchestration Workflow:**\n1. **Validation:** Checks strict business rules regarding the project structure.\n2. **Update:** Updates the underlying Application with the provided payload to ensure data consistency.\n3. **Creation:** Creates the Project entity.\n4. **Connection:** Automatically connects the requesting professor as a Team Member, assigning the role of *Advisor* or *Researcher* based on the Project Type constraints.\n\n**Business Rules Checked:**\n- **Single Type Cardinality:** Ensures that exactly **one** Project Type ID is selected for the project, normalizing the input if necessary.\n- **Time Constraints:** Validates that the provided `deadline` fits within the *minimum* and *maximum* estimated months defined by the selected Project Type configuration.\n    - *Note:* A **30-day margin of error** is applied to this calculation to allow for reasonable flexibility.",
     "tags": ["Project"],
     "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
     "requestBody": {
       "required": true,
       "content": {
-        "multipart/form-data": {
+        "application/json": {
           "schema": {
             "allOf": [{ "$ref": "../payload/ProjectCreate.json" }]
           }
@@ -16,7 +16,7 @@
     },
     "responses": {
       "201": {
-        "description": "Project approved successfully.",
+        "description": "Project approved and created successfully.",
         "content": {
           "application/json": {
             "schema": { "$ref": "../responses/CreateProjectSuccess.json" }
@@ -26,6 +26,7 @@
       "400": { "$ref": "../../../responses/Error400.json" },
       "401": { "$ref": "../../../responses/Error401.json" },
       "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
       "409": { "$ref": "../../../responses/Error409.json" },
       "500": { "$ref": "../../../responses/Error500.json" }
     }
