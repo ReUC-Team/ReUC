@@ -199,7 +199,10 @@
       "$ref": "./components/tags/application/paths/Explore.json"
     },
     "/application/{uuid}": {
-      "$ref": "./components/tags/application/paths/Get.json"
+      "$ref": "./components/tags/application/paths/ByUuid.json"
+    },
+    "/mobile/application/{uuid}": {
+      "$ref": "./components/tags/application/paths/MobileByUuid.json"
     },
     "/application/my-applications": {
       "$ref": "./components/tags/application/paths/GetMyApplications.json"

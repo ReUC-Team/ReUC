@@ -10,6 +10,7 @@ import {
   getExploreFiltersHandler,
   getDetailedApplicationHandler,
   getMyApplicationsHandler,
+  updateApplicationHandler,
 } from "./handlers.js";
 
 export const applicationRouter = express.Router();
@@ -89,15 +90,19 @@ applicationRouter.get(
   "/metadata/explore",
   asyncHandler(getExploreFiltersHandler)
 );
-
 applicationRouter.get(
   "/my-applications",
   requireRole(["outsider", "professor"]),
   asyncHandler(getMyApplicationsHandler)
 );
-
 applicationRouter.get(
   "/:uuid",
   requireRole(["outsider", "professor"]),
   asyncHandler(getDetailedApplicationHandler)
+);
+applicationRouter.put(
+  "/:uuid",
+  csrfProtection,
+  requireRole("professor"),
+  asyncHandler(updateApplicationHandler)
 );

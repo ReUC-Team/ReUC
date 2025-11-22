@@ -12,7 +12,8 @@
     "db:seed": "node ./seed/seed.js",
     "db:migrate": "npx prisma migrate dev",
     "db:apply": "npx prisma generate client",
-    "db:clear": "node ./seed/clear.js"
+    "db:clear": "npx prisma migrate reset",
+    "db:studio": "npx prisma studio"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.0.0",

@@ -26,13 +26,13 @@ export async function seedProjectTypeModel() {
           create: [
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id },
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
               },
               minCount: 1,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id },
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
               },
               minCount: 0,
             },
@@ -48,13 +48,13 @@ export async function seedProjectTypeModel() {
           create: [
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id },
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
               },
               minCount: 1,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id },
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
               },
               minCount: 0,
             },
@@ -69,14 +69,14 @@ export async function seedProjectTypeModel() {
           create: [
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id },
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
               },
               minCount: 4,
               maxCount: 5,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id },
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
               },
               minCount: 1,
             },
@@ -92,14 +92,14 @@ export async function seedProjectTypeModel() {
           create: [
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id },
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
               },
               minCount: 1,
               maxCount: 4,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id },
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
               },
               minCount: 1,
               maxCount: 1,
@@ -115,21 +115,21 @@ export async function seedProjectTypeModel() {
           create: [
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id },
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
               },
               minCount: 1,
               maxCount: 5,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id },
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
               },
               minCount: 1,
               maxCount: 1,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[2].team_role_id },
+                connect: { team_role_id: teamRoles[2].team_role_id }, // Co-Asesor
               },
               minCount: 0,
               maxCount: 1,
@@ -146,13 +146,13 @@ export async function seedProjectTypeModel() {
           create: [
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id },
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
               },
               minCount: 1,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id },
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
               },
               minCount: 0,
             },
@@ -167,13 +167,13 @@ export async function seedProjectTypeModel() {
           create: [
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id },
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
               },
               minCount: 0,
             },
             {
               teamRole: {
-                connect: { team_role_id: teamRoles[3].team_role_id },
+                connect: { team_role_id: teamRoles[3].team_role_id }, // Investigador
               },
               minCount: 1,
             },

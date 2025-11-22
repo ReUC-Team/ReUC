@@ -1,5 +1,6 @@
 import * as ApplicationError from "../errors/index.js";
 import { validateGetProjectsQuery } from "./validators.js";
+import { flattenProjectData } from "./utils.js";
 import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
 import { getProjects as getProjectsDomain } from "@reuc/domain/project/getProjects.js";
 import { getLinksByTargets } from "@reuc/domain/file/getLinksByTargets.js";
@@ -29,15 +30,18 @@ export async function getProjects(
 
   try {
     // Step 1: Get the primary data from the project domain
-    const { records: projects, metadata } = await getProjectsDomain({
+    const { records: rawProjects, metadata } = await getProjectsDomain({
       page,
       perPage,
     });
 
     // Return early on empty set
-    if (projects.length === 0) {
+    if (rawProjects.length === 0) {
       return { records: [], metadata };
     }
+
+    // Step 1.5: Flatten the data
+    const projects = rawProjects.map(flattenProjectData);
 
     // Step 2: Get related file data
     const applicationIds = projects.map((p) => p.uuidApplication);

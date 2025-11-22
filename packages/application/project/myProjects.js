@@ -1,5 +1,6 @@
 import * as ApplicationError from "../errors/index.js";
 import { validateGetProjectsQuery } from "./validators.js";
+import { flattenProjectData } from "./utils.js";
 import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
 import { getProjectsByAuthor } from "@reuc/domain/project/getProjectsByAuthor.js";
 import { getLinksByTargets } from "@reuc/domain/file/getLinksByTargets.js";
@@ -29,15 +30,19 @@ export async function myProjects(
 
   try {
     // Step 1: Get the primary data from the project domain
-    const { records: projects, metadata } = await getProjectsByAuthor({
+    const { records: rawProjects, metadata } = await getProjectsByAuthor({
       uuidAuthor: uuidRequestingUser,
       page,
       perPage,
     });
 
-    if (projects.length === 0) {
+    if (rawProjects.length === 0) {
       return { records: [], metadata };
     }
+
+    // Step 1.5: Flatten the data
+    // This ensures 'title' is at the root and 'uuidApplication' is accessible
+    const projects = rawProjects.map(flattenProjectData);
 
     // Step 2: Get related file data (identical logic to getProjects)
     const applicationIds = projects.map((p) => p.uuidApplication);
