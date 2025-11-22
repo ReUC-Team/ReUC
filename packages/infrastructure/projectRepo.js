@@ -5,30 +5,34 @@ export const projectRepo = {
   /**
    * Orchestrates the creation of a new project
    * @param {object} project - The core project data and related IDs.
+   * @param {string} uuidAdvisor - The UUID of the professor creating it.
+   * @param {string} roleSlug - The slug of the project member role of the professor that will be assigned to.
    *
+   * @throws {InfrastructureError.UniqueConstraintError} If exist a constraint error (P2002).
    * @throws {InfrastructureError.ForeignKeyConstraintError} If exist a constraint error (P2003).
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
-  async save(project) {
+  async save(project, uuidAdvisor, roleSlug) {
     try {
-      // 1. Build the main project data
-      const createData = _buildProjectCreateData(project);
-
-      // 2. Start the database transaction
+      // 1. Start the database transaction
       return await db.project.create({
-        data: createData,
+        data: {
+          ...project,
+          teamMembers: {
+            create: {
+              user: { connect: { uuid_user: uuidAdvisor } },
+              role: { connect: { slug: roleSlug } },
+            },
+          },
+        },
         select: {
           uuid_project: true,
           uuidApplication: true,
-          title: true,
-          shortDescription: true,
-          description: true,
-          estimatedDate: true,
         },
       });
     } catch (err) {
-      // 3. Translate and re-throw database errors
+      // 2. Translate and re-throw database errors
       if (isPrismaError(err)) {
         if (err.code === "P2002") {
           const field = err.meta.target[0];
@@ -47,6 +51,14 @@ export const projectRepo = {
             { details: { field, rule: "foreign_key_violation" } }
           );
         }
+        if (err.code === "P2025") {
+          const message = err.meta?.cause || "Required relation not found";
+
+          throw new InfrastructureError.NotFoundError(
+            `No (${roleSlug} Role or User) related relation found for project creation.`,
+            { cause: err, details: { message } }
+          );
+        }
 
         throw new InfrastructureError.DatabaseError(
           `Unexpected Database error while creating project: ${err.message}`,
@@ -54,7 +66,7 @@ export const projectRepo = {
         );
       }
 
-      // 4. Handle any other unexpected errors
+      // 3. Handle any other unexpected errors
       const context = JSON.stringify({ project });
       console.error(
         `Infrastructure error (projectRepo.save) with CONTEXT ${context}:`,
@@ -85,9 +97,14 @@ export const projectRepo = {
         db.project.findMany({
           select: {
             uuid_project: true,
-            title: true,
-            shortDescription: true,
             uuidApplication: true,
+            application: {
+              select: {
+                uuid_application: true,
+                title: true,
+                shortDescription: true,
+              },
+            },
           },
           orderBy: sort,
           skip,
@@ -151,9 +168,14 @@ export const projectRepo = {
           where,
           select: {
             uuid_project: true,
-            title: true,
-            shortDescription: true,
             uuidApplication: true,
+            application: {
+              select: {
+                uuid_application: true,
+                title: true,
+                shortDescription: true,
+              },
+            },
           },
           orderBy: sort,
           skip,
@@ -208,14 +230,24 @@ export const projectRepo = {
       return await db.project.findUnique({
         where: { uuid_project: uuidProject },
         select: {
-          projectType: {
+          application: {
             select: {
-              roleConstraints: {
+              applicationProjectType: {
                 select: {
-                  projectTypeId: true,
-                  teamRoleId: true,
-                  minCount: true,
-                  maxCount: true,
+                  projectTypeId: {
+                    select: {
+                      minEstimatedMonths: true,
+                      maxEstimatedMonths: true,
+                      roleConstraints: {
+                        select: {
+                          projectTypeId: true,
+                          teamRoleId: true,
+                          minCount: true,
+                          maxCount: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -251,9 +283,16 @@ export const projectRepo = {
       const projectData = await db.project.findUnique({
         where: { uuid_project: uuid },
         select: {
-          // --- Author OR Organization ---
+          // --- 1. Inherited Data (Source of Truth: Application) ---
           application: {
             select: {
+              uuid_application: true,
+              title: true,
+              shortDescription: true,
+              description: true,
+              deadline: true,
+              createdAt: true,
+              // Author Details
               author: {
                 select: {
                   uuid_user: true,
@@ -265,10 +304,7 @@ export const projectRepo = {
                     select: {
                       universityId: true,
                       professorRole: {
-                        select: {
-                          professor_role_id: true,
-                          name: true,
-                        },
+                        select: { professor_role_id: true, name: true },
                       },
                     },
                   },
@@ -281,52 +317,49 @@ export const projectRepo = {
                   },
                 },
               },
+              // --- Fetch Categories from Application ---
+              applicationProjectType: {
+                select: {
+                  projectTypeId: {
+                    select: {
+                      project_type_id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+              applicationFaculty: {
+                select: {
+                  facultyTypeId: {
+                    select: {
+                      faculty_id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+              applicationProblemType: {
+                select: {
+                  problemTypeId: {
+                    select: {
+                      problem_type_id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
             },
           },
-          // --- Application Details ---
+          // --- 2. Project Execution Context ---
+          uuid_project: true,
           uuidApplication: true,
-          title: true,
-          shortDescription: true,
-          description: true,
-          estimatedEffortHours: true,
-          estimatedDate: true,
-          createdAt: true,
-          projectType: {
-            select: {
-              name: true,
-              maxEstimatedMonths: true,
-              minEstimatedMonths: true,
-              requiredHours: true,
-            },
-          },
           projectStatus: {
             select: {
               project_status_id: true,
               name: true,
-              description: true,
             },
           },
-          // --- Related Types (Many-to-Many) ---
-          projectFaculties: {
-            select: {
-              faculty: {
-                select: {
-                  faculty_id: true,
-                  name: true,
-                },
-              },
-            },
-          },
-          projectProblemTypes: {
-            select: {
-              problemType: {
-                select: {
-                  problem_type_id: true,
-                  name: true,
-                },
-              },
-            },
-          },
+          // --- 3. Related Types ---
           teamMembers: {
             select: {
               uuid_team_member: true,
@@ -337,16 +370,8 @@ export const projectRepo = {
                   middleName: true,
                   lastName: true,
                   email: true,
-                  student: {
-                    select: {
-                      universityId: true,
-                    },
-                  },
-                  professor: {
-                    select: {
-                      universityId: true,
-                    },
-                  },
+                  student: { select: { universityId: true } },
+                  professor: { select: { universityId: true } },
                 },
               },
               role: {
@@ -379,50 +404,3 @@ export const projectRepo = {
     }
   },
 };
-
-/**
- * A private helper to build the data payload for creating a project.
- * @param {object} project - The raw project data from the domain layer.
- *
- * @returns {object} The formatted data object for Prisma's `create` method.
- */
-function _buildProjectCreateData(project) {
-  const {
-    uuidApplication,
-    projectTypeId,
-    projectFaculty = [],
-    projectProblemType = [],
-    projectCustomProblemType = null,
-    ...projectData
-  } = project;
-
-  const createData = {
-    ...projectData,
-    application: { connect: { uuid_application: uuidApplication } },
-    projectType: { connect: { project_type_id: projectTypeId } },
-    projectFaculties: {
-      create: projectFaculty.map((id) => ({
-        faculty: { connect: { faculty_id: id } },
-      })),
-    },
-    projectProblemTypes: {
-      create: projectProblemType.map((id) => ({
-        problemType: { connect: { problem_type_id: id } },
-      })),
-    },
-  };
-
-  // Handle the custom problem type if it exists
-  if (projectCustomProblemType) {
-    createData.projectProblemTypes.create.push({
-      problemType: {
-        connectOrCreate: {
-          where: { name: projectCustomProblemType },
-          create: { name: projectCustomProblemType },
-        },
-      },
-    });
-  }
-
-  return createData;
-}

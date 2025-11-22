@@ -108,6 +108,68 @@ export const applicationRepo = {
     }
   },
   /**
+   * Updates an application's metadata and replaces its relational classifications.
+   * @param {string} uuid - The UUID of the application to update.
+   * @param {object} applicationUpdates - The new application data to update (title, desc, relations).
+   *
+   * @throws {InfrastructureError.NotFoundError} If the application does not exist.
+   * @throws {InfrastructureError.ForeignKeyConstraintError} If exist a constraint error (P2003).
+   * @throws {InfrastructureError.DatabaseError} For unexpected Prisma errors.
+   */
+  async update(uuid, applicationUpdates) {
+    try {
+      const updatePayload = _buildApplicationUpdateData(applicationUpdates);
+
+      return await db.application.update({
+        where: { uuid_application: uuid },
+        data: updatePayload,
+        select: {
+          uuid_application: true,
+          uuidAuthor: true,
+          title: true,
+          shortDescription: true,
+          description: true,
+          deadline: true,
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2003") {
+          const field = err.meta.constraint;
+
+          throw new InfrastructureError.ForeignKeyConstraintError(
+            `An application with this ${field} failed to update the application.`,
+            { details: { field, rule: "foreign_key_violation" } }
+          );
+        }
+
+        if (err.code === "P2025") {
+          const message = err.meta.cause;
+
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuid} application found to update.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected Database error while updating application: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      const context = JSON.stringify({ uuid, applicationUpdates });
+      console.error(
+        `Infrastructure error (applicationRepo.update) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while updating application",
+        { cause: err }
+      );
+    }
+  },
+  /**
    * Retrieves a paginated list of applications that are not yet linked to a project,
    * optionally filtered by faculty.
    * @param {object} options - The filtering and pagination options.
@@ -334,6 +396,39 @@ export const applicationRepo = {
       );
     }
   },
+  /**
+   * Confirm the application exist
+   * @param {string} uuid - The UUID of the application to search for.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async getByUuid(uuid) {
+    try {
+      return await db.application.findUnique({
+        where: { uuid_application: uuid },
+        select: {
+          uuid_application: true,
+          uuidAuthor: true,
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while confirm existing application: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (applicationRepo.exist) with UUID ${uuid}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error confirm existing application",
+        { cause: err }
+      );
+    }
+  },
 };
 
 /**
@@ -382,6 +477,75 @@ function _buildApplicationCreateData(application) {
   }
 
   return createData;
+}
+
+/**
+ * Private helper to construct the Prisma Update input.
+ * It maps arrays of IDs to "delete all existing relations -> connect new ones".
+ */
+function _buildApplicationUpdateData(application) {
+  const {
+    applicationProjectType,
+    applicationFaculty,
+    applicationProblemType,
+    applicationCustomProblemType,
+    ...otherFields
+  } = application;
+
+  const updateData = {
+    ...otherFields,
+  };
+
+  if (applicationProjectType) {
+    updateData.applicationProjectType = {
+      deleteMany: {},
+      create: applicationProjectType.map((id) => ({
+        projectTypeId: { connect: { project_type_id: id } },
+      })),
+    };
+  }
+
+  if (applicationFaculty) {
+    updateData.applicationFaculty = {
+      deleteMany: {},
+      create: applicationFaculty.map((id) => ({
+        facultyTypeId: { connect: { faculty_id: id } },
+      })),
+    };
+  }
+
+  if (
+    applicationProblemType !== undefined ||
+    applicationCustomProblemType !== undefined
+  ) {
+    const createOperations = [];
+
+    if (applicationProblemType && Array.isArray(applicationProblemType)) {
+      createOperations.push(
+        ...applicationProblemType.map((id) => ({
+          problemTypeId: { connect: { problem_type_id: id } },
+        }))
+      );
+    }
+
+    if (applicationCustomProblemType) {
+      createOperations.push({
+        problemTypeId: {
+          connectOrCreate: {
+            where: { name: applicationCustomProblemType },
+            create: { name: applicationCustomProblemType },
+          },
+        },
+      });
+    }
+
+    updateData.applicationProblemType = {
+      deleteMany: {},
+      create: createOperations,
+    };
+  }
+
+  return updateData;
 }
 
 /**
