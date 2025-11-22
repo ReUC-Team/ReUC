@@ -11,6 +11,7 @@ import { seedProjectTypeModel } from "./projectType.seed.js";
 import { studentStatusSeedData } from "./studentStatus.seed.js";
 import { userStatusSeedData } from "./userStatus.seed.js";
 import { teamRoleSeedData } from "./teamRole.seed.js";
+import { projectSeed } from "./project.seed.js";
 
 const prisma = new PrismaClient();
 
@@ -100,11 +101,8 @@ async function seedDummyData() {
   const allProfessorRoles = await prisma.professor_Role.findMany();
 
   // ======================= USERS =======================
-  console.log(
-    "  - Generating dummy user data (outsiders, students, professors)..."
-  );
+  console.log("  - Generating dummy user data...");
 
-  // Define limits for each role
   const outsiderLimit = 10;
   const studentLimit = 15;
   const professorLimit = 5;
@@ -130,19 +128,18 @@ async function seedDummyData() {
     await Promise.all(
       allUsersToCreate.map((user) => prisma.user.create({ data: user }))
     );
-    console.log(
-      `  - Created ${outsidersToCreate.length} dummy users/outsiders.`
-    );
-    console.log(`  - Created ${studentsToCreate.length} dummy users/students.`);
-    console.log(
-      `  - Created ${professorsToCreate.length} dummy users/professors.`
-    );
-  } else {
-    console.log("  - No dummy users to create.");
+    console.log(`  - Created ${allUsersToCreate.length} total dummy users.`);
   }
   // ======================= APPLICATIONS =======================
   console.log("  - Generating dummy application data...");
-  const allUsers = await prisma.user.findMany({ take: outsiderLimit });
+
+  const applicationLimit = 35;
+
+  const allUsers = await prisma.user.findMany({
+    where: {
+      OR: [{ outsider: { isNot: null } }, { professor: { isNot: null } }],
+    },
+  });
   const allFaculties = await prisma.faculty.findMany();
   const allProjectTypes = await prisma.project_Type.findMany();
   const allProblemTypes = await prisma.problem_Type.findMany();
@@ -152,7 +149,7 @@ async function seedDummyData() {
     allFaculties,
     allProjectTypes,
     allProblemTypes,
-    25
+    applicationLimit
   );
 
   if (applicationsToCreate.length > 0) {
@@ -164,8 +161,6 @@ async function seedDummyData() {
     console.log(
       `  - Created ${applicationsToCreate.length} dummy applications.`
     );
-  } else {
-    console.log("  - No dummy applications to create.");
   }
 
   // ======================= FILE_LINKS -> APPLICATIONS =======================
@@ -193,16 +188,13 @@ async function seedDummyData() {
       });
     }
 
-    const { count } = await prisma.file_Link.createMany({
+    await prisma.file_Link.createMany({
       data: fileLinksToCreate,
       skipDuplicates: true,
     });
-    console.log(`  - Created ${count} file links for banners.`);
-  } else {
-    console.log(
-      "  - Skipping file linking (no applications or asset files found)."
-    );
   }
+  // ======================= PROJECTS & TEAMS =======================
+  await projectSeed(prisma);
 }
 
 /**
@@ -215,6 +207,7 @@ async function main() {
   await runTask("Seeding catalog data", seedCatalogs);
   await runTask("Seeding core data", seedCoreData);
   await runTask("Seeding dummy data", seedDummyData);
+
   console.log("\nSeeding complete! The database is ready.");
 }
 

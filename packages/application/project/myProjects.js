@@ -2,7 +2,7 @@ import * as ApplicationError from "../errors/index.js";
 import { validateGetProjectsQuery } from "./validators.js";
 import { flattenProjectData } from "./utils.js";
 import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
-import { getProjectsByAuthor } from "@reuc/domain/project/getProjectsByAuthor.js";
+import { getProjectsByUser } from "@reuc/domain/project/getProjectsByUser.js";
 import { getLinksByTargets } from "@reuc/domain/file/getLinksByTargets.js";
 import { buildFileUrl } from "@reuc/domain/file/buildFileUrl.js";
 import * as DomainError from "@reuc/domain/errors/index.js";
@@ -30,8 +30,8 @@ export async function myProjects(
 
   try {
     // Step 1: Get the primary data from the project domain
-    const { records: rawProjects, metadata } = await getProjectsByAuthor({
-      uuidAuthor: uuidRequestingUser,
+    const { records: rawProjects, metadata } = await getProjectsByUser({
+      uuidUser: uuidRequestingUser,
       page,
       perPage,
     });

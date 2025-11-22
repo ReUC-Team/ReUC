@@ -31,7 +31,7 @@ projectRouter.get(
 );
 projectRouter.get(
   "/my-projects",
-  requireRole(["outsider", "professor"]),
+  requireRole(["outsider", "professor", "student"]),
   asyncHandler(getMyProjectsHandler)
 );
 projectRouter.post(

@@ -149,16 +149,21 @@ export const projectRepo = {
   /**
    * Retrieves a paginated list of all projects owned by a specfic user.
    * @param {object} options - The filtering and pagination options.
-   * @param {string} [options.uuidAuthor] - The unique indentifier ID of a user to filter by.
+   * @param {string} [options.uuidUser] - The unique indentifier ID of a user to filter by.
    * @param {number} [options.page] - The current page number for pagination.
    * @param {number} [options.perPage] - The number of items per page.
    *
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
    */
-  async getAllByAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
+  async getAllByUser({ uuidUser, page = 1, perPage = 50 }) {
     try {
-      const where = { application: { uuidAuthor } };
+      const where = {
+        OR: [
+          { application: { uuidAuthor: uuidUser } },
+          { teamMembers: { some: { uuidUser } } },
+        ],
+      };
       const sort = { createdAt: "asc" };
       const skip = (page - 1) * perPage;
       const take = perPage;
@@ -174,6 +179,7 @@ export const projectRepo = {
                 uuid_application: true,
                 title: true,
                 shortDescription: true,
+                uuidAuthor: true,
               },
             },
           },
@@ -195,7 +201,7 @@ export const projectRepo = {
             totalPages,
             filteredItems: totalItems,
           },
-          query: { uuidAuthor },
+          query: { uuidUser },
           sort,
         },
       };
@@ -206,7 +212,7 @@ export const projectRepo = {
           { cause: err }
         );
 
-      const context = JSON.stringify({ uuidAuthor, page, perPage });
+      const context = JSON.stringify({ uuidUser, page, perPage });
       console.error(
         `Infrastructure error (projectRepo.getByUuidUser) with CONTEXT ${context}:`,
         err
