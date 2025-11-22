@@ -22,6 +22,11 @@ const MyProjectsList = () => {
     navigate(`/my-projects/${uuidApplication}`);
   };
 
+  // NUEVA FUNCIÓN: Navegar a la página de equipo
+  const handleTeamClick = (uuid) => {
+    navigate(`/my-projects/${uuid}/team`);
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -108,6 +113,8 @@ const MyProjectsList = () => {
                 title={proj.title}
                 description={proj.shortDescription}
                 onDetailsClick={() => handleProjectClick(proj.uuid_project, proj.uuidApplication)}
+                showTeamButton={true} // ACTIVAR botón de equipo
+                onTeamClick={handleTeamClick} // FUNCIÓN para navegar
               />
             ))}
           </div>
