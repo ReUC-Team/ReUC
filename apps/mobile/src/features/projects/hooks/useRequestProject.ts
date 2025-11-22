@@ -295,7 +295,7 @@ export default function useRequestProject(onClose?: () => void) {
 
       // Navegar a ExploreProjects
       setTimeout(() => {
-        navigation.navigate('ExploreProjects')
+        navigation.navigate('MyApplications')
       }, 1500)
     } catch (error: any) {
       console.error('❌ Error creating application:', error)

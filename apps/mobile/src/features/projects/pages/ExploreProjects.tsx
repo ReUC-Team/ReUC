@@ -1,67 +1,27 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
-import ProjectsList from '../components/ProjectsList';
-import { useThemedStyles } from '../../../hooks/useThemedStyles';
-import { createExploreProjectsStyles } from '../../../styles/screens/ExploreProjects.styles';
+// apps/mobile/src/features/projects/pages/ExploreProjects.tsx
 
-const TAGS = ['FIE', 'FECAM', 'FACIMAR', 'EDUC'];
+import React from 'react'
+import { View, Text, ScrollView } from 'react-native'
+import { useThemedStyles } from '../../../hooks/useThemedStyles'
+import { createExploreProjectsStyles } from '../../../styles/screens/ExploreProjects.styles'
+import ExploreProjectsList from '../components/ExploreProjectsList'
 
-const mockProjects = [
-  {
-    id: '1',
-    title: 'Aplicación móvil para cocina',
-    description: 'Aplicación móvil de recetario para los estudiantes de la carrera de gastronomía',
-    image: require('../../../../../web/src/assets/project.webp'),
-  },
-  {
-    id: '2',
-    title: 'Sistema de gestión universitaria',
-    description: 'Plataforma para administrar procesos académicos',
-    image: require('../../../../../web/src/assets/project2.webp'),
-  },
-];
-
-const ExploreProjects = () => {
-  const styles = useThemedStyles(createExploreProjectsStyles);
-  const [selectedTag, setSelectedTag] = useState('');
+const ExploreProjects: React.FC = () => {
+  const styles = useThemedStyles(createExploreProjectsStyles)
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header estático */}
       <View style={styles.header}>
         <Text style={styles.title}>
           Explorar <Text style={styles.titleAccent}>proyectos</Text>
         </Text>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.tagsContainer}
-      >
-        {TAGS.map((tag) => (
-          <TouchableOpacity
-            key={tag}
-            style={[
-              styles.tag,
-              selectedTag === tag && styles.tagActive,
-            ]}
-            onPress={() => setSelectedTag(tag)}
-          >
-            <Text
-              style={[
-                styles.tagText,
-                selectedTag === tag && styles.tagTextActive,
-              ]}
-            >
-              {tag}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <ProjectsList projects={mockProjects} />
+      {/* Lista de proyectos */}
+      <ExploreProjectsList />
     </ScrollView>
-  );
-};
+  )
+}
 
-export default ExploreProjects;
+export default ExploreProjects

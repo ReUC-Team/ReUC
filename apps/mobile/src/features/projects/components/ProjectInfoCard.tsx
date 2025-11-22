@@ -1,3 +1,5 @@
+// apps/mobile/src/features/projects/components/ProjectInfoCard.tsx
+
 import React from 'react';
 import { View, Text } from 'react-native';
 import { useThemedStyles } from '../../../hooks/useThemedStyles';
@@ -21,7 +23,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ title, items }) => {
       {title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.itemsContainer}>
         {items.map((item, index) => (
-          <View key={index} style={styles.item}>
+          <View key={`${item.label}-${index}`} style={styles.item}> 
             <Text style={styles.label}>{item.label}:</Text>
             <Text style={styles.value}>{item.value}</Text>
           </View>

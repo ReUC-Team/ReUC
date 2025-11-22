@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return
       }
 
-      console.log(' Token found, loading user session...')
+      console.log('✅ Token found, loading user session...')
 
       // Usar getSession del authService (ya tiene todos los headers correctos)
       const userData = await getSession()
@@ -70,18 +70,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   const login = (userData: User) => {
-    console.log(' Setting user in AuthContext:', userData)
+    console.log('✅ Setting user in AuthContext:', userData)
     setUser(userData)
   }
 
   const logout = async () => {
-    console.log(' Logging out...')
+    console.log('✅ Logging out...')
     await tokenStorage.clearTokens()
     setUser(null)
   }
 
   const refreshUser = async () => {
-    console.log(' Refreshing user session...')
+    console.log('✅ Refreshing user session...')
     await loadUser()
   }
 

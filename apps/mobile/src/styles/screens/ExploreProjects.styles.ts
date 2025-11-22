@@ -1,47 +1,29 @@
-import { StyleSheet } from 'react-native';
-import { ColorPalette } from '../theme/colors';
-import { spacing } from '../theme/spacing';
-import { typography } from '../theme/typography';
+// apps/mobile/src/styles/screens/ExploreProjects.styles.ts
 
-export const createExploreProjectsStyles = (palette: ColorPalette) =>
+import { StyleSheet } from 'react-native'
+import { ColorPalette } from '../theme/colors'
+import { spacing } from '../theme/spacing'
+import { typography } from '../theme/typography'
+
+export const createExploreProjectsStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: palette.surface,
+      backgroundColor: palette.background,
     },
     header: {
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.lg,
+      alignItems: 'center',
+      backgroundColor: palette.background,
     },
     title: {
       fontSize: typography.xl3,
       fontWeight: '700',
       color: palette.text,
+      textAlign: 'center',
     },
     titleAccent: {
       color: palette.primary,
     },
-    tagsContainer: {
-      paddingHorizontal: spacing.md,
-      paddingBottom: spacing.md,
-      gap: spacing.sm,
-    },
-    tag: {
-      backgroundColor: palette.graybtn,
-      paddingVertical: spacing.xs,
-      paddingHorizontal: spacing.md,
-      borderRadius: 20,
-      marginRight: spacing.xs,
-    },
-    tagActive: {
-      backgroundColor: palette.primary,
-    },
-    tagText: {
-      fontSize: typography.base,
-      fontWeight: '600',
-      color: palette.onGBtn,
-    },
-    tagTextActive: {
-      color: palette.onPrimary,
-    },
-  });
+  })

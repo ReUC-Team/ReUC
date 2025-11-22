@@ -1,11 +1,11 @@
-// apps/mobile/src/styles/screens/ProjectDetails.styles.ts
+// apps/mobile/src/styles/screens/ApplicationDetails.styles.ts
 
 import { StyleSheet } from 'react-native'
 import { ColorPalette } from '../theme/colors'
 import { spacing } from '../theme/spacing'
 import { typography } from '../theme/typography'
 
-export const createProjectDetailsStyles = (palette: ColorPalette, fontMode: string) =>
+export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -75,9 +75,35 @@ export const createProjectDetailsStyles = (palette: ColorPalette, fontMode: stri
       marginTop: spacing.lg,
       marginBottom: spacing.md,
     },
+    attachmentsTitle: {
+      fontSize: typography.xl,
+      fontWeight: '600',
+      color: palette.text,
+      marginTop: spacing.lg,
+      marginBottom: spacing.md,
+    },
     actionsContainer: {
       marginTop: spacing.lg,
       gap: spacing.sm,
+    },
+    approveButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.primary,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.lg,
+      borderRadius: 8,
+      gap: spacing.xs,
+    },
+    approveButtonDisabled: {
+      backgroundColor: palette.gray,
+      opacity: 0.5,
+    },
+    approveButtonText: {
+      fontSize: typography.base,
+      fontWeight: '600',
+      color: palette.onPrimary,
     },
     downloadAllButton: {
       flexDirection: 'row',
