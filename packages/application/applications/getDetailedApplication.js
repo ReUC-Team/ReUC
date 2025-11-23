@@ -126,10 +126,12 @@ function _normalizeDetails(appData) {
     shortDescription: appData.shortDescription,
     description: appData.description,
     deadline: appData.deadline,
+    status: appData.applicationStatus,
     createdAt: appData.createdAt,
     projectTypes,
     faculties,
     problemTypes,
+    project: appData?.project?.uuid_project || null,
   };
 }
 

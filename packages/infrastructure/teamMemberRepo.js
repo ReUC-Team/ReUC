@@ -110,8 +110,11 @@ export const teamMemberRepo = {
    * @param {number} params.roleId - The new role id of the team role.
    *
    * @throws {InfrastructureError.NotFoundError} If record was not found (P2025).
+   * @throws {InfrastructureError.ForeignKeyConstraintError} If exist a constraint error (P2003).
    * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
    * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   *
+   * @
    */
   async updateTeamMemberRole({ uuidProject, uuidUser, roleId }) {
     try {
@@ -120,7 +123,7 @@ export const teamMemberRepo = {
           uuidProject_uuidUser: { uuidProject, uuidUser },
         },
         data: {
-          roleId,
+          role: { connect: { team_role_id: roleId } },
         },
         select: {
           uuidProject: true,
