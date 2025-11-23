@@ -1,0 +1,56 @@
+{
+  "patch": {
+    "summary": "(Web) Update Project Deadline",
+    "description": "Updates the deadline of a project. This validates the new date against the constraints (min/max months) defined by the Project Type.\n - Requires **\"professor\"** role.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "required": true,
+        "description": "The unique identifier (UUID) of the project to update.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "deadline": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The new deadline for the project. Must adhere to the time constraints of the project type.",
+                "example": "2026-12-31T23:59:59Z"
+              }
+            },
+            "required": ["deadline"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Deadline updated successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/UpdateDeadlineProjectSuccess.json"
+            }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}
