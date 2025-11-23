@@ -13,6 +13,7 @@ import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
  * @throws {DomainError.ValidationError} If the input data is invalid.
  * @throws {DomainError.NotFoundError} Member is not found or is
  * deleted (race conditions between the find and update calls).
+ * @throws {DomainError.BusinessRuleError} If a invalid business rule.
  * @throws {DomainError.DomainError} For any unexpected errors.
  */
 export async function updateMemberRole({
