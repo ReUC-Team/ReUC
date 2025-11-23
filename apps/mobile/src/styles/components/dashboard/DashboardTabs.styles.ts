@@ -5,7 +5,7 @@ import { ColorPalette } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { typography } from '../../theme/typography'
 
-export const createDashboardTabsStyles = (palette: ColorPalette) =>
+export const createDashboardTabsStyles = (palette: ColorPalette,fontMode: string ) =>
   StyleSheet.create({
     tabBar: {
       backgroundColor: palette.background,
@@ -24,5 +24,6 @@ export const createDashboardTabsStyles = (palette: ColorPalette) =>
       margin: 0,
       padding: 0,
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   })

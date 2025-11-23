@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createProjectsListStyles = (palette: ColorPalette) =>
+export const createProjectsListStyles = (palette: ColorPalette, fontMode:string) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -33,6 +33,7 @@ export const createProjectsListStyles = (palette: ColorPalette) =>
       paddingVertical: spacing.sm,
       fontSize: typography.base,
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     listContent: {
       paddingHorizontal: spacing.md,

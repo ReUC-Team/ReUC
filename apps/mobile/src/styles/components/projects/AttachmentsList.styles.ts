@@ -5,7 +5,7 @@ import { ColorPalette } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { typography } from '../../theme/typography'
 
-export const createAttachmentsListStyles = (palette: ColorPalette) =>
+export const createAttachmentsListStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       marginBottom: spacing.md,
@@ -15,11 +15,13 @@ export const createAttachmentsListStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     optional: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       fontWeight: '400',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     addButton: {
       backgroundColor: palette.surface,
@@ -45,6 +47,7 @@ export const createAttachmentsListStyles = (palette: ColorPalette) =>
       color: palette.primary,
       marginLeft: spacing.xs,
       fontWeight: '600',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     addButtonTextDisabled: {
       color: palette.textSecondary,
@@ -76,10 +79,12 @@ export const createAttachmentsListStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: 2,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     fileSize: {
       fontSize: typography.sm,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     removeButton: {
       padding: spacing.xs,
@@ -88,5 +93,6 @@ export const createAttachmentsListStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginTop: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   })

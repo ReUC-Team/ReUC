@@ -5,7 +5,7 @@ import { ColorPalette } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { typography } from '../../theme/typography'
 
-export const createBannerSelectorStyles = (palette: ColorPalette) =>
+export const createBannerSelectorStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       marginBottom: spacing.md,
@@ -15,11 +15,13 @@ export const createBannerSelectorStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     errorText: {
       fontSize: typography.sm,
       color: palette.error,
       marginTop: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     uploadButton: {
       backgroundColor: palette.primary,
@@ -36,6 +38,7 @@ export const createBannerSelectorStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.onPrimary,
       marginLeft: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     customBannerInfo: {
       backgroundColor: '#D1FAE5',
@@ -52,6 +55,7 @@ export const createBannerSelectorStyles = (palette: ColorPalette) =>
       color: '#065F46',
       flex: 1,
       marginLeft: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     dividerContainer: {
       flexDirection: 'row',
@@ -67,6 +71,7 @@ export const createBannerSelectorStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginHorizontal: spacing.sm,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     bannersGrid: {
       flexDirection: 'row',
@@ -100,5 +105,6 @@ export const createBannerSelectorStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       color: '#FFFFFF',
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   })

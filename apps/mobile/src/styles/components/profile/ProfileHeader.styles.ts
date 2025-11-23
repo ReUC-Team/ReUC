@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createProfileHeaderStyles = (palette: ColorPalette) =>
+export const createProfileHeaderStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.background,
@@ -32,10 +32,12 @@ export const createProfileHeaderStyles = (palette: ColorPalette) =>
       fontWeight: '700',
       color: palette.text,
       marginBottom: spacing.xxs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     location: {
       fontSize: typography.lg,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     buttonsContainer: {
       flexDirection: 'row',
@@ -57,6 +59,7 @@ export const createProfileHeaderStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '600',
       color: palette.onGBtn,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     contactButton: {
       backgroundColor: palette.primary,
@@ -65,5 +68,6 @@ export const createProfileHeaderStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   });

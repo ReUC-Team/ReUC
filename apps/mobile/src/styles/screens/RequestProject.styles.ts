@@ -3,7 +3,7 @@ import { ColorPalette } from '../theme/colors';
 import { spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
 
-export const createRequestProjectStyles = (palette: ColorPalette) =>
+export const createRequestProjectStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -23,6 +23,7 @@ export const createRequestProjectStyles = (palette: ColorPalette) =>
       fontSize: typography.xl3, 
       fontWeight: '700',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     titleAccent: {
       color: palette.primary,
@@ -41,11 +42,13 @@ export const createRequestProjectStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: '#065F46',
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     helpText: {
       fontSize: typography.sm,
       color: '#065F46',
       lineHeight: 20,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     errorBox: {
       backgroundColor: palette.errorBg,
@@ -59,6 +62,7 @@ export const createRequestProjectStyles = (palette: ColorPalette) =>
     errorText: {
       fontSize: typography.base,
       color: palette.errorText,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     loadingContainer: {
       flex: 1,
@@ -70,5 +74,6 @@ export const createRequestProjectStyles = (palette: ColorPalette) =>
       marginTop: spacing.md,
       fontSize: typography.base,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   });

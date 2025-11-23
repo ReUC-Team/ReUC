@@ -44,6 +44,7 @@ export const createLeftSidebarStyles = (palette: ColorPalette, fontMode: string)
       fontWeight: '900',
       color: palette.onPrimary,
       letterSpacing: 1,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     logoAccent: {
       color: palette.onPrimary,
@@ -73,6 +74,7 @@ export const createLeftSidebarStyles = (palette: ColorPalette, fontMode: string)
       marginBottom: spacing.sm,
       marginLeft: spacing.xs,
       textTransform: 'uppercase',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     menuItem: {
       flexDirection: 'row',
@@ -106,6 +108,7 @@ export const createLeftSidebarStyles = (palette: ColorPalette, fontMode: string)
       color: palette.text,
       fontWeight: '500',
       flex: 1,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     chevronIcon: {
       color: palette.textSecondary,

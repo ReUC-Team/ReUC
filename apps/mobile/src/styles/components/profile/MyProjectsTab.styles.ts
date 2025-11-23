@@ -1,34 +1,26 @@
-// apps/mobile/src/styles/screens/MyProjects.styles.ts
+// apps/mobile/src/styles/components/profile/MyProjectsTab.styles.ts
 
 import { StyleSheet } from 'react-native'
-import { ColorPalette } from '../theme/colors'
-import { spacing } from '../theme/spacing'
-import { typography } from '../theme/typography'
+import { ColorPalette } from '../../theme/colors'
+import { spacing } from '../../theme/spacing'
+import { typography } from '../../theme/typography'
 
-export const createMyProjectsStyles = (palette: ColorPalette, fontMode: string) =>
+export const createMyProjectsTabStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: palette.background,
     },
-    header: {
-      paddingHorizontal: spacing.md,
-      paddingVertical: spacing.lg,
-      alignItems: 'center',
-    },
-    title: {
-      fontSize: typography.xl3,
-      fontWeight: '700',
-      color: palette.text,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
-    },
-    titleAccent: {
-      color: palette.primary,
+    listContent: {
+      padding: spacing.md,
+      paddingBottom: spacing.xl,
     },
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
+      padding: spacing.xl,
+      backgroundColor: palette.background,
     },
     loadingText: {
       marginTop: spacing.md,
@@ -40,46 +32,29 @@ export const createMyProjectsStyles = (palette: ColorPalette, fontMode: string) 
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      padding: spacing.md,
+      padding: spacing.xl,
+      backgroundColor: palette.background,
     },
-    errorText: {
+    errorTitle: {
+      fontSize: typography.lg,
+      fontWeight: '600',
+      color: palette.text,
       marginTop: spacing.md,
-      fontSize: typography.base,
-      color: palette.errorText,
-      textAlign: 'center',
+      marginBottom: spacing.xs,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
     },
-    searchContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: palette.background,
-      borderRadius: 24,
-      borderWidth: 1,
-      borderColor: palette.grayLight,
-      paddingHorizontal: spacing.md,
-      marginHorizontal: spacing.md,
-      marginBottom: spacing.md,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 2,
-      elevation: 2,
-    },
-    searchIcon: {
-      marginRight: spacing.xs,
-    },
-    searchInput: {
-      flex: 1,
-      paddingVertical: spacing.sm,
-      fontSize: typography.base,
-      color: palette.text,
+    errorText: {
+      fontSize: typography.sm,
+      color: palette.errorText,
+      textAlign: 'center',
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
     },
     emptyContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: spacing.md,
+      padding: spacing.xl,
+      backgroundColor: palette.background,
     },
     emptyTitle: {
       fontSize: typography.xl,
@@ -87,46 +62,53 @@ export const createMyProjectsStyles = (palette: ColorPalette, fontMode: string) 
       color: palette.text,
       marginTop: spacing.md,
       marginBottom: spacing.xs,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
-    },
-    emptySubtitle: {
-      fontSize: typography.base,
-      color: palette.textSecondary,
       textAlign: 'center',
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
     },
-    listContent: {
-      paddingHorizontal: spacing.md,
-      paddingBottom: spacing.md,
+    emptyText: {
+      fontSize: typography.base,
+      color: palette.textSecondary,
+      textAlign: 'center',
+      marginBottom: spacing.lg,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+    },
+    emptyButton: {
+      backgroundColor: palette.primary,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.lg,
+      borderRadius: 8,
+    },
+    emptyButtonText: {
+      fontSize: typography.base,
+      fontWeight: '600',
+      color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
     },
     paginationContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      paddingHorizontal: spacing.md,
       paddingVertical: spacing.md,
+      paddingHorizontal: spacing.md,
     },
     paginationButton: {
+      backgroundColor: palette.primary,
       paddingVertical: spacing.xs,
       paddingHorizontal: spacing.md,
       borderRadius: 8,
-    },
-    paginationButtonActive: {
-      backgroundColor: palette.primary,
-      opacity: 1,
     },
     paginationButtonDisabled: {
       backgroundColor: palette.gray,
       opacity: 0.5,
     },
     paginationButtonText: {
-      fontSize: typography.base,
+      fontSize: typography.sm,
       fontWeight: '600',
       color: palette.onPrimary,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
     },
     paginationText: {
-      fontSize: typography.base,
+      fontSize: typography.sm,
       fontWeight: '500',
       color: palette.text,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',

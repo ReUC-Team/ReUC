@@ -49,6 +49,7 @@ export const createAttachmentCardStyles = (palette: ColorPalette, fontMode: stri
       fontWeight: '600',
       color: palette.text,
       marginBottom: 2,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     metaInfo: {
       flexDirection: 'row',
@@ -58,11 +59,13 @@ export const createAttachmentCardStyles = (palette: ColorPalette, fontMode: stri
     fileSize: {
       fontSize: typography.sm,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     pdfHint: {
       fontSize: typography.sm,
       color: palette.primary,
       fontWeight: '500',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     downloadButton: {
       backgroundColor: palette.primary,

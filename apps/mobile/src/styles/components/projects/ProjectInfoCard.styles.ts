@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createProjectInfoCardStyles = (palette: ColorPalette) =>
+export const createProjectInfoCardStyles = (palette: ColorPalette, fontMode:string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.grayExtraLight,
@@ -21,6 +21,7 @@ export const createProjectInfoCardStyles = (palette: ColorPalette) =>
       fontWeight: '700',
       color: palette.text,
       marginBottom: spacing.sm,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     itemsContainer: {
       gap: spacing.sm,
@@ -33,9 +34,11 @@ export const createProjectInfoCardStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: spacing.xxs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     value: {
       fontSize: typography.base,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   });

@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createProjectSummaryStyles = (palette: ColorPalette) =>
+export const createProjectSummaryStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       marginBottom: spacing.lg,
@@ -13,10 +13,12 @@ export const createProjectSummaryStyles = (palette: ColorPalette) =>
       fontWeight: '700',
       color: palette.text,
       marginBottom: spacing.sm,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     description: {
       fontSize: typography.base,
       color: palette.textSecondary,
       lineHeight: 22,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   });
