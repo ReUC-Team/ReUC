@@ -91,6 +91,20 @@
           "name": { "type": "string" }
         }
       }
+    },
+    "teamMembers": {
+      "type": "array",
+      "description": "List of members currently assigned to the project.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "uuid_user": { "type": "string", "format": "uuid" },
+          "fullName": { "type": "string", "example": "John Smith" },
+          "email": { "type": "string", "format": "email" },
+          "universityId": { "type": "string", "nullable": true },
+          "role": { "type": "string", "example": "Developer" }
+        }
+      }
     }
   }
 }
