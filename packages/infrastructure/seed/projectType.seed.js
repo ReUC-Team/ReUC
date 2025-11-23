@@ -18,72 +18,6 @@ export async function seedProjectTypeModel() {
 
     const projectTypeSeedData = [
       {
-        name: "Servicio Social Universitario",
-        minEstimatedMonths: 6,
-        maxEstimatedMonths: 6,
-        requiredHours: 50,
-        roleConstraints: {
-          create: [
-            {
-              teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
-              },
-              minCount: 1,
-            },
-            {
-              teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
-              },
-              minCount: 0,
-            },
-          ],
-        },
-      },
-      {
-        name: "Culturales y Deportivas",
-        minEstimatedMonths: 6,
-        maxEstimatedMonths: 6,
-        requiredHours: 32,
-        roleConstraints: {
-          create: [
-            {
-              teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
-              },
-              minCount: 1,
-            },
-            {
-              teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
-              },
-              minCount: 0,
-            },
-          ],
-        },
-      },
-      {
-        name: "Proyectos Integradores",
-        minEstimatedMonths: 6,
-        maxEstimatedMonths: 6,
-        roleConstraints: {
-          create: [
-            {
-              teamRole: {
-                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
-              },
-              minCount: 4,
-              maxCount: 5,
-            },
-            {
-              teamRole: {
-                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
-              },
-              minCount: 1,
-            },
-          ],
-        },
-      },
-      {
         name: "Servicio Social Constitucional",
         minEstimatedMonths: 6,
         maxEstimatedMonths: 6,
@@ -155,6 +89,50 @@ export async function seedProjectTypeModel() {
                 connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
               },
               minCount: 0,
+            },
+          ],
+        },
+      },
+      {
+        name: "Servicio Social Universitario",
+        minEstimatedMonths: 6,
+        maxEstimatedMonths: 6,
+        requiredHours: 50,
+        roleConstraints: {
+          create: [
+            {
+              teamRole: {
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
+              },
+              minCount: 1,
+            },
+            {
+              teamRole: {
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
+              },
+              minCount: 0,
+            },
+          ],
+        },
+      },
+      {
+        name: "Proyectos Integradores",
+        minEstimatedMonths: 6,
+        maxEstimatedMonths: 6,
+        roleConstraints: {
+          create: [
+            {
+              teamRole: {
+                connect: { team_role_id: teamRoles[0].team_role_id }, // Miembro
+              },
+              minCount: 4,
+              maxCount: 5,
+            },
+            {
+              teamRole: {
+                connect: { team_role_id: teamRoles[1].team_role_id }, // Asesor
+              },
+              minCount: 1,
             },
           ],
         },
