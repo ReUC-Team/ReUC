@@ -13,6 +13,7 @@ import {
   deleteTeamMemberHandler,
   startProjectHandler,
   rollbackProjectHandler,
+  updateDeadlineProjectHandler,
 } from "./handlers.js";
 
 export const projectRouter = express.Router();
@@ -75,4 +76,10 @@ projectRouter.post(
   csrfProtection,
   requireRole("professor"),
   asyncHandler(rollbackProjectHandler)
+);
+projectRouter.patch(
+  "/:uuid/deadline",
+  csrfProtection,
+  requireRole("professor"),
+  asyncHandler(updateDeadlineProjectHandler)
 );

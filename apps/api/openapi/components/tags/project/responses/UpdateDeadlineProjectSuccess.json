@@ -1,0 +1,29 @@
+{
+  "description": "Project deadline updated successfully.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "project": {
+              "type": "object",
+              "properties": {
+                "uuid_project": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "deadline": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

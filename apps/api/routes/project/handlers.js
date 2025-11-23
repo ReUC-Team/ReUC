@@ -176,3 +176,20 @@ export async function rollbackProjectHandler(req, res) {
     message: "Project successfully rolled back to Application.",
   });
 }
+
+/**
+ * Handles the update of the deadline of a project.
+ */
+export async function updateDeadlineProjectHandler(req, res) {
+  const { uuid: uuidProject } = req.params;
+
+  const { project: projectData } = await project.updateDeadline({
+    uuidProject,
+    body: req.body,
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: { project: projectData },
+  });
+}

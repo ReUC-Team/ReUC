@@ -259,6 +259,12 @@
     },
     "/mobile/project/{uuid}/rollback": {
       "$ref": "./components/tags/project/paths/MobileRollbackProject.json"
+    },
+    "/project/{uuid}/deadline": {
+      "$ref": "./components/tags/project/paths/WebUpdateDeadlineProject.json"
+    },
+    "/mobile/project/{uuid}/deadline": {
+      "$ref": "./components/tags/project/paths/MobileUpdateDeadlineProject.json"
     }
   }
 }
