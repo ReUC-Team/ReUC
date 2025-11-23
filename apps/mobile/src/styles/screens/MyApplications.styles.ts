@@ -20,6 +20,7 @@ export const createMyApplicationsStyles = (palette: ColorPalette, fontMode: stri
       fontSize: typography.xl3,
       fontWeight: '700',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     titleAccent: {
       color: palette.primary,

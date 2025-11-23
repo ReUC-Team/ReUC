@@ -1,7 +1,7 @@
 // apps/mobile/src/components/MainHeader.tsx
 
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { createMainHeaderStyles } from '../styles/components/header/MainHeader.styles'
 import { useThemedStyles, useThemedPalette } from '../hooks/useThemedStyles'
@@ -11,22 +11,15 @@ import Avatar from './Avatar'
 import { useProfile } from '../context/ProfileContext'
 
 type Props = {
-  onSearchChange?: (text: string) => void
-  searchValue?: string
   onNavigate?: (screen: string) => void
 }
 
-export default function MainHeader({
-  onSearchChange,
-  searchValue,
-  onNavigate,
-}: Props) {
+export default function MainHeader({ onNavigate }: Props) {
   const styles = useThemedStyles(createMainHeaderStyles)
   const palette = useThemedPalette()
   const [isSidebarVisible, setIsSidebarVisible] = useState(false)
   const [isRightSidebarVisible, setIsRightSidebarVisible] = useState(false)
-  
-  // Usar el ProfileContext para obtener datos del perfil
+
   const { profile, isLoading: isLoadingProfile } = useProfile()
 
   const toggleSidebar = () => {
@@ -37,7 +30,6 @@ export default function MainHeader({
     setIsRightSidebarVisible(!isRightSidebarVisible)
   }
 
-  // Obtener datos del perfil con valores por defecto
   const firstName = profile?.firstName || 'ReUC'
   const middleName = profile?.middleName || ''
   const lastName = profile?.lastName || ''
@@ -48,50 +40,20 @@ export default function MainHeader({
       <View style={styles.container}>
         <View style={styles.topRow}>
           <View style={styles.leftSection}>
-            <TouchableOpacity
-              style={styles.hamburgerBtn}
-              onPress={toggleSidebar}
-            >
-              <Ionicons
-                name="menu"
-                size={24}
-                style={styles.hamburgerIcon}
-              />
+            <TouchableOpacity style={styles.hamburgerBtn} onPress={toggleSidebar}>
+              <Ionicons name="menu" size={24} style={styles.hamburgerIcon} />
             </TouchableOpacity>
             <Text style={styles.logo}>
               Re<Text style={{ color: styles.logo.color }}>UC</Text>
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.profileBtn}
-            onPress={toggleRightSidebar}
-          >
+          <TouchableOpacity style={styles.profileBtn} onPress={toggleRightSidebar}>
             {isLoadingProfile ? (
               <ActivityIndicator size="small" color={palette.primary} />
             ) : (
-              <Avatar
-                firstName={firstName}
-                middleName={middleName}
-                lastName={lastName}
-                size="small"
-              />
+              <Avatar firstName={firstName} middleName={middleName} lastName={lastName} size="small" />
             )}
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.searchContainer}>
-          <Ionicons
-            name="search-outline"
-            size={20}
-            style={styles.searchIcon}
-          />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Buscar proyectos..."
-            placeholderTextColor={palette.textSecondary}
-            value={searchValue}
-            onChangeText={onSearchChange}
-          />
         </View>
       </View>
 

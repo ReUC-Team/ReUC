@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createRequestProjectFormStyles = (palette: ColorPalette) =>
+export const createRequestProjectFormStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -18,10 +18,10 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       backgroundColor: palette.background,
     },
     titleInScroll: {
-      marginLeft: spacing.xl,
       fontSize: typography.xl3,
       fontWeight: '700',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     titleAccentInScroll: {
       color: palette.primary,
@@ -40,11 +40,13 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: '#065F46',
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     helpText: {
       fontSize: typography.sm,
       color: '#065F46',
       lineHeight: 20,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     errorBox: {
       backgroundColor: palette.errorBg,
@@ -58,6 +60,7 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
     errorText: {
       fontSize: typography.base,
       color: palette.errorText,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     form: {
       backgroundColor: palette.background,
@@ -77,6 +80,7 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       fontWeight: '700',
       color: palette.text,
       marginBottom: spacing.md,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     field: {
       marginBottom: spacing.md,
@@ -86,11 +90,13 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     optional: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       fontWeight: '400',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     labelWithIcon: {
       flexDirection: 'row',
@@ -107,11 +113,13 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       paddingVertical: spacing.sm,
       fontSize: typography.base,
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     textArea: {
       height: 120,
       textAlignVertical: 'top',
       paddingTop: spacing.sm,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     infoBox: {
       backgroundColor: '#D1FAE5',
@@ -124,6 +132,7 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
     infoText: {
       fontSize: typography.sm,
       color: '#065F46',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     checkboxContainer: {
       flexDirection: 'row',
@@ -134,6 +143,7 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       color: palette.text,
       marginLeft: spacing.sm,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     buttonsContainer: {
       flexDirection: 'row',
@@ -152,6 +162,7 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onGBtn,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     submitButton: {
       flex: 1,
@@ -164,5 +175,6 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   });

@@ -22,6 +22,7 @@ export const createExploreProjectsStyles = (palette: ColorPalette, fontMode: str
       fontWeight: '700',
       color: palette.text,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     titleAccent: {
       color: palette.primary,

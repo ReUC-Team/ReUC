@@ -5,7 +5,7 @@ import { ColorPalette } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { typography } from '../../theme/typography'
 
-export const createMultiSelectDropdownStyles = (palette: ColorPalette) =>
+export const createMultiSelectDropdownStyles = (palette: ColorPalette, fontMode:string) =>
   StyleSheet.create({
     container: {
       marginBottom: spacing.md,
@@ -15,11 +15,13 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     optional: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       fontWeight: '400',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     selectButton: {
       backgroundColor: palette.surface,
@@ -39,6 +41,7 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       color: palette.text,
       flex: 1,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     selectButtonTextPlaceholder: {
       color: palette.textSecondary,
@@ -47,6 +50,7 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       color: palette.error,
       marginTop: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     modalOverlay: {
       flex: 1,
@@ -73,6 +77,7 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '700',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     optionItem: {
       flexDirection: 'row',
@@ -86,6 +91,7 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette) =>
       color: palette.text,
       marginLeft: spacing.sm,
       flex: 1,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     checkbox: {
       width: 24,

@@ -21,6 +21,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       marginTop: spacing.md,
       fontSize: typography.base,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     errorContainer: {
       flex: 1,
@@ -37,6 +38,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       color: palette.errorText,
       textAlign: 'center',
       marginBottom: spacing.lg,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     backButton: {
       backgroundColor: palette.primary,
@@ -48,6 +50,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     header: {
       paddingHorizontal: spacing.md,
@@ -60,9 +63,27 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       fontWeight: '700',
       color: palette.text,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     titleAccent: {
       color: palette.primary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+    },
+    // Estilos del badge de estado
+    statusBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.md,
+      borderRadius: 20,
+      marginTop: spacing.sm,
+      gap: spacing.xs,
+    },
+    statusBadgeText: {
+      fontSize: typography.sm,
+      fontWeight: '600',
+      color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     content: {
       paddingHorizontal: spacing.md,
@@ -74,6 +95,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       color: palette.text,
       marginTop: spacing.lg,
       marginBottom: spacing.md,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     attachmentsTitle: {
       fontSize: typography.xl,
@@ -81,6 +103,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       color: palette.text,
       marginTop: spacing.lg,
       marginBottom: spacing.md,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     actionsContainer: {
       marginTop: spacing.lg,
@@ -104,12 +127,13 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     downloadAllButton: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: palette.primary,
+      backgroundColor: palette.onGBtn,
       paddingVertical: spacing.md,
       paddingHorizontal: spacing.lg,
       borderRadius: 8,
@@ -123,6 +147,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     contactButton: {
       backgroundColor: palette.surface,
@@ -140,5 +165,6 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       fontWeight: '600',
       color: palette.primary,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   })

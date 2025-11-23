@@ -83,7 +83,7 @@ export const createProjectDetailsStyles = (palette: ColorPalette, fontMode: stri
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: palette.primary,
+      backgroundColor: palette.onGBtn,
       paddingVertical: spacing.md,
       paddingHorizontal: spacing.lg,
       borderRadius: 8,

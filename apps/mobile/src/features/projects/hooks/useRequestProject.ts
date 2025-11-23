@@ -281,7 +281,7 @@ export default function useRequestProject(onClose?: () => void) {
         })
       }
 
-      console.log('📤 Sending form data...')
+      console.log(' Sending form data...')
 
       // Enviar al backend
       const response = await createApplication(formData)
@@ -293,7 +293,7 @@ export default function useRequestProject(onClose?: () => void) {
         position: 'bottom',
       })
 
-      // Navegar a ExploreProjects
+      // Navegar a MyApplications
       setTimeout(() => {
         navigation.navigate('MyApplications')
       }, 1500)

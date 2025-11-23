@@ -11,7 +11,6 @@ const ExploreProjects: React.FC = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header estático */}
       <View style={styles.header}>
         <Text style={styles.title}>
           Explorar <Text style={styles.titleAccent}>proyectos</Text>

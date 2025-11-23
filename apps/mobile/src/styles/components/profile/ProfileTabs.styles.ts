@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createProfileTabsStyles = (palette: ColorPalette) =>
+export const createProfileTabsStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.background,
@@ -27,6 +27,7 @@ export const createProfileTabsStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '500',
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     activeTabText: {
       color: palette.text,

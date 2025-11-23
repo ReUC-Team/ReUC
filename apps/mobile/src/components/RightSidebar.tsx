@@ -14,7 +14,7 @@ import {
   Alert,
 } from 'react-native'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native' 
+import { useNavigation } from '@react-navigation/native'
 import { useThemedStyles } from '../hooks/useThemedStyles'
 import { createRightSidebarStyles } from '../styles/components/header/RightSidebar.styles'
 import { useTheme } from '../context/ThemeContext'
@@ -49,15 +49,33 @@ type AccessibilityItem = {
 
 const menuItems: MenuItem[] = [
   { icon: 'person-outline', iconType: 'ionicons', label: 'Mi perfil', screen: 'Profile' },
-  { icon: 'accessibility-outline', iconType: 'ionicons', label: 'Accesibilidad', screen: 'Accessibility', hasSubmenu: true },
+  {
+    icon: 'accessibility-outline',
+    iconType: 'ionicons',
+    label: 'Accesibilidad',
+    screen: 'Accessibility',
+    hasSubmenu: true,
+  },
   { icon: 'settings-outline', iconType: 'ionicons', label: 'Configuración', screen: 'Settings' },
   { icon: 'help-circle-outline', iconType: 'ionicons', label: 'Ayuda', screen: 'Help' },
 ]
 
 const accessibilityItems: AccessibilityItem[] = [
   { icon: 'moon-outline', iconType: 'ionicons', label: 'Modo Oscuro', setting: 'darkMode', hasToggle: true },
-  { icon: 'contrast-outline', iconType: 'ionicons', label: 'Alto Contraste', setting: 'highContrast', hasToggle: true },
-  { icon: 'text-outline', iconType: 'ionicons', label: 'Cambio de Fuente', setting: 'fontChange' },
+  {
+    icon: 'contrast-outline',
+    iconType: 'ionicons',
+    label: 'Alto Contraste',
+    setting: 'highContrast',
+    hasToggle: true,
+  },
+  {
+    icon: 'text-outline',
+    iconType: 'ionicons',
+    label: 'Fuente Dislexia',
+    setting: 'fontChange',
+    hasToggle: true, // ✅ Ahora tiene toggle
+  },
 ]
 
 export default function RightSidebar({
@@ -73,20 +91,22 @@ export default function RightSidebar({
   const navigation = useNavigation<any>()
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
-  const { themeMode, setThemeMode } = useTheme()
+  const { themeMode, setThemeMode, fontMode, setFontMode } = useTheme() // ✅ Agregamos fontMode
   const { handleLogout, isLoading: isLoggingOut } = useLogout()
 
   const [accessibilitySettings, setAccessibilitySettings] = useState({
     darkMode: themeMode === 'dark',
     highContrast: themeMode === 'highContrast',
+    dyslexicFont: fontMode === 'dyslexic', // ✅ Nuevo
   })
 
   useEffect(() => {
     setAccessibilitySettings({
       darkMode: themeMode === 'dark',
       highContrast: themeMode === 'highContrast',
+      dyslexicFont: fontMode === 'dyslexic', // ✅ Sincronizar con context
     })
-  }, [themeMode])
+  }, [themeMode, fontMode])
 
   useEffect(() => {
     if (isVisible) {
@@ -105,10 +125,8 @@ export default function RightSidebar({
   }, [isVisible])
 
   const toggleSubmenu = (screen: string) => {
-    setExpandedMenus(prev =>
-      prev.includes(screen)
-        ? prev.filter(s => s !== screen)
-        : [...prev, screen]
+    setExpandedMenus((prev) =>
+      prev.includes(screen) ? prev.filter((s) => s !== screen) : [...prev, screen]
     )
   }
 
@@ -119,31 +137,23 @@ export default function RightSidebar({
     if (setting === 'highContrast') {
       setThemeMode(themeMode === 'highContrast' ? 'light' : 'highContrast')
     }
+    if (setting === 'fontChange') {
+      // ✅ Cambiar fuente
+      setFontMode(fontMode === 'dyslexic' ? 'default' : 'dyslexic')
+    }
   }
 
   const renderIcon = (item: MenuItem) => {
     if (item.iconType === 'ionicons') {
-      return (
-        <Ionicons
-          name={item.icon as any}
-          size={24}
-          style={styles.menuIcon}
-        />
-      )
+      return <Ionicons name={item.icon as any} size={24} style={styles.menuIcon} />
     }
-    return (
-      <MaterialIcons
-        name={item.icon as any}
-        size={24}
-        style={styles.menuIcon}
-      />
-    )
+    return <MaterialIcons name={item.icon as any} size={24} style={styles.menuIcon} />
   }
 
   const handleMenuPress = (item: MenuItem | string) => {
-    let screen = typeof item === "string" ? item : item.screen
-    
-    if (typeof item !== "string" && item.hasSubmenu) {
+    let screen = typeof item === 'string' ? item : item.screen
+
+    if (typeof item !== 'string' && item.hasSubmenu) {
       toggleSubmenu(item.screen)
     } else {
       if (onNavigate) {
@@ -155,69 +165,46 @@ export default function RightSidebar({
     }
   }
 
-  const handleAccessibilityPress = (setting: string) => {
-    if (setting === 'fontChange') {
-      if (onNavigate) {
-        onNavigate('FontSettings')
-      } else {
-        navigation.navigate('FontSettings')
-      }
-      onClose()
-    }
-  }
-
   /**
    * Maneja el logout con confirmación
    */
   const handleLogoutPress = () => {
-    Alert.alert(
-      '¿Cerrar sesión?',
-      '¿Estás seguro de que quieres salir?',
-      [
-        {
-          text: 'Cancelar',
-          onPress: () => {},
-          style: 'cancel',
+    Alert.alert('¿Cerrar sesión?', '¿Estás seguro de que quieres salir?', [
+      {
+        text: 'Cancelar',
+        onPress: () => {},
+        style: 'cancel',
+      },
+      {
+        text: 'Cerrar sesión',
+        onPress: async () => {
+          onClose()
+          await handleLogout()
         },
-        {
-          text: 'Cerrar sesión',
-          onPress: async () => {
-            onClose()
-            await handleLogout()
-          },
-          style: 'destructive',
-        },
-      ]
-    )
+        style: 'destructive',
+      },
+    ])
   }
 
   const renderAccessibilitySubmenu = () => (
     <View style={styles.submenuContainer}>
       {accessibilityItems.map((item, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.submenuItem}
-          onPress={() => handleAccessibilityPress(item.setting)}
-        >
+        <View key={index} style={styles.submenuItem}>
           <View style={styles.submenuItemContent}>
             {item.iconType === 'ionicons' ? (
-              <Ionicons
-                name={item.icon as any}
-                size={20}
-                style={styles.submenuIcon}
-              />
+              <Ionicons name={item.icon as any} size={20} style={styles.submenuIcon} />
             ) : (
-              <MaterialIcons
-                name={item.icon as any}
-                size={20}
-                style={styles.submenuIcon}
-              />
+              <MaterialIcons name={item.icon as any} size={20} style={styles.submenuIcon} />
             )}
             <Text style={styles.submenuText}>{item.label}</Text>
           </View>
           {item.hasToggle && (
             <Switch
-              value={accessibilitySettings[item.setting as keyof typeof accessibilitySettings]}
+              value={
+                item.setting === 'fontChange'
+                  ? accessibilitySettings.dyslexicFont
+                  : accessibilitySettings[item.setting as keyof typeof accessibilitySettings]
+              }
               onValueChange={() => toggleAccessibilitySetting(item.setting)}
               trackColor={{ false: styles.switchTrack.color, true: styles.switchTrackActive.color }}
               thumbColor={styles.switchThumb.color}
@@ -228,18 +215,13 @@ export default function RightSidebar({
               }
             />
           )}
-        </TouchableOpacity>
+        </View>
       ))}
     </View>
   )
 
   return (
-    <Modal
-      visible={isVisible}
-      transparent
-      animationType="none"
-      onRequestClose={onClose}
-    >
+    <Modal visible={isVisible} transparent animationType="none" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
@@ -258,12 +240,7 @@ export default function RightSidebar({
                 </TouchableOpacity>
 
                 <View style={styles.profileContainer}>
-                  <Avatar
-                    firstName={firstName}
-                    middleName={middleName}
-                    lastName={lastName}
-                    size="medium"
-                  />
+                  <Avatar firstName={firstName} middleName={middleName} lastName={lastName} size="medium" />
                   <Text style={styles.userEmail}>{userEmail}</Text>
                 </View>
               </View>
@@ -272,15 +249,12 @@ export default function RightSidebar({
               <ScrollView style={styles.menuContainer}>
                 {menuItems.map((item, index) => (
                   <View key={index}>
-                    <TouchableOpacity
-                      style={styles.menuItem}
-                      onPress={() => handleMenuPress(item)}
-                    >
+                    <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuPress(item)}>
                       {renderIcon(item)}
                       <Text style={styles.menuText}>{item.label}</Text>
                       {item.hasSubmenu && (
                         <Ionicons
-                          name={expandedMenus.includes(item.screen) ? "chevron-up" : "chevron-down"}
+                          name={expandedMenus.includes(item.screen) ? 'chevron-up' : 'chevron-down'}
                           size={20}
                           style={styles.chevronIcon}
                         />
@@ -297,14 +271,8 @@ export default function RightSidebar({
                 onPress={handleLogoutPress}
                 disabled={isLoggingOut}
               >
-                <Ionicons
-                  name="log-out-outline"
-                  size={24}
-                  style={styles.logoutIcon}
-                />
-                <Text style={styles.logoutText}>
-                  {isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
-                </Text>
+                <Ionicons name="log-out-outline" size={24} style={styles.logoutIcon} />
+                <Text style={styles.logoutText}>{isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}</Text>
               </TouchableOpacity>
             </Animated.View>
           </TouchableWithoutFeedback>

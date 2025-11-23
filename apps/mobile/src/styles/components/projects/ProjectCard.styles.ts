@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createProjectCardStyles = (palette: ColorPalette) =>
+export const createProjectCardStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.background,
@@ -44,12 +44,14 @@ export const createProjectCardStyles = (palette: ColorPalette) =>
       fontWeight: '700',
       color: palette.text,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     description: {
       fontSize: typography.base,
       color: palette.textSecondary,
       marginBottom: spacing.md,
       lineHeight: 20,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     button: {
       backgroundColor: palette.primary,
@@ -62,5 +64,6 @@ export const createProjectCardStyles = (palette: ColorPalette) =>
       color: palette.onPrimary,
       fontSize: typography.base,
       fontWeight: '600',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   });

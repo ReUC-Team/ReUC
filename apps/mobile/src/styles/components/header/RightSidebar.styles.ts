@@ -5,7 +5,7 @@ import { ColorPalette } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { typography } from '../../theme/typography'
 
-export const createRightSidebarStyles = (palette: ColorPalette) =>
+export const createRightSidebarStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -59,6 +59,7 @@ export const createRightSidebarStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       color: palette.textSecondary,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     menuContainer: {
       flex: 1,
@@ -79,6 +80,7 @@ export const createRightSidebarStyles = (palette: ColorPalette) =>
       color: palette.text,
       fontWeight: '400',
       flex: 1,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     chevronIcon: {
       color: palette.textSecondary,
@@ -111,6 +113,7 @@ export const createRightSidebarStyles = (palette: ColorPalette) =>
     submenuText: {
       fontSize: typography.sm,
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     switch: {
       transform: [{ scale: 0.8 }],
@@ -141,5 +144,6 @@ export const createRightSidebarStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       color: palette.error,
       fontWeight: '500',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
   })
