@@ -17,6 +17,20 @@
       "nullable": true,
       "example": "/file/APPLICATION/BANNER/123e4567-e89b-12d3-a456-426614174000",
       "description": "URL to the application's banner image."
+    },
+    "status": {
+      "type": "object",
+      "description": "The current status of the application.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Aprobado"
+        },
+        "slug": {
+          "type": "string",
+          "example": "approved"
+        }
+      }
     }
   },
   "required": ["uuid_application", "title", "shortDescription", "bannerUrl"]

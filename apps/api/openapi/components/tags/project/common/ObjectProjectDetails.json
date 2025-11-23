@@ -14,42 +14,62 @@
       "type": "string",
       "example": "A full, detailed description of the project."
     },
-    "estimatedEffortHours": {
-      "type": "integer",
-      "example": 120,
-      "nullable": true
-    },
-    "estimatedDate": {
+    "deadline": {
       "type": "string",
       "format": "date-time",
       "example": "2026-05-20T00:00:00Z"
     },
-    "createdAt": {
+    "uuidCreator": {
       "type": "string",
-      "format": "date-time",
-      "example": "2025-11-17T10:00:00Z"
+      "format": "uuid",
+      "example": "123e4567-e89b-12d3-a456-426614174000",
+      "description": "The professor's ID that approved the application."
     },
     "status": {
       "type": "object",
+      "description": "The current status of the project.",
       "properties": {
-        "name": { "type": "string", "example": "Active" },
-        "description": {
+        "name": {
           "type": "string",
-          "example": "Project is currently ongoing."
+          "example": "Aprobado"
+        },
+        "slug": {
+          "type": "string",
+          "example": "approved"
         }
       }
     },
-    "projectType": {
-      "type": "object",
-      "properties": {
-        "name": { "type": "string", "example": "Intership" },
-        "minEstimatedMonths": { "type": "integer", "example": 12 },
-        "maxEstimatedMonths": {
-          "type": "integer",
-          "example": 24,
-          "nullable": true
-        },
-        "requiredHours": { "type": "integer", "example": 400, "nullable": true }
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2025-11-17T10:00:00Z",
+      "description": "Creation date of the application."
+    },
+    "approvedAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2025-11-17T10:00:00Z",
+      "description": "Approved date of the application and creation of the project."
+    },
+    "projectTypes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "Intership" },
+          "minEstimatedMonths": { "type": "integer", "example": 12 },
+          "maxEstimatedMonths": {
+            "type": "integer",
+            "example": 24,
+            "nullable": true
+          },
+          "requiredHours": {
+            "type": "integer",
+            "example": 400,
+            "nullable": true
+          }
+        }
       }
     },
     "faculties": {
@@ -69,20 +89,6 @@
         "properties": {
           "id": { "type": "integer" },
           "name": { "type": "string" }
-        }
-      }
-    },
-    "teamMembers": {
-      "type": "array",
-      "description": "List of members currently assigned to the project.",
-      "items": {
-        "type": "object",
-        "properties": {
-          "uuid_user": { "type": "string", "format": "uuid" },
-          "fullName": { "type": "string", "example": "John Smith" },
-          "email": { "type": "string", "format": "email" },
-          "universityId": { "type": "string", "nullable": true },
-          "role": { "type": "string", "example": "Developer" }
         }
       }
     }
