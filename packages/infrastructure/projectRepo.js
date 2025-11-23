@@ -16,20 +16,38 @@ export const projectRepo = {
   async save(project, uuidAdvisor, roleSlug) {
     try {
       // 1. Start the database transaction
-      return await db.project.create({
-        data: {
-          ...project,
-          teamMembers: {
-            create: {
-              user: { connect: { uuid_user: uuidAdvisor } },
-              role: { connect: { slug: roleSlug } },
+      return await db.$transaction(async (tx) => {
+        // Step A: Create the Project
+        const newProject = await tx.project.create({
+          data: {
+            creator: { connect: { uuid_user: uuidAdvisor } },
+            projectStatus: { connect: { slug: "project_approved" } },
+            teamMembers: {
+              create: {
+                user: { connect: { uuid_user: uuidAdvisor } },
+                role: { connect: { slug: roleSlug } },
+              },
+            },
+            application: {
+              connect: { uuid_application: project.uuidApplication },
             },
           },
-        },
-        select: {
-          uuid_project: true,
-          uuidApplication: true,
-        },
+          select: {
+            uuid_project: true,
+            uuidApplication: true,
+            statusId: true,
+          },
+        });
+
+        // Step B: Update the Parent Application
+        await tx.application.update({
+          where: { uuid_application: project.uuidApplication },
+          data: {
+            applicationStatus: { connect: { slug: "approved" } },
+          },
+        });
+
+        return newProject;
       });
     } catch (err) {
       // 2. Translate and re-throw database errors
@@ -55,7 +73,7 @@ export const projectRepo = {
           const message = err.meta?.cause || "Required relation not found";
 
           throw new InfrastructureError.NotFoundError(
-            `No (${roleSlug} Role or User) related relation found for project creation.`,
+            `No (${roleSlug} Role, User or Status) related relation found for project creation.`,
             { cause: err, details: { message } }
           );
         }
@@ -98,6 +116,7 @@ export const projectRepo = {
           select: {
             uuid_project: true,
             uuidApplication: true,
+            projectStatus: { select: { name: true, slug: true } },
             application: {
               select: {
                 uuid_application: true,
@@ -174,6 +193,7 @@ export const projectRepo = {
           select: {
             uuid_project: true,
             uuidApplication: true,
+            projectStatus: { select: { name: true, slug: true } },
             application: {
               select: {
                 uuid_application: true,
@@ -330,6 +350,9 @@ export const projectRepo = {
                     select: {
                       project_type_id: true,
                       name: true,
+                      minEstimatedMonths: true,
+                      maxEstimatedMonths: true,
+                      requiredHours: true,
                     },
                   },
                 },
@@ -359,12 +382,9 @@ export const projectRepo = {
           // --- 2. Project Execution Context ---
           uuid_project: true,
           uuidApplication: true,
-          projectStatus: {
-            select: {
-              project_status_id: true,
-              name: true,
-            },
-          },
+          uuidCreator: true,
+          projectStatus: { select: { name: true, slug: true } },
+          createdAt: true,
           // --- 3. Related Types ---
           teamMembers: {
             select: {
@@ -405,6 +425,217 @@ export const projectRepo = {
       );
       throw new InfrastructureError.InfrastructureError(
         "Unexpected Infrastructure error while quering project",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Updates the status of a project using the status slug.
+   * @param {string} uuidProject - The UUID of the project to update.
+   * @param {string} targetStatusSlug - The unique slug identifier of the new status (e.g., 'project_in_progress').
+   *
+   * @throws {InfrastructureError.NotFoundError} If record was not found (P2025).
+   * @throws {InfrastructureError.ForeignKeyConstraintError} If exist a constraint error (P2003).
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async updateStatus(uuidProject, targetStatusSlug) {
+    try {
+      return db.project.update({
+        where: { uuid_project: uuidProject },
+        data: {
+          projectStatus: {
+            connect: { slug: targetStatusSlug },
+          },
+        },
+        select: {
+          uuid_project: true,
+          projectStatus: { select: { name: true, slug: true } },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2003") {
+          const field = err.meta.constraint;
+
+          throw new InfrastructureError.ForeignKeyConstraintError(
+            `A status with this ${field} failed to update on this project.`,
+            { details: { field, rule: "foreign_key_violation" } }
+          );
+        }
+
+        if (err.code === "P2025") {
+          const message = err.meta?.cause || "Record to update not found.";
+
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuid} project found to update.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while updating project status: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      const context = JSON.stringify({ uuidProject, targetStatusSlug });
+      console.error(
+        `Infrastructure error (projectRepo.updateStatus) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while updating project status.",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Get the specific data graph needed to validate if a project can start.
+   * @param {string} uuidProject - The UUID of the project to search for.
+   *
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async getForValidation(uuidProject) {
+    try {
+      return await db.project.findUnique({
+        where: { uuid_project: uuidProject },
+        select: {
+          // --- 1. Get Team Members to validate composition ---
+          uuid_project: true,
+          uuidCreator: true,
+          teamMembers: {
+            select: {
+              role: {
+                select: {
+                  team_role_id: true,
+                },
+              },
+            },
+          },
+          // --- 2. Get Deadline and Project Type ---
+          application: {
+            select: {
+              deadline: true,
+              applicationProjectType: {
+                select: {
+                  projectTypeId: {
+                    select: {
+                      // 3. Get Constraints from the Project Type
+                      minEstimatedMonths: true,
+                      maxEstimatedMonths: true,
+                      roleConstraints: {
+                        select: {
+                          teamRoleId: true,
+                          minCount: true,
+                          maxCount: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err))
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while querying project for start validation: ${err.message}`,
+          { cause: err }
+        );
+
+      console.error(
+        `Infrastructure error (projectRepo.getForStartValidation) with UUID ${uuidProject}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while quering project for start validation",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Rolls back a project to the application stage.
+   * This is a destructive action: it deletes the Project and resets the Application status.
+   * @param {string} uuidProject - The UUID of the project to rollback.
+   *
+   * @throws {InfrastructureError.NotFoundError} If the project does not exist.
+   * @throws {InfrastructureError.ForeignKeyConstraintError} If exist a constraint error (P2003).
+   * @throws {InfrastructureError.DatabaseError} For unexpected database errors.
+   * @throws {InfrastructureError.InfrastructureError} For generic infrastructure errors.
+   */
+  async rollbackProjectToApplication(uuidProject) {
+    try {
+      return await db.$transaction(async (tx) => {
+        // 1. Find the Project to get the Application UUID
+        const project = await tx.project.findUnique({
+          where: { uuid_project: uuidProject },
+          select: { uuidApplication: true },
+        });
+
+        if (!project) {
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuidProject} project found for rollback.`,
+            { details: { message: `No uuid_project was found.` } }
+          );
+        }
+
+        // 2. Reset Application Status to 'In Review'
+        await tx.application.update({
+          where: { uuid_application: project.uuidApplication },
+          data: {
+            applicationStatus: { connect: { slug: "in_review" } },
+          },
+        });
+
+        // 3. Delete the Project
+        await tx.project.delete({
+          where: { uuid_project: uuidProject },
+        });
+
+        return true;
+      });
+    } catch (err) {
+      // 1. Handle Known Infrastructure Errors (re-throw)
+      if (err instanceof InfrastructureError.InfrastructureError) throw err;
+
+      // 2. Handle Prisma Errors
+      if (isPrismaError(err)) {
+        if (err.code === "P2003") {
+          const field = err.meta.constraint;
+
+          throw new InfrastructureError.ForeignKeyConstraintError(
+            `A project application with this ${field} failed for rollback to.`,
+            { details: { field, rule: "foreign_key_violation" } }
+          );
+        }
+
+        if (err.code === "P2025") {
+          const message =
+            err.meta?.cause || "Related record not found during rollback.";
+
+          throw new InfrastructureError.NotFoundError(
+            `No application found for rollback to.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while rolling back project: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      // 3. Handle Unexpected Errors
+      console.error(
+        `Infrastructure error (projectRepo.rollbackProjectToApplication) with UUID ${uuidProject}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while rolling back project.",
         { cause: err }
       );
     }

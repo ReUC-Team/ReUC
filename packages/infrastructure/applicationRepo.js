@@ -279,6 +279,8 @@ export const applicationRepo = {
           description: true,
           deadline: true,
           createdAt: true,
+          applicationStatus: { select: { name: true, slug: true } },
+          project: { select: { uuid_project: true } },
           // --- Related Types (Many-to-Many) ---
           applicationProjectType: {
             select: {
@@ -355,6 +357,7 @@ export const applicationRepo = {
             uuid_application: true,
             title: true,
             shortDescription: true,
+            applicationStatus: { select: { name: true, slug: true } },
           },
           orderBy: sort,
           skip,
@@ -438,6 +441,7 @@ export const applicationRepo = {
  */
 function _buildApplicationCreateData(application) {
   const {
+    uuidAuthor,
     applicationProjectType = [],
     applicationFaculty = [],
     applicationProblemType = [],
@@ -447,6 +451,8 @@ function _buildApplicationCreateData(application) {
 
   const createData = {
     ...applicationData,
+    author: { connect: { uuid_user: uuidAuthor } },
+    applicationStatus: { connect: { slug: "in_review" } },
     applicationProjectType: {
       create: applicationProjectType.map((id) => ({
         projectTypeId: { connect: { project_type_id: id } },
