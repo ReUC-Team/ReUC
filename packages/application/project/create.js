@@ -29,7 +29,7 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @param {string} [params.body.problemTypeOther] - A user-defined problem type if 'other' is selected.
  *
  * @throws {ApplicationError.ValidationError} If the input data is invalid.
- * @throws {ApplicationError.NotFoundError} If the requesting user entity is not found during project creation.
+ * @throws {ApplicationError.NotFoundError} If any resource is not found during transaction.
  * @throws {ApplicationError.ConflictError} if the application is already approved
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
@@ -46,19 +46,9 @@ export async function create({ uuidRequestingUser, body }) {
 
   try {
     // --- STEP 2: VALIDATE BUSINESS RULE ---
-    // --- STEP 2A: VALIDATE CARDINALITY ---
     const singleProjectTypeId = validateProjectCreationRules(
       applicationData.projectType
     );
-
-    // --- STEP 2B: FETCH PROJECT TYPE CONSTRAINTS ---
-    const projectTypeData = await getProjectTypeById(singleProjectTypeId);
-
-    // --- STEP 2C: VALIDATE DEADLINE (Time Constraints) ---
-    validateProjectDeadline(applicationData.deadline, {
-      minMonths: projectTypeData.minEstimatedMonths,
-      maxMonths: projectTypeData.maxEstimatedMonths,
-    });
 
     // --- STEP 3: UPDATE APPLICATION ---
     await updateApplicationService({
