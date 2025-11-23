@@ -68,7 +68,10 @@ export async function myApplications(
 
     // Step 4: Combine the data (identical logic)
     const applicationsWithBanners = applications.map((project) => ({
-      ...project,
+      uuid_application: project.uuid_application,
+      title: project.title,
+      shortDescription: project.shortDescription,
+      status: project.applicationStatus,
       bannerUrl: bannerMap.get(project.uuid_application) || null,
     }));
 

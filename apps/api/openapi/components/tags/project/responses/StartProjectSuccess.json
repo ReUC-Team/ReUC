@@ -1,0 +1,36 @@
+{
+  "description": "Project successfully started (status changed to In Progress).",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "project": {
+              "type": "object",
+              "properties": {
+                "uuid_project": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "The unique identifier of the updated project."
+                },
+                "projectStatus": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string", "example": "En Progreso" },
+                    "slug": {
+                      "type": "string",
+                      "example": "project_in_progress"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -12,6 +12,8 @@ import { studentStatusSeedData } from "./studentStatus.seed.js";
 import { userStatusSeedData } from "./userStatus.seed.js";
 import { teamRoleSeedData } from "./teamRole.seed.js";
 import { projectSeed } from "./project.seed.js";
+import { applicationStatusSeedData } from "./applicationStatus.seed.js";
+import { projectStatusSeedData } from "./projectStatus.seed.js";
 
 const prisma = new PrismaClient();
 
@@ -55,6 +57,8 @@ async function clearDatabase() {
   await prisma.user_Status.deleteMany();
   await prisma.student_Status.deleteMany();
   await prisma.professor_Role.deleteMany();
+  await prisma.application_Status.deleteMany();
+  await prisma.project_Status.deleteMany();
 }
 
 /**
@@ -69,6 +73,8 @@ async function seedCatalogs() {
     prisma.professor_Role.createMany({ data: professorRoleSeedData }),
     prisma.faculty.createMany({ data: facultySeedData }),
     prisma.team_Role.createMany({ data: teamRoleSeedData }),
+    prisma.application_Status.createMany({ data: applicationStatusSeedData }),
+    prisma.project_Status.createMany({ data: projectStatusSeedData }),
   ]);
   await seedProjectTypeModel();
 }
@@ -143,12 +149,14 @@ async function seedDummyData() {
   const allFaculties = await prisma.faculty.findMany();
   const allProjectTypes = await prisma.project_Type.findMany();
   const allProblemTypes = await prisma.problem_Type.findMany();
+  const allAppStatuses = await prisma.application_Status.findMany();
 
   const applicationsToCreate = applicationSeedData(
     allUsers,
     allFaculties,
     allProjectTypes,
     allProblemTypes,
+    allAppStatuses,
     applicationLimit
   );
 

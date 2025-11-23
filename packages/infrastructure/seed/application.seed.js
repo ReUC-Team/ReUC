@@ -10,16 +10,27 @@ export const applicationSeedData = (
   faculties,
   projectTypes,
   problemTypes,
+  statuses,
   count = 15
 ) => {
   if (
     !author.length ||
     !faculties.length ||
     !projectTypes.length ||
-    !problemTypes.length
+    !problemTypes.length ||
+    !statuses.length
   ) {
     console.log(
       "Skipping application seeding due to missing related data (author, faculties, etc.)."
+    );
+    return [];
+  }
+
+  const inReviewStatus = statuses.find((s) => s.slug === "in_review");
+
+  if (!inReviewStatus) {
+    console.warn(
+      "Skipping application seeding due to 'in_review' status not found."
     );
     return [];
   }
@@ -35,8 +46,8 @@ export const applicationSeedData = (
     ); // 1 to 2 faculties
     const selectedProjectTypes = getRandomSample(
       projectTypes,
-      Math.floor(Math.random() * 3) + 1
-    ); // 1 to 3 project types
+      Math.floor(Math.random() * 1) + 1
+    ); // 1 project types
     const selectedProblemTypes = getRandomSample(
       problemTypes,
       Math.floor(Math.random() * 2) + 1
@@ -48,6 +59,7 @@ export const applicationSeedData = (
       description: faker.lorem.paragraphs(3),
       deadline: faker.date.future({ years: 1 }),
       uuidAuthor: randomAuthor.uuid_user,
+      statusId: inReviewStatus.application_status_id,
 
       applicationFaculty: {
         create: selectedFaculties.map((faculty) => ({

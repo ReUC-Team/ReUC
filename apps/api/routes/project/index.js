@@ -11,6 +11,8 @@ import {
   getDetailedProjectHandler,
   updateTeamMemberHandler,
   deleteTeamMemberHandler,
+  startProjectHandler,
+  rollbackProjectHandler,
 } from "./handlers.js";
 
 export const projectRouter = express.Router();
@@ -61,4 +63,16 @@ projectRouter.delete(
   csrfProtection,
   requireRole("professor"),
   asyncHandler(deleteTeamMemberHandler)
+);
+projectRouter.post(
+  "/:uuid/start",
+  csrfProtection,
+  requireRole("professor"),
+  asyncHandler(startProjectHandler)
+);
+projectRouter.post(
+  "/:uuid/rollback",
+  csrfProtection,
+  requireRole("professor"),
+  asyncHandler(rollbackProjectHandler)
 );

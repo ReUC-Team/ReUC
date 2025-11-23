@@ -1,8 +1,6 @@
 import { TeamMember } from "./TeamMember.js";
-import { validateTeamComposition } from "./teamCompositionService.js";
 import * as DomainError from "../errors/index.js";
 import { teamMemberRepo } from "@reuc/infrastructure/teamMemberRepo.js";
-import { projectRepo } from "@reuc/infrastructure/projectRepo.js";
 import * as InfrastructureError from "@reuc/infrastructure/errors/index.js";
 
 /**
