@@ -47,10 +47,49 @@ app.use(express.json({ limit: "10mb" }));
 // ----- REGISTER LOGGER <<DEV ONLY>> -----
 
 app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.originalUrl}`);
-  if (typeof req.body !== "undefined" && Object.keys(req.body).length) {
-    console.log("Body:", req.body);
-  }
+  // 1. Store the original send function
+  const originalSend = res.send;
+
+  // 2. Initialize a variable to store the response body
+  let responseBody;
+
+  // 3. Override res.send to capture the body
+  res.send = function (body) {
+    responseBody = body; // Capture the body here
+    return originalSend.apply(this, arguments); // Pass control back to original function
+  };
+
+  // 4. Listen for the request to finish
+  res.on("finish", () => {
+    // --- GATHER DATA ---
+    const method = req.method;
+    const url = req.originalUrl;
+    const statusCode = res.statusCode;
+
+    // --- LOGGING ---
+    console.log(`\n--- [${method}] ${url} ---`);
+    console.log(`Status Code: ${statusCode}`);
+
+    // Log Request Body (if exists and not empty)
+    if (req.body && Object.keys(req.body).length > 0) {
+      console.log("Request Body:", JSON.stringify(req.body, null, 2));
+    }
+
+    // Log Response/Result
+    // Try to parse JSON strings for cleaner logging, otherwise log as is
+    try {
+      const parsedResponse =
+        typeof responseBody === "string"
+          ? JSON.parse(responseBody)
+          : responseBody;
+      console.log("Response Body:", JSON.stringify(parsedResponse, null, 2));
+    } catch (e) {
+      console.log("Response Body:", responseBody);
+    }
+
+    console.log("--------------------------\n");
+  });
+
   next();
 });
 

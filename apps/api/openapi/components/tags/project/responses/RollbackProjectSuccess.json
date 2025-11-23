@@ -1,0 +1,19 @@
+{
+  "description": "Project successfully rolled back (deleted and application reopened).",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "Project successfully rolled back to Application."
+        },
+        "data": {
+          "type": "object",
+          "description": "Empty object as the project resource has been deleted."
+        }
+      }
+    }
+  ]
+}
