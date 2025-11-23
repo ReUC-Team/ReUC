@@ -38,13 +38,13 @@ const LeftSidebar: React.FC<Props> = ({ isVisible, onClose, onNavigate }) => {
 
   // Obtener rutas de proyectos según el rol del usuario
   const projectRoutes = getSidebarProjectRoutes(user?.role || 'outsider')
+    .filter(route => route.screen !== 'Dashboard') // Filtrar Dashboard para evitar duplicados
 
   // Construir menú dinámico basado en el rol
   const menuItems: MenuItem[] = [
-    // Siempre mostrar Dashboard
+  
     { icon: 'home-outline', label: 'Inicio', screen: 'Dashboard' },
 
-    // Rutas de proyectos basadas en rol
     ...projectRoutes.map((route) => ({
       icon: route.icon,
       label: route.label,

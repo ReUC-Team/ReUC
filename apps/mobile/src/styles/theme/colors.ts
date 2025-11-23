@@ -63,7 +63,7 @@ export const highContrastPalette = {
   errorText:     '#FFD600',
 
   // Neutros
-  grayLight:     '#FFD600',
+  grayLight:     '#1b1911ff',
   graybtn:       '#262626',
   gray:          '#FFD600',
   grayExtraLight:'#262626',

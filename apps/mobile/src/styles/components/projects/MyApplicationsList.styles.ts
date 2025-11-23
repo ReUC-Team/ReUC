@@ -10,6 +10,20 @@ export const createMyApplicationsListStyles = (palette: ColorPalette, fontMode: 
     container: {
       flex: 1,
     },
+    header: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.lg,
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: typography.xl3,
+      fontWeight: '700',
+      color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+    },
+    titleAccent: {
+      color: palette.primary,
+    },
     loadingContainer: {
       flex: 1,
       justifyContent: 'center',
@@ -33,6 +47,7 @@ export const createMyApplicationsListStyles = (palette: ColorPalette, fontMode: 
       fontSize: typography.base,
       color: palette.errorText,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     searchContainer: {
       flexDirection: 'row',
@@ -58,6 +73,7 @@ export const createMyApplicationsListStyles = (palette: ColorPalette, fontMode: 
       paddingVertical: spacing.sm,
       fontSize: typography.base,
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     listContent: {
       paddingHorizontal: spacing.md,
@@ -76,12 +92,14 @@ export const createMyApplicationsListStyles = (palette: ColorPalette, fontMode: 
       color: palette.text,
       marginTop: spacing.md,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     emptySubtitle: {
       fontSize: typography.base,
       color: palette.textSecondary,
       textAlign: 'center',
       marginBottom: spacing.md,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     createButton: {
       backgroundColor: palette.primary,
@@ -94,6 +112,7 @@ export const createMyApplicationsListStyles = (palette: ColorPalette, fontMode: 
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     paginationContainer: {
       flexDirection: 'row',
@@ -116,16 +135,19 @@ export const createMyApplicationsListStyles = (palette: ColorPalette, fontMode: 
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     paginationText: {
       fontSize: typography.base,
       fontWeight: '500',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     resultsText: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       textAlign: 'center',
       paddingBottom: spacing.md,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   })

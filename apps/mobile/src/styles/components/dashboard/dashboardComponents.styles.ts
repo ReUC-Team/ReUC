@@ -46,11 +46,14 @@ export const createProjectStatsStyles = (palette: ColorPalette, fontMode: string
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
+    
   },
   heroButtonText: {
     fontSize: typography.lg,
     fontWeight: '600',
     color: palette.primary,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+    
   },
   summarySection: {
     backgroundColor: palette.background,
@@ -71,11 +74,13 @@ export const createProjectStatsStyles = (palette: ColorPalette, fontMode: string
     fontWeight: '600',
     color: palette.text,
     marginBottom: spacing.xs,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   summarySubtitle: {
     fontSize: typography.sm,
     color: palette.textSecondary,
     marginBottom: spacing.md,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   summaryStats: {
     flexDirection: 'row',
@@ -90,16 +95,21 @@ export const createProjectStatsStyles = (palette: ColorPalette, fontMode: string
     fontSize: typography.xl2,
     fontWeight: 'bold',
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+
   },
   summaryStatLabel: {
     fontSize: typography.sm,
     color: palette.textSecondary,
     marginTop: spacing.xxs,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+
   },
   summaryStatProgress: {
     fontSize: typography.xl,
     fontWeight: 'bold',
     color: palette.primary,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   sectionTitle: {
     fontSize: typography.xl,
@@ -107,6 +117,7 @@ export const createProjectStatsStyles = (palette: ColorPalette, fontMode: string
     color: palette.text,
     paddingHorizontal: spacing.lg,
     marginBottom: spacing.md,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   horizontalScrollContainer: {
     paddingLeft: spacing.lg,
@@ -154,12 +165,14 @@ export const createProjectStatsStyles = (palette: ColorPalette, fontMode: string
     color: palette.text,
     marginBottom: spacing.sm,
     lineHeight: typography.base * 1.3,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   horizontalValue: {
     fontSize: typography.xl4,
     fontWeight: 'bold',
     color: palette.primary,
     letterSpacing: -1,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   gradientOverlay: {
     position: 'absolute',
@@ -194,7 +207,7 @@ export const createProjectStatsStyles = (palette: ColorPalette, fontMode: string
 })
 
 
-export const createRequestedProjectsStyles = (palette: ColorPalette) =>
+export const createRequestedProjectsStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
   container: {
     backgroundColor: palette.background,
@@ -217,12 +230,14 @@ export const createRequestedProjectsStyles = (palette: ColorPalette) =>
     fontWeight: '600',
     color: palette.text,
     marginLeft: spacing.sm,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   subtitle: {
     fontSize: typography.sm,
     color: palette.textSecondary,
     marginLeft: spacing.sm,
     marginTop: spacing.xs,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -244,6 +259,7 @@ export const createRequestedProjectsStyles = (palette: ColorPalette) =>
     fontSize: typography.sm,
     color: palette.textSecondary,
     fontWeight: '600',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   filterButtonTextActive: {
     color: palette.onPrimary,
@@ -263,6 +279,7 @@ export const createRequestedProjectsStyles = (palette: ColorPalette) =>
     fontWeight: '600',
     color: palette.text,
     marginRight: spacing.xs,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   statusDot: {
     width: spacing.sm,
@@ -277,10 +294,12 @@ export const createRequestedProjectsStyles = (palette: ColorPalette) =>
   projectType: {
     fontSize: typography.sm,
     color: palette.textSecondary,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   projectDate: {
     fontSize: typography.sm,
     color: palette.textSecondary,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   statusBadge: {
     paddingHorizontal: spacing.sm,
@@ -291,6 +310,7 @@ export const createRequestedProjectsStyles = (palette: ColorPalette) =>
   statusBadgeText: {
     fontSize: typography.sm,
     fontWeight: '600',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   emptyState: {
     alignItems: 'center',
@@ -311,7 +331,7 @@ export const createRequestedProjectsStyles = (palette: ColorPalette) =>
   },
 })
 
-export const createProjectListStyles = (palette: ColorPalette) =>
+export const createProjectListStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
   container: {
     backgroundColor: palette.background,
@@ -332,6 +352,7 @@ export const createProjectListStyles = (palette: ColorPalette) =>
   itemText: {
     fontSize: typography.base,
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   statusDot: {
     width: spacing.sm,
@@ -345,7 +366,7 @@ export const createProjectListStyles = (palette: ColorPalette) =>
   },
 })
 
-export const createRecentProjectsStyles = (palette: ColorPalette) =>
+export const createRecentProjectsStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
   container: {
     backgroundColor: palette.background,
@@ -366,6 +387,7 @@ export const createRecentProjectsStyles = (palette: ColorPalette) =>
     fontSize: typography.lg,
     fontWeight: '600',
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   project: {
     flexDirection: 'row',
@@ -396,7 +418,7 @@ export const createRecentProjectsStyles = (palette: ColorPalette) =>
   },
 })
 
-export const createRecentActivityStyles = (palette: ColorPalette) =>
+export const createRecentActivityStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
   container: {
     backgroundColor: palette.background,
@@ -421,6 +443,7 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
     fontSize: typography.lg,
     fontWeight: '600',
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   timeline: {
     position: 'relative',
@@ -454,10 +477,12 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
     fontSize: typography.sm,
     color: palette.textSecondary,
     marginBottom: spacing.xs,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   text: {
     fontSize: typography.base,
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   footer: {
     marginTop: spacing.sm,
@@ -467,6 +492,7 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
     fontSize: typography.base,
     color: palette.primary,
     fontWeight: '600',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   activityItem: {
     flexDirection: 'row',
@@ -499,9 +525,11 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
     fontSize: typography.base,
     color: palette.text,
     lineHeight: typography.base * 1.4,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   userName: {
     fontWeight: '600',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   targetText: {
     fontWeight: '600',
@@ -525,6 +553,7 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
   timeAgo: {
     fontSize: typography.sm,
     color: palette.textSecondary,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   emptyState: {
     alignItems: 'center',
@@ -542,6 +571,7 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
   emptyText: {
     fontSize: typography.base,
     color: palette.textSecondary,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   loadingState: {
     paddingVertical: spacing.xl,
@@ -564,6 +594,7 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
     color: palette.errorText,
     marginBottom: spacing.sm,
     textAlign: 'center',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   retryButton: {
     paddingHorizontal: spacing.md,
@@ -575,10 +606,11 @@ export const createRecentActivityStyles = (palette: ColorPalette) =>
     fontSize: typography.base,
     color: palette.onPrimary,
     fontWeight: '600',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
 })
 
-export const createProjectSummaryStyles = (palette: ColorPalette) =>
+export const createProjectSummaryStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
   container: {
     backgroundColor: palette.background,
@@ -599,6 +631,7 @@ export const createProjectSummaryStyles = (palette: ColorPalette) =>
     fontSize: typography.lg,
     fontWeight: '600',
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   item: {
     flexDirection: 'row',
@@ -620,11 +653,13 @@ export const createProjectSummaryStyles = (palette: ColorPalette) =>
   itemLabel: {
     fontSize: typography.base,
     color: palette.textSecondary,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   count: {
     fontSize: typography.base,
     color: palette.text,
     fontWeight: '600',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   totalContainer: {
     marginTop: spacing.md,
@@ -639,15 +674,17 @@ export const createProjectSummaryStyles = (palette: ColorPalette) =>
     fontSize: typography.base,
     fontWeight: '600',
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   totalValue: {
     fontSize: typography.lg,
     fontWeight: 'bold',
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
 })
 
-export const createTimelineStyles = (palette: ColorPalette) =>
+export const createTimelineStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
   container: {
     backgroundColor: palette.background,
@@ -679,10 +716,12 @@ export const createTimelineStyles = (palette: ColorPalette) =>
     fontSize: typography.sm,
     color: palette.textSecondary,
     marginBottom: spacing.xs,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
   eventText: {
     fontSize: typography.base,
     color: palette.text,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
   },
 })
 
@@ -795,148 +834,5 @@ export const createRecentProjectStyles = (palette: ColorPalette) =>
     fontWeight: '500',
   },
   
-  // ELIMINADOS (ya no se usan):
-  // avatarsContainer, studentsInfo, studentsNames, studentsEmails
-  
-  // Project Info
-  projectInfo: {
-    marginBottom: spacing.sm,
-  },
-  projectHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: spacing.xs,
-  },
-  projectTitle: {
-    fontSize: typography.lg,
-    fontWeight: '600',
-    color: palette.text,
-    flex: 1,
-    marginRight: spacing.sm,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xxs,
-    borderRadius: spacing.sm,
-  },
-  statusDot: {
-    width: spacing.xs,
-    height: spacing.xs,
-    borderRadius: spacing.xxs,
-    marginRight: spacing.xxs,
-  },
-  statusText: {
-    fontSize: typography.sm,
-    fontWeight: '500',
-  },
-  projectDescription: {
-    fontSize: typography.base,
-    color: palette.textSecondary,
-    lineHeight: 20,
-    marginBottom: spacing.xs,
-  },
-  projectCompany: {
-    fontSize: typography.sm,
-    color: palette.textSecondary,
-  },
-  companyLabel: {
-    fontWeight: '500',
-    color: palette.text,
-  },
-  
-  // Progress Section
-  progressSection: {
-    marginBottom: spacing.sm,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.xs,
-  },
-  progressLabel: {
-    fontSize: typography.sm,
-    color: palette.textSecondary,
-  },
-  progressValue: {
-    fontSize: typography.sm,
-    fontWeight: '500',
-    color: palette.text,
-  },
-  progressBarContainer: {
-    width: '100%',
-    height: spacing.xs,
-    backgroundColor: palette.grayLight,
-    borderRadius: spacing.xxs,
-    overflow: 'hidden',
-  },
-  progressBarBg: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: palette.grayLight,
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: palette.primary,
-    borderRadius: spacing.xxs,
-  },
-  
-  // Project Meta
-  projectMeta: {
-    marginBottom: spacing.sm,
-  },
-  metaText: {
-    fontSize: typography.sm,
-    color: palette.textSecondary,
-    marginBottom: 2,
-    lineHeight: 18,
-  },
-  
-  // Actions Container
-  actionsContainer: {
-    marginTop: spacing.xs,
-  },
-  actionButton: {
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginRight: spacing.xs,
-  },
-  
-  // Action Button Variants
-  detailsButton: {
-    backgroundColor: '#EBF4FF', // Indigo light
-  },
-  detailsButtonText: {
-    color: '#3B82F6', // Indigo
-    fontSize: typography.sm,
-    fontWeight: '500',
-  },
-  contactButton: {
-    backgroundColor: '#D1FAE5', // Green light
-  },
-  contactButtonText: {
-    color: '#059669', // Green
-    fontSize: typography.sm,
-    fontWeight: '500',
-  },
-  commentButton: {
-    backgroundColor: '#FEF3C7', // Yellow light
-  },
-  commentButtonText: {
-    color: '#D97706', // Yellow
-    fontSize: typography.sm,
-    fontWeight: '500',
-  },
-  deliverablesButton: {
-    backgroundColor: '#F3E8FF', // Purple light
-  },
-  deliverablesButtonText: {
-    color: '#7C3AED', // Purple
-    fontSize: typography.sm,
-    fontWeight: '500',
-  },
+
 })

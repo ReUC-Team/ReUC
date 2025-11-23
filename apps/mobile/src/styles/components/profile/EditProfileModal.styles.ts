@@ -36,7 +36,7 @@ export const createEditProfileModalStyles = (palette: ColorPalette, fontMode: st
       fontSize: typography.xl,
       fontWeight: 'bold',
       color: palette.text,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     form: {
       paddingHorizontal: spacing.md,
@@ -51,7 +51,7 @@ export const createEditProfileModalStyles = (palette: ColorPalette, fontMode: st
       fontWeight: '600',
       color: palette.text,
       marginBottom: spacing.xs,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     input: {
       borderWidth: 1,
@@ -62,7 +62,7 @@ export const createEditProfileModalStyles = (palette: ColorPalette, fontMode: st
       fontSize: typography.lg,
       color: palette.text,
       backgroundColor: palette.background,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     inputError: {
       borderColor: palette.error,
@@ -103,12 +103,12 @@ export const createEditProfileModalStyles = (palette: ColorPalette, fontMode: st
       fontSize: typography.lg,
       color: palette.text,
       backgroundColor: palette.background,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     phoneCodeText: {
       fontSize: typography.lg,
       color: palette.text,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     phoneFlagButton: {
       backgroundColor: palette.background,
@@ -117,7 +117,7 @@ export const createEditProfileModalStyles = (palette: ColorPalette, fontMode: st
       color: palette.error,
       fontSize: typography.sm,
       marginTop: spacing.xxs,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     buttonContainer: {
       flexDirection: 'row',
@@ -139,7 +139,7 @@ export const createEditProfileModalStyles = (palette: ColorPalette, fontMode: st
       color: palette.text,
       fontSize: typography.lg,
       fontWeight: '600',
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     saveButton: {
       backgroundColor: palette.primary,
@@ -148,6 +148,6 @@ export const createEditProfileModalStyles = (palette: ColorPalette, fontMode: st
       color: palette.onPrimary,
       fontSize: typography.lg,
       fontWeight: '600',
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   })

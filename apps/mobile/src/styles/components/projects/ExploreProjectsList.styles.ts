@@ -22,6 +22,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       marginTop: spacing.md,
       fontSize: typography.base,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     errorContainer: {
       flex: 1,
@@ -36,6 +37,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       fontSize: typography.base,
       color: palette.errorText,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     searchContainer: {
       flexDirection: 'row',
@@ -62,6 +64,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       paddingVertical: spacing.sm,
       fontSize: typography.base,
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     filtersSection: {
       marginBottom: spacing.md,
@@ -73,6 +76,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       marginHorizontal: spacing.md,
       marginBottom: spacing.sm,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     filtersContainer: {
       flexDirection: 'row',
@@ -96,6 +100,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.onGBtn,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     filterTagTextActive: {
       color: palette.onPrimary,
@@ -117,11 +122,13 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       marginTop: spacing.md,
       marginBottom: spacing.xs,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     emptySubtitle: {
       fontSize: typography.base,
       color: palette.textSecondary,
       textAlign: 'center',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     paginationContainer: {
       flexDirection: 'row',
@@ -145,11 +152,13 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     paginationText: {
       fontSize: typography.base,
       fontWeight: '500',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     resultsText: {
       fontSize: typography.sm,
@@ -157,5 +166,6 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
       textAlign: 'center',
       paddingVertical: spacing.md,
       paddingBottom: spacing.xxl,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   })

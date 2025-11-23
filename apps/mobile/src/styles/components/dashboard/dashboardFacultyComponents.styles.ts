@@ -6,7 +6,7 @@ import { spacing } from '../../theme/spacing'
 import { typography } from '../../theme/typography'
 
 // PendingRequests Styles
-export const createPendingRequestsStyles = (palette: ColorPalette) =>
+export const createPendingRequestsStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.background,
@@ -30,11 +30,13 @@ export const createPendingRequestsStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     subtitle: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginTop: 2,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     loadingState: {
       alignItems: 'center',
@@ -44,6 +46,7 @@ export const createPendingRequestsStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginTop: spacing.sm,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     errorState: {
       alignItems: 'center',
@@ -54,6 +57,7 @@ export const createPendingRequestsStyles = (palette: ColorPalette) =>
       color: palette.errorText,
       textAlign: 'center',
       marginBottom: spacing.md,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     retryButton: {
       backgroundColor: palette.error,
@@ -95,10 +99,12 @@ export const createPendingRequestsStyles = (palette: ColorPalette) =>
       fontWeight: '500',
       color: palette.text,
       marginBottom: 4,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     requestCompany: {
       fontSize: typography.sm,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     requestRight: {
       alignItems: 'flex-end',
@@ -112,15 +118,18 @@ export const createPendingRequestsStyles = (palette: ColorPalette) =>
     priorityText: {
       fontSize: typography.sm,
       fontWeight: '500',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     statusText: {
       fontSize: typography.sm,
       fontWeight: '500',
       marginBottom: 2,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     dateText: {
       fontSize: typography.sm,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     emptyState: {
       alignItems: 'center',
@@ -136,7 +145,7 @@ export const createPendingRequestsStyles = (palette: ColorPalette) =>
   })
 
   // LinkedStudents Styles
-export const createLinkedStudentsStyles = (palette: ColorPalette) =>
+export const createLinkedStudentsStyles = (palette: ColorPalette, fontMode:string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.background,
@@ -159,6 +168,7 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     badge: {
       backgroundColor: '#D1FAE5',
@@ -170,6 +180,7 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '500',
       color: '#065F46',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     studentItem: {
       borderWidth: 1,
@@ -186,11 +197,13 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     studentTitle: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginTop: 2,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     statusBadge: {
       paddingHorizontal: spacing.xs,
@@ -200,6 +213,7 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
     statusText: {
       fontSize: typography.sm,
       fontWeight: '500',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     progressSection: {
       marginBottom: spacing.sm,
@@ -214,11 +228,13 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '500',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     progressValue: {
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     progressBarContainer: {
       height: 8,
@@ -242,6 +258,7 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
     lastActivity: {
       fontSize: typography.sm,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     commentButton: {
       backgroundColor: palette.primary,
@@ -253,6 +270,7 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     
     // Modal Styles
@@ -286,11 +304,13 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalSubtitle: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginTop: 2,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalBody: {
       padding: spacing.md,
@@ -304,6 +324,7 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       color: palette.text,
       backgroundColor: palette.surface,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalActions: {
       flexDirection: 'row',
@@ -323,6 +344,7 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     sendButton: {
       paddingHorizontal: spacing.md,
@@ -340,11 +362,12 @@ export const createLinkedStudentsStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
   })
 
   // UploadedLinks Styles
-export const createUploadedLinksStyles = (palette: ColorPalette) =>
+export const createUploadedLinksStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.background,
@@ -367,6 +390,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.lg,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     badge: {
       backgroundColor: '#D1FAE5',
@@ -378,6 +402,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '500',
       color: '#065F46',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     linkItem: {
       borderWidth: 1,
@@ -404,11 +429,13 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: 2,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     linkUrl: {
       fontSize: typography.sm,
       color: '#3B82F6',
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     studentInfo: {
       flexDirection: 'row',
@@ -420,6 +447,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       color: palette.textSecondary,
       flex: 1,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     statusBadge: {
       paddingHorizontal: spacing.xs,
@@ -430,11 +458,13 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
     statusText: {
       fontSize: typography.sm,
       fontWeight: '500',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     description: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginBottom: spacing.sm,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     metaInfo: {
       flexDirection: 'row',
@@ -444,6 +474,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
     metaText: {
       fontSize: typography.sm,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     actions: {
       flexDirection: 'row',
@@ -468,6 +499,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: '#1E40AF',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     secondaryAction: {
       backgroundColor: palette.grayLight,
@@ -476,6 +508,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     reviewAction: {
       backgroundColor: palette.primary,
@@ -484,6 +517,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     viewCommentsAction: {
       backgroundColor: '#D1FAE5',
@@ -525,20 +559,24 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontWeight: '600',
       color: palette.text,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalInfoLabel: {
       fontSize: typography.sm,
       color: palette.textSecondary,
       marginBottom: 4,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalInfoBold: {
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalInfoUrl: {
       fontSize: typography.sm,
       color: '#3B82F6',
       marginBottom: 4,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalBody: {
       padding: spacing.md,
@@ -548,6 +586,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontWeight: '500',
       color: palette.text,
       marginBottom: spacing.xs,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     commentInput: {
       height: 120,
@@ -558,6 +597,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.base,
       color: palette.text,
       backgroundColor: palette.surface,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     modalActions: {
       flexDirection: 'row',
@@ -578,6 +618,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     rejectButton: {
       paddingHorizontal: spacing.sm,
@@ -589,6 +630,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: '#FFFFFF',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     changesButton: {
       paddingHorizontal: spacing.sm,
@@ -600,6 +642,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: '#FFFFFF',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     approveButton: {
       paddingHorizontal: spacing.sm,
@@ -611,5 +654,7 @@ export const createUploadedLinksStyles = (palette: ColorPalette) =>
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+      
     },
   })

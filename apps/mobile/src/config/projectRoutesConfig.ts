@@ -9,6 +9,16 @@ export interface ProjectRoute {
 }
 
 export const PROJECT_ROUTES: ProjectRoute[] = [
+  // ==================== RUTAS GENERALES ====================
+  {
+    screen: 'Dashboard',
+    label: 'Home',
+    icon: 'home-outline',
+    roles: ['outsider', 'student', 'professor', 'admin'],
+    showInSidebar: true,
+  },
+
+  // ==================== RUTAS DE PROYECTOS ====================
   {
     screen: 'ExploreProjects',
     label: 'Explorar proyectos',
@@ -62,7 +72,7 @@ export const PROJECT_ROUTES: ProjectRoute[] = [
     screen: 'FavoriteProjects',
     label: 'Mis favoritos',
     icon: 'star-outline',
-    roles: ['outsider', 'student', 'professor', 'admin'], // ✅ AHORA PARA TODOS
+    roles: ['outsider', 'student', 'professor', 'admin'],
     showInSidebar: true,
   },
 ]
@@ -78,6 +88,16 @@ export const getProjectRoutesByRole = (role: string): ProjectRoute[] => {
  * Obtiene las rutas que deben mostrarse en el sidebar según el rol
  */
 export const getSidebarProjectRoutes = (role: string): ProjectRoute[] => {
+  return PROJECT_ROUTES.filter(
+    (route) => route.roles.includes(role as any) && route.showInSidebar
+  )
+}
+
+/**
+ * ✅ NUEVA: Obtiene las rutas que deben mostrarse en la búsqueda según el rol
+ * (Solo rutas con showInSidebar: true para que no salgan rutas de detalles)
+ */
+export const getSearchRoutesByRole = (role: string): ProjectRoute[] => {
   return PROJECT_ROUTES.filter(
     (route) => route.roles.includes(role as any) && route.showInSidebar
   )

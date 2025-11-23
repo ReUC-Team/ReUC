@@ -3,7 +3,7 @@ import { ColorPalette } from '../../theme/colors';
 import { spacing } from '../../theme/spacing';
 import { typography } from '../../theme/typography';
 
-export const createProfileInfoStyles = (palette: ColorPalette) =>
+export const createProfileInfoStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       backgroundColor: palette.background,
@@ -24,10 +24,12 @@ export const createProfileInfoStyles = (palette: ColorPalette) =>
       fontWeight: '700',
       color: palette.titleDescription,
       marginBottom: spacing.md,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     description: {
       fontSize: typography.lg,
       lineHeight: 24,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
   });
