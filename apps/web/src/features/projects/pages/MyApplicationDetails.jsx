@@ -6,6 +6,7 @@ import ProjectInfoCard from '../components/ProjectInfoCard';
 import AttachmentCard from '../components/AttachmentCard';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments } from '../projectsService';
+import { formatDateStringSpanish } from '@/utils/dateUtils';
 
 export default function MyApplicationDetails() {
   const { uuid } = useParams();
@@ -14,17 +15,7 @@ export default function MyApplicationDetails() {
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
 
-  // Formatear fechas
-  const formatDate = (dateString) => {
-    if (!dateString) return 'No especificada';
-    return new Date(dateString).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  // Función para descargar todos los archivos
+  // Descargar todos los archivos adjuntos
   const handleDownloadAll = async () => {
     if (!application?.attachments || application.attachments.length === 0) {
       alert('No hay archivos para descargar');
@@ -131,7 +122,7 @@ export default function MyApplicationDetails() {
     project,
   } = application;
 
-  // Determinar el estado visual
+  // Configuración de estados visuales
   const statusConfig = {
     pending: {
       label: 'Pendiente de revisión',
@@ -164,12 +155,12 @@ export default function MyApplicationDetails() {
 
   const currentStatus = statusConfig[status] || statusConfig.pending;
 
-  // Preparar información del proyecto
+  // Información del proyecto
   const projectInfo = [
     { 
       label: 'Tipo de proyecto', 
       value: projectTypes.length > 0 
-        ? projectTypes.map(pt => pt.name).join(', ')  // Extraer .name
+        ? projectTypes.map(pt => pt.name).join(', ')
         : 'No especificado' 
     },
     { 
@@ -186,15 +177,19 @@ export default function MyApplicationDetails() {
     },
     { 
       label: 'Fecha límite', 
-      value: formatDate(dueDate) 
+      value: dueDate 
+        ? formatDateStringSpanish(dueDate.split('T')[0])
+        : 'No especificada'
     },
     { 
       label: 'Fecha de creación', 
-      value: formatDate(createdAt) 
+      value: createdAt 
+        ? formatDateStringSpanish(createdAt.split('T')[0])
+        : 'No especificada'
     },
   ];
 
-  // Función para manejar contacto
+  // Manejar contacto con soporte
   const handleContact = () => {
     if (outsider?.email) {
       window.location.href = `mailto:${outsider.email}?subject=Consulta sobre solicitud: ${title}`;
@@ -259,7 +254,7 @@ export default function MyApplicationDetails() {
           )}
         </div>
 
-        {/* Columna derecha: Información */}
+        {/* Columna derecha: Información y acciones */}
         <div className="w-7/12">
           {/* Información del proyecto */}
           <h2 className="text-3xl font-bold mb-3">
@@ -279,7 +274,7 @@ export default function MyApplicationDetails() {
                     ¡Tu solicitud fue aprobada!
                   </h3>
                   <p className="text-sm text-green-700 mb-3">
-                    Esta solicitud se convirtió en un proyecto activo el {formatDate(project.createdAt)}
+                    Esta solicitud se convirtió en un proyecto activo el {formatDateStringSpanish(project.createdAt.split('T')[0])}
                   </p>
                   <button
                     onClick={() => navigate(`/project/${project.uuid_project}`)}

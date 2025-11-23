@@ -8,14 +8,11 @@ export async function getCSRFToken() {
   });
 
   const { csrfToken } = await res.json();
-
   return csrfToken;
 }
 
 /**
  * Obtiene metadata para explorar aplicaciones (facultades disponibles)
- * @returns {Promise<object>} Metadata con facultades
- * @throws {ApplicationError}
  */
 export async function getExploreApplicationsMetadata() {
   const response = await fetchWithAuthAndAutoRefresh(
@@ -31,11 +28,6 @@ export async function getExploreApplicationsMetadata() {
 
 /**
  * Explora aplicaciones con filtros opcionales
- * @param {string|null} facultyName - Nombre/abreviación de facultad para filtrar (ej: "FIE")
- * @param {number} page - Número de página (empieza en 1)
- * @param {number} limit - Items por página
- * @returns {Promise<{applications: Array, pagination: object}>}
- * @throws {ApplicationError}
  */
 export async function exploreApplications(facultyName = null, page = 1, limit = 9) {
   // Construir URL base
@@ -72,8 +64,6 @@ export async function exploreApplications(facultyName = null, page = 1, limit = 
 
 /**
  * Obtiene metadata para crear una aplicación
- * @returns {Promise<object>} Metadata con facultades, tipos de proyecto, etc.
- * @throws {ApplicationError}
  */
 export async function getCreateMetadata() {
   const response = await fetchWithAuthAndAutoRefresh(
@@ -100,9 +90,6 @@ export async function getCreateMetadata() {
 
 /**
  * Crea una nueva aplicación
- * @param {FormData} formData - Datos del formulario
- * @returns {Promise<object>} Aplicación creada
- * @throws {ValidationError|ApplicationError}
  */
 export async function createApplication(formData) {
   const csrfToken = await getCSRFToken();
@@ -123,8 +110,6 @@ export async function createApplication(formData) {
 
 /**
  * Obtiene el estado del perfil del usuario
- * @returns {Promise<{status: {isComplete: boolean}}>}
- * @throws {AuthenticationError|ApplicationError}
  */
 export async function getProfileStatus() {
   const response = await fetchWithAuthAndAutoRefresh(
@@ -140,9 +125,6 @@ export async function getProfileStatus() {
 
 /**
  * Obtiene los detalles de una aplicación específica
- * @param {string} uuid - UUID de la aplicación
- * @returns {Promise<object>} Detalles completos de la aplicación
- * @throws {NotFoundError|ApplicationError}
  */
 export async function getApplicationDetails(uuid) {
   const response = await fetchWithAuthAndAutoRefresh(
@@ -156,8 +138,8 @@ export async function getApplicationDetails(uuid) {
   const app = response.data.application;
 
   return {
-
     uuid_application: uuid,
+    
     // Información básica del proyecto
     title: app.details?.title || 'Sin título',
     shortDescription: app.details?.shortDescription || 'Sin descripción corta',
@@ -165,7 +147,8 @@ export async function getApplicationDetails(uuid) {
     
     // Fechas
     dueDate: app.details?.deadline,
-    createdAt: app.createdAt,
+    createdAt: app.details?.createdAt,
+    
     status: app.status || 'pending',
     
     // Banner con verificación de URL absoluta
@@ -196,15 +179,17 @@ export async function getApplicationDetails(uuid) {
       } : null,
     },
 
+    // Metadata (arrays de objetos con id y name)
     faculties: app.details?.faculties || [],  
     projectTypes: app.details?.projectTypes || [],
     problemTypes: app.details?.problemTypes || [],
     
+    // Arrays de IDs (para el modal de edición)
     facultyIds: (app.details?.faculties || []).map(f => f.id),
     projectTypeIds: (app.details?.projectTypes || []).map(pt => pt.id),
     problemTypeIds: (app.details?.problemTypes || []).map(pt => pt.id),
     
-    
+    // Outsider (legacy, para compatibilidad)
     outsider: {
       firstName: app.author?.fullName?.split(' ')[0] || 'No especificado',
       lastName: app.author?.fullName?.split(' ').slice(1).join(' ') || '',
@@ -214,7 +199,7 @@ export async function getApplicationDetails(uuid) {
       location: app.author?.outsider?.location || 'No especificado',
     },
     
-    // Facultad (legacy)
+    // Facultad (legacy, para compatibilidad)
     faculty: app.details?.faculties?.length > 0 
       ? { 
           name: app.details.faculties[0].name, 
@@ -226,19 +211,12 @@ export async function getApplicationDetails(uuid) {
 
 /**
  * Descarga un archivo individual y lo abre en nueva pestaña o descarga según el tipo
- * @param {string} downloadUrl - URL del archivo con ticket
- * @param {string} fileName - Nombre del archivo
- * @param {string} mimeType - Tipo MIME del archivo
- * @param {boolean} forceDownload - Si es true, fuerza la descarga en lugar de abrir
- * @returns {Promise<void>}
  */
 export async function downloadFile(downloadUrl, fileName, mimeType, forceDownload = false) {
   try {
-    
-    // Agregar credentials: 'include' para enviar cookies de sesión
     const response = await fetch(downloadUrl, {
       method: 'GET',
-      credentials: 'include', // Envía cookies de autenticación
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -257,7 +235,6 @@ export async function downloadFile(downloadUrl, fileName, mimeType, forceDownloa
         throw new Error('No se pudo abrir la ventana. Verifica que tu navegador permita ventanas emergentes.');
       }
       
-      // Limpiar después de un tiempo para liberar memoria
       setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
       return;
     }
@@ -273,7 +250,6 @@ export async function downloadFile(downloadUrl, fileName, mimeType, forceDownloa
     document.body.appendChild(link);
     link.click();
     
-    // Limpiar
     setTimeout(() => {
       document.body.removeChild(link);
       URL.revokeObjectURL(objectUrl);
@@ -286,8 +262,6 @@ export async function downloadFile(downloadUrl, fileName, mimeType, forceDownloa
 
 /**
  * Descarga todos los archivos adjuntos de un proyecto
- * @param {Array} attachments - Array de objetos con downloadUrl, name, type
- * @returns {Promise<{successful: number, failed: number, errors: Array}>}
  */
 export async function downloadAllAttachments(attachments) {
   if (!attachments || attachments.length === 0) {
@@ -303,13 +277,12 @@ export async function downloadAllAttachments(attachments) {
     const file = attachments[i];
     
     try {
-      
       await downloadFile(file.downloadUrl, file.name, file.type, true);
       successful++;
       
       // Delay entre descargas para evitar bloqueo del navegador
       if (i < attachments.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 800)); // 800ms de delay
+        await new Promise(resolve => setTimeout(resolve, 800));
       }
     } catch (error) {
       failed++;
@@ -323,38 +296,26 @@ export async function downloadAllAttachments(attachments) {
 
 /**
  * Aprueba una Application y crea un Project
- * @param {string} uuid_application - UUID de la Application a aprobar
- * @param {object} projectData - Datos del proyecto
- * @returns {Promise<object>} Project creado
- * @throws {ValidationError|ApplicationError}
  */
 export async function approveApplication(uuid_application, projectData = {}) {
   const csrfToken = await getCSRFToken();
 
-  // ✅ Construir payload solo con campos que tengan valor
   const payload = {
     uuidApplication: uuid_application,
     title: projectData.title,
     shortDescription: projectData.shortDescription,
     description: projectData.description,
-    estimatedDate: projectData.estimatedDate,
-    
-    projectTypeId: projectData.projectType?.[0] || null,  
-    facultyIds: projectData.faculty || [],                
-    problemTypeIds: projectData.problemType || [],
+    deadline: projectData.deadline || projectData.estimatedDate,
+    projectType: Array.isArray(projectData.projectType) 
+      ? projectData.projectType[0]
+      : projectData.projectType,
+    problemType: projectData.problemType || [],
+    faculty: projectData.faculty,
   };
 
-  // ✅ Solo agregar problemTypeOther si existe
   if (projectData.problemTypeOther !== undefined && projectData.problemTypeOther !== null) {
     payload.problemTypeOther = projectData.problemTypeOther;
   }
-
-  // ✅ Solo agregar estimatedEffortHours si existe
-  if (projectData.estimatedEffortHours !== undefined) {
-    payload.estimatedEffortHours = projectData.estimatedEffortHours;
-  }
-
-  console.log("📤 [projectsService] Payload final:", payload);
 
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/project/create`,
@@ -368,18 +329,11 @@ export async function approveApplication(uuid_application, projectData = {}) {
     }
   );
 
-  console.log("✅ [projectsService] Respuesta completa del backend:", response);
-
-  // ✅ Retornar response.data (contiene { project: {...} })
   return response.data;
 }
 
 /**
  * Obtiene todas las applications del usuario autenticado
- * @param {number} page - Número de página
- * @param {number} limit - Items por página
- * @returns {Promise<{applications: Array, pagination: object}>}
- * @throws {ApplicationError}
  */
 export async function getMyApplications(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
@@ -408,10 +362,6 @@ export async function getMyApplications(page = 1, limit = 9) {
 
 /**
  * Obtiene todos los proyectos aprobados del usuario autenticado
- * @param {number} page - Número de página
- * @param {number} limit - Items por página
- * @returns {Promise<{projects: Array, pagination: object}>}
- * @throws {ApplicationError}
  */
 export async function getMyProjects(page = 1, limit = 9) {
   const response = await fetchWithAuthAndAutoRefresh(
@@ -425,7 +375,6 @@ export async function getMyProjects(page = 1, limit = 9) {
   const records = response.data.projects.records;
   const paginationData = response.data.projects.metadata.pagination;
 
-  // Convertir URLs relativas a absolutas
   const projects = records.map((proj) => ({
     ...proj,
     bannerUrl: proj.bannerUrl?.startsWith('http') 
@@ -439,13 +388,8 @@ export async function getMyProjects(page = 1, limit = 9) {
   };
 }
 
-// Línea 416-490: REEMPLAZAR función getProjectDetails
-
 /**
  * Obtiene los detalles completos de un proyecto específico
- * @param {string} uuid - UUID del proyecto
- * @returns {Promise<Object>} Detalles del proyecto
- * @throws {ApplicationError}
  */
 export async function getProjectDetails(uuid) {
   const response = await fetchWithAuthAndAutoRefresh(
@@ -457,29 +401,24 @@ export async function getProjectDetails(uuid) {
   );
 
   const proj = response.data.project;
-
-  console.log("✅ [getProjectDetails] Respuesta del backend:", proj);
-
-  // ✅ Extraer datos correctamente según la estructura real del backend
   const details = proj.details || {};
   const author = proj.author || {};
 
   return {
-    // IDs
     uuid_project: proj.uuid_project,
     uuidApplication: proj.uuidApplication,
 
-    // Información básica del proyecto
+    // Información básica
     title: details.title || 'Sin título',
     description: details.description || 'Sin descripción',
     shortDescription: details.shortDescription || 'Sin descripción corta',
     
-    // Banner con URL absoluta
+    // Banner
     bannerUrl: proj.bannerUrl?.startsWith('http')
       ? proj.bannerUrl
       : proj.bannerUrl ? `${API_URL}${proj.bannerUrl}` : null,
     
-    // Attachments con URLs absolutas
+    // Attachments
     attachments: (proj.appAttachments || []).map(att => ({
       downloadUrl: att.downloadUrl?.startsWith('http') 
         ? att.downloadUrl 
@@ -505,19 +444,12 @@ export async function getProjectDetails(uuid) {
       } : null,
     },
     
-    // ✅ Metadata del proyecto (extraído de details)
-    projectTypes: details.projectType ? [{
-      name: details.projectType.name,
-      minEstimatedMonths: details.projectType.minEstimatedMonths,
-      maxEstimatedMonths: details.projectType.maxEstimatedMonths,
-      requiredHours: details.projectType.requiredHours,
-    }] : [],
-    
+    // Metadata del proyecto
+    projectTypes: details.projectTypes || [],
     faculties: details.faculties || [],
-    
     problemTypes: details.problemTypes || [],
     
-    // ✅ Team members (extraído de details.teamMembers)
+    // Team members
     teamMembers: (details.teamMembers || []).map(member => ({
       uuid_user: member.uuid_user,
       fullName: member.fullName,
@@ -526,28 +458,19 @@ export async function getProjectDetails(uuid) {
       role: member.role,
     })),
     
-    // Estado del proyecto
+    // Estado
     status: details.status?.name || 'approved',
     statusDescription: details.status?.description,
     
     // Fechas
     createdAt: details.createdAt,
-    estimatedDate: details.estimatedDate,
-    estimatedEffortHours: details.estimatedEffortHours,
+    estimatedDate: details.deadline,
+    estimatedEffortHours: details.estimatedEffortHours || null,
   };
 }
+
 /**
  * Edita una Application existente (solo metadata)
- * @param {string} uuid - UUID de la Application
- * @param {object} editData - Datos a editar
- * @param {Array<number>} editData.projectType - IDs de tipos de proyecto
- * @param {Array<number>} editData.faculty - IDs de facultades
- * @param {Array<number>} editData.problemType - IDs de tipos de problemática
- * @param {string|null} editData.problemTypeOther - Descripción si "Otro" está seleccionado
- * @param {string} editData.deadline - Nueva fecha límite (YYYY-MM-DD)
- * @param {string} editData.editReason - Razón de la edición
- * @returns {Promise<object>} Application actualizada
- * @throws {ValidationError|ApplicationError}
  */
 export async function editApplication(uuid, editData) {
   const csrfToken = await getCSRFToken();
@@ -568,6 +491,52 @@ export async function editApplication(uuid, editData) {
         deadline: editData.deadline,
         editReason: editData.editReason,
       }),
+    }
+  );
+
+  return response.data;
+}
+
+/**
+ * Actualiza una Application existente (solo metadata)
+ */
+export async function updateApplication(uuid, editData) {
+  const csrfToken = await getCSRFToken();
+
+  const payload = {
+    title: editData.title,
+    shortDescription: editData.shortDescription,
+    description: editData.description,
+    deadline: editData.deadline,
+  };
+
+  if (editData.projectType !== undefined) {
+    payload.projectType = Array.isArray(editData.projectType) 
+      ? editData.projectType[0]
+      : editData.projectType;
+  }
+
+  if (editData.faculty !== undefined) {
+    payload.faculty = editData.faculty;
+  }
+
+  if (editData.problemType !== undefined) {
+    payload.problemType = editData.problemType;
+  }
+
+  if (editData.problemTypeOther !== undefined && editData.problemTypeOther !== null) {
+    payload.problemTypeOther = editData.problemTypeOther;
+  }
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/${uuid}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "csrf-token": csrfToken,
+      },
+      body: JSON.stringify(payload),
     }
   );
 

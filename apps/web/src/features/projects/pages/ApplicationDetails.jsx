@@ -8,6 +8,7 @@ import EditApplicationModal from '../components/EditApplicationModal';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments, approveApplication } from '../projectsService';
 import { Alerts } from '@/shared/alerts';
+import { formatDateStringSpanish } from '@/utils/dateUtils';
 
 export default function ApplicationDetails() {
   const { uuid } = useParams();
@@ -18,37 +19,23 @@ export default function ApplicationDetails() {
   const [isApproving, setIsApproving] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  // Handler para abrir modal de edición
   const handleEditClick = () => {
     setIsEditModalOpen(true);
   };
 
-  // Handler cuando se aprueba exitosamente desde el modal
-// Línea 27-36: REEMPLAZAR handleApproveSuccess
-
-// ✅ Handler cuando se aprueba exitosamente desde el modal
-const handleApproveSuccess = (projectUuid) => {
-  console.log("✅ Proyecto aprobado con UUID:", projectUuid);
-  
-  Alerts.success('¡Proyecto aprobado exitosamente!');
-  
-  setTimeout(() => {
-    // ✅ Redirigir a los detalles del proyecto creado
-    navigate(`/my-projects/${projectUuid}`);
-  }, 1500);
-};
-
-  // Formatear fechas
-  const formatDate = (dateString) => {
-    if (!dateString) return 'No especificada';
-    return new Date(dateString).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const handleEditSuccess = () => {
+    refetch();
+    Alerts.success("Cambios guardados exitosamente");
   };
 
-  // Función para descargar todos los archivos
+  const handleApproveSuccess = (projectUuid) => {
+    Alerts.success('¡Proyecto aprobado exitosamente!');
+    setTimeout(() => {
+      navigate(`/my-projects/${projectUuid}`);
+    }, 1500);
+  };
+
+  // Descargar todos los archivos adjuntos
   const handleDownloadAll = async () => {
     if (!application?.attachments || application.attachments.length === 0) {
       alert('No hay archivos para descargar');
@@ -72,109 +59,88 @@ const handleApproveSuccess = (projectUuid) => {
     } finally {
       setIsDownloadingAll(false);
     }
-  }; 
+  };
 
-  // ✅ Handler para aprobar directamente (SIN editar)
-// Línea 84-130: Actualizar función handleApprove
+  // Aprobar proyecto sin modificaciones
+  const handleApprove = async () => {
+    const result = await Alerts.confirm({
+      title: '¿Aprobar este proyecto?',
+      text: 'Esta acción creará un nuevo proyecto activo basado en esta solicitud SIN modificaciones.',
+      confirmText: 'Sí, aprobar',
+      cancelText: 'Cancelar',
+    });
 
-// Línea 84-140: Actualizar handleApprove
-
-// Línea 84-140: REEMPLAZAR función handleApprove completa
-
-// Línea 84-145: REEMPLAZAR handleApprove
-
-// Línea 84-145: REEMPLAZAR handleApprove
-
-const handleApprove = async () => {
-  const result = await Alerts.confirm({
-    title: '¿Aprobar este proyecto?',
-    text: 'Esta acción creará un nuevo proyecto activo basado en esta solicitud SIN modificaciones.',
-    confirmText: 'Sí, aprobar',
-    cancelText: 'Cancelar',
-  });
-
-  if (!result.isConfirmed) {
-    return;
-  }
-
-  setIsApproving(true);
-  
-  try {
-    // Extraer IDs de los arrays
-    const projectTypeIds = application.projectTypes.map(pt => pt.id);
-    const facultyIds = application.faculties.map(f => f.id);
-    const problemTypeIds = application.problemTypes.map(pt => pt.id);
-
-    // Validaciones
-    if (projectTypeIds.length === 0) {
-      Alerts.warning('El proyecto debe tener al menos un tipo de proyecto');
-      setIsApproving(false);
-      return;
-    }
-    if (facultyIds.length === 0) {
-      Alerts.warning('El proyecto debe tener al menos una facultad');
-      setIsApproving(false);
-      return;
-    }
-    if (problemTypeIds.length === 0) {
-      Alerts.warning('El proyecto debe tener al menos un tipo de problemática');
-      setIsApproving(false);
+    if (!result.isConfirmed) {
       return;
     }
 
-    const projectData = {
-      title: application.title,
-      shortDescription: application.shortDescription,
-      description: application.detailedDescription,
-      estimatedDate: application.dueDate?.split('T')[0] || null,
-      projectType: projectTypeIds,
-      faculty: facultyIds,
-      problemType: problemTypeIds,
-    };
-
-    console.log("📤 Aprobando proyecto directo:", projectData);
-
-    const loadingAlert = Alerts.loading('Aprobando proyecto...');
-
+    setIsApproving(true);
+    
     try {
-      const response = await approveApplication(uuid, projectData);
-      
-      loadingAlert.close();
+      const projectTypeIds = application.projectTypes.map(pt => pt.id);
+      const facultyIds = application.faculties.map(f => f.id);
+      const problemTypeIds = application.problemTypes.map(pt => pt.id);
 
-      console.log('✅ Respuesta del backend:', response);
-
-      // ✅ Extraer UUID del proyecto creado
-      const projectUuid = response?.project?.uuid_project;
-
-      if (!projectUuid) {
-        console.error("❌ Backend no retornó uuid_project:", response);
-        throw new Error("No se pudo obtener el UUID del proyecto creado");
+      if (projectTypeIds.length === 0) {
+        Alerts.warning('El proyecto debe tener al menos un tipo de proyecto');
+        setIsApproving(false);
+        return;
+      }
+      if (facultyIds.length === 0) {
+        Alerts.warning('El proyecto debe tener al menos una facultad');
+        setIsApproving(false);
+        return;
+      }
+      if (problemTypeIds.length === 0) {
+        Alerts.warning('El proyecto debe tener al menos un tipo de problemática');
+        setIsApproving(false);
+        return;
       }
 
-      Alerts.success('¡Proyecto aprobado exitosamente!');
-      
-      setTimeout(() => {
-        // ✅ Redirigir a los detalles del proyecto creado
-        navigate(`/my-projects/${projectUuid}`);
-      }, 1500);
+      const projectData = {
+        title: application.title,
+        shortDescription: application.shortDescription,
+        description: application.detailedDescription,
+        estimatedDate: application.dueDate?.split('T')[0] || null,
+        projectType: projectTypeIds,
+        faculty: facultyIds,
+        problemType: problemTypeIds,
+      };
+
+      const loadingAlert = Alerts.loading('Aprobando proyecto...');
+
+      try {
+        const response = await approveApplication(uuid, projectData);
+        
+        loadingAlert.close();
+
+        const projectUuid = response?.project?.uuid_project;
+
+        if (!projectUuid) {
+          throw new Error("No se pudo obtener el UUID del proyecto creado");
+        }
+
+        Alerts.success('¡Proyecto aprobado exitosamente!');
+        
+        setTimeout(() => {
+          navigate(`/my-projects/${projectUuid}`);
+        }, 1500);
+        
+      } catch (error) {
+        loadingAlert.close();
+        throw error;
+      }
       
     } catch (error) {
-      loadingAlert.close();
-      throw error;
+      if (error.message) {
+        Alerts.error(error.message);
+      } else {
+        Alerts.error('No se pudo aprobar el proyecto. Por favor, intenta nuevamente.');
+      }
+    } finally {
+      setIsApproving(false);
     }
-    
-  } catch (error) {
-    console.error('❌ Error al aprobar proyecto:', error);
-    
-    if (error.message) {
-      Alerts.error(error.message);
-    } else {
-      Alerts.error('No se pudo aprobar el proyecto. Por favor, intenta nuevamente.');
-    }
-  } finally {
-    setIsApproving(false);
-  }
-};
+  };
 
   // Loading state
   if (isLoading) {
@@ -241,6 +207,7 @@ const handleApprove = async () => {
     );
   }
 
+  // Extraer datos de la aplicación
   const {
     title,
     shortDescription,
@@ -270,6 +237,7 @@ const handleApprove = async () => {
   const isOutsider = !!outsiderData;
   const authorRole = isOutsider ? 'Outsider' : 'Profesor';
 
+  // Información del solicitante
   const applicantInfo = [
     { 
       label: 'Nombre del solicitante', 
@@ -300,6 +268,7 @@ const handleApprove = async () => {
     ]),
   ];
 
+  // Información del proyecto
   const projectInfo = [
     { 
       label: 'Tipo de proyecto', 
@@ -321,11 +290,15 @@ const handleApprove = async () => {
     },
     { 
       label: 'Fecha límite', 
-      value: formatDate(dueDate) 
+      value: dueDate 
+        ? formatDateStringSpanish(dueDate.split('T')[0])
+        : 'No especificada'
     },
     { 
       label: 'Fecha de creación', 
-      value: formatDate(createdAt) 
+      value: createdAt 
+        ? formatDateStringSpanish(createdAt.split('T')[0])
+        : 'No especificada'
     },
     { 
       label: 'Estado', 
@@ -384,7 +357,7 @@ const handleApprove = async () => {
           )}
         </div>
 
-        {/* Columna derecha: Información */}
+        {/* Columna derecha: Información y acciones */}
         <div className="w-7/12">
           {/* Información del solicitante */}
           <h2 className="text-3xl font-bold mb-3">
@@ -402,7 +375,7 @@ const handleApprove = async () => {
           <div className="flex flex-col gap-3 pt-4 w-11/12">
             {/* Primera fila: Editar + Aceptar */}
             <div className='flex gap-5'>
-              {/* ✅ Botón Editar proyecto */}
+              {/* Botón Editar proyecto */}
               <button 
                 onClick={handleEditClick}
                 disabled={isApproving || isAlreadyApproved}
@@ -419,7 +392,7 @@ const handleApprove = async () => {
                 {isAlreadyApproved ? 'Ya aprobado' : 'Editar proyecto'}
               </button>
 
-              {/* ✅ Botón Aceptar Proyecto (directo, sin editar) */}
+              {/* Botón Aceptar Proyecto (directo, sin editar) */}
               <button 
                 onClick={handleApprove}
                 disabled={isApproving || isAlreadyApproved}
@@ -513,7 +486,8 @@ const handleApprove = async () => {
         onClose={() => setIsEditModalOpen(false)}
         uuid={uuid}
         application={application}
-        onSuccess={handleApproveSuccess}
+        onEditSuccess={handleEditSuccess}
+        onApproveSuccess={handleApproveSuccess}
       />
     </section>
   );

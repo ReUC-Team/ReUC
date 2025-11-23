@@ -6,6 +6,7 @@ import ProjectInfoCard from '../components/ProjectInfoCard';
 import AttachmentCard from '../components/AttachmentCard';
 import useProjectDetails from '../hooks/useProjectDetails';
 import { downloadAllAttachments } from '../projectsService';
+import { formatDateStringSpanish } from '@/utils/dateUtils';
 
 export default function ProjectDetails() {
   const { uuid } = useParams();
@@ -14,17 +15,7 @@ export default function ProjectDetails() {
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
 
-  // Formatear fechas
-  const formatDate = (dateString) => {
-    if (!dateString) return 'No especificada';
-    return new Date(dateString).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  // Función para descargar todos los archivos
+  // Descargar todos los archivos adjuntos
   const handleDownloadAll = async () => {
     if (!project?.attachments || project.attachments.length === 0) {
       alert('No hay archivos para descargar');
@@ -115,34 +106,24 @@ export default function ProjectDetails() {
     );
   }
 
-const {
-  title,
-  description,
-  shortDescription,
-  bannerUrl,
-  faculties = [],
-  author,
-  projectTypes = [],
-  problemTypes = [],
-  status,
-  statusDescription,
-  createdAt,
-  estimatedDate,
-  estimatedEffortHours,
-  teamMembers = [],
-  attachments = [],
-} = project;
-
-console.log("📊 [ProjectDetails] Datos del proyecto:", {
-  title,
-  projectTypes,
-  faculties,
-  problemTypes,
-  estimatedDate,
-  createdAt,
-  status,
-  teamMembers
-});
+  // Extraer datos del proyecto
+  const {
+    title,
+    description,
+    shortDescription,
+    bannerUrl,
+    faculties = [],
+    author,
+    projectTypes = [],
+    problemTypes = [],
+    status,
+    statusDescription,
+    createdAt,
+    estimatedDate,
+    estimatedEffortHours,
+    teamMembers = [],
+    attachments = [],
+  } = project;
 
   // Obtener datos del autor
   const authorFirstName = author?.firstName || 'No especificado';
@@ -161,102 +142,96 @@ console.log("📊 [ProjectDetails] Datos del proyecto:", {
   const authorRole = isOutsider ? 'Outsider' : 'Profesor';
 
   // Información del autor
-// Línea 120-130: ACTUALIZAR authorInfo
-
-const authorInfo = [
-  { 
-    label: 'Nombre', 
-    value: author?.fullName || 'No especificado' 
-  },
-  { 
-    label: 'Correo', 
-    value: author?.email || 'No especificado' 
-  },
-  { 
-    label: 'Matrícula', 
-    value: author?.universityId || 'No especificada' 
-  },
-  { 
-    label: 'Tipo de usuario', 
-    value: author?.roleName === 'professor' ? 'Profesor' :
-           author?.roleName === 'student' ? 'Estudiante' :
-           author?.roleName === 'outsider' ? 'Externo' :
-           author?.roleName || 'No especificado'
-  },
-  ...(author?.outsider ? [
+  const authorInfo = [
     { 
-      label: 'Organización', 
-      value: author.outsider.organizationName 
+      label: 'Nombre', 
+      value: author?.fullName || 'No especificado' 
     },
     { 
-      label: 'Teléfono', 
-      value: author.outsider.phoneNumber 
+      label: 'Correo', 
+      value: author?.email || 'No especificado' 
     },
     { 
-      label: 'Ubicación', 
-      value: author.outsider.location 
+      label: 'Matrícula', 
+      value: author?.universityId || 'No especificada' 
     },
-  ] : [
     { 
-      label: 'Información', 
-      value: author?.roleName === 'professor' 
-        ? 'Proyecto creado por un profesor' 
-        : author?.roleName === 'student'
-        ? 'Proyecto creado por un estudiante'
-        : 'Proyecto creado por un usuario externo'
-    }
-  ])
-];
+      label: 'Tipo de usuario', 
+      value: author?.roleName === 'professor' ? 'Profesor' :
+             author?.roleName === 'student' ? 'Estudiante' :
+             author?.roleName === 'outsider' ? 'Externo' :
+             author?.roleName || 'No especificado'
+    },
+    ...(author?.outsider ? [
+      { 
+        label: 'Organización', 
+        value: author.outsider.organizationName 
+      },
+      { 
+        label: 'Teléfono', 
+        value: author.outsider.phoneNumber 
+      },
+      { 
+        label: 'Ubicación', 
+        value: author.outsider.location 
+      },
+    ] : [
+      { 
+        label: 'Información', 
+        value: author?.roleName === 'professor' 
+          ? 'Proyecto creado por un profesor' 
+          : author?.roleName === 'student'
+          ? 'Proyecto creado por un estudiante'
+          : 'Proyecto creado por un usuario externo'
+      }
+    ])
+  ];
 
   // Información del proyecto
-// Línea 80-110: ACTUALIZAR projectInfo
+  const projectInfo = [
+    { 
+      label: 'Tipo de proyecto', 
+      value: projectTypes.length > 0 
+        ? projectTypes.map(pt => pt.name).join(', ')
+        : 'No especificado' 
+    },
+    { 
+      label: 'Facultades', 
+      value: faculties.length > 0 
+        ? faculties.map(f => f.name).join(', ')
+        : 'No especificada' 
+    },
+    { 
+      label: 'Tipo de problemática', 
+      value: problemTypes.length > 0 
+        ? problemTypes.map(pt => pt.name).join(', ')
+        : 'No especificado' 
+    },
+    { 
+      label: 'Fecha límite', 
+      value: estimatedDate 
+        ? formatDateStringSpanish(estimatedDate.split('T')[0])
+        : 'No especificada'
+    },
+    { 
+      label: 'Fecha de creación', 
+      value: createdAt 
+        ? formatDateStringSpanish(createdAt.split('T')[0])
+        : 'No especificada'
+    },
+    { 
+      label: 'Estado', 
+      value: status || 'Aprobado'
+    },
+  ];
 
-const projectInfo = [
-  { 
-    label: 'Tipo de proyecto', 
-    value: projectTypes.length > 0 
-      ? projectTypes.map(pt => pt.name).join(', ')
-      : 'No especificado' 
-  },
-  { 
-    label: 'Facultades', 
-    value: faculties.length > 0 
-      ? faculties.map(f => f.name).join(', ')
-      : 'No especificada' 
-  },
-  { 
-    label: 'Tipo de problemática', 
-    value: problemTypes.length > 0 
-      ? problemTypes.map(pt => pt.name).join(', ')
-      : 'No especificado' 
-  },
-  { 
-    label: 'Fecha estimada', 
-    value: estimatedDate ? formatDate(estimatedDate) : 'No especificada'
-  },
-  { 
-    label: 'Horas estimadas', 
-    value: estimatedEffortHours ? `${estimatedEffortHours} horas` : 'No especificadas'
-  },
-  { 
-    label: 'Fecha de creación', 
-    value: createdAt ? formatDate(createdAt) : 'No especificada'
-  },
-  { 
-    label: 'Estado', 
-    value: status || 'Aprobado'
-  },
-];
+  // Información del equipo
+  const teamInfo = teamMembers.map(member => ({
+    label: member.role || 'Miembro',
+    value: `${member.fullName || 'Sin nombre'} (${member.email}) - ${member.universityId || 'Sin matrícula'}`
+  }));
 
-// Línea 140-160: ACTUALIZAR teamInfo
-
-// ✅ Información del equipo
-const teamInfo = teamMembers.map(member => ({
-  label: member.role || 'Miembro',
-  value: `${member.fullName || 'Sin nombre'} (${member.email}) - ${member.universityId || 'Sin matrícula'}`
-}));
-
-  // Función para contactar
+  // Manejar contacto con el autor
   const handleContact = () => {
     if (authorEmail) {
       window.location.href = `mailto:${authorEmail}?subject=Consulta sobre proyecto: ${title}`;
@@ -313,7 +288,7 @@ const teamInfo = teamMembers.map(member => ({
           )}
         </div>
 
-        {/* Columna derecha: Información */}
+        {/* Columna derecha: Información y acciones */}
         <div className="w-7/12">
           {/* Información del autor */}
           <h2 className="text-3xl font-bold mb-3">
@@ -327,15 +302,15 @@ const teamInfo = teamMembers.map(member => ({
           </h2>
           <ProjectInfoCard items={projectInfo} />
 
-          {/* ✅ Sección de Equipo (si hay miembros) */}
-{project.teamMembers && project.teamMembers.length > 0 && (
-  <>
-    <h2 className="text-3xl font-bold mb-3 mt-8">
-      Equipo del <span className="text-lime-700">proyecto</span>
-    </h2>
-    <ProjectInfoCard items={teamInfo} />
-  </>
-)}
+          {/* Sección de Equipo (si hay miembros) */}
+          {project.teamMembers && project.teamMembers.length > 0 && (
+            <>
+              <h2 className="text-3xl font-bold mb-3 mt-8">
+                Equipo del <span className="text-lime-700">proyecto</span>
+              </h2>
+              <ProjectInfoCard items={teamInfo} />
+            </>
+          )}
 
           {/* Botones de acción */}
           <div className="flex flex-col gap-3 pt-6 w-11/12">
@@ -389,7 +364,7 @@ const teamInfo = teamMembers.map(member => ({
               <div>
                 <p className="font-semibold mb-1">Proyecto aprobado</p>
                 <p className="text-xs">
-                  Este proyecto fue aprobado el {formatDate(createdAt)}. Puedes gestionar su progreso desde esta página.
+                  Este proyecto fue aprobado el {formatDateStringSpanish(createdAt.split('T')[0])}. Puedes gestionar su progreso desde esta página.
                 </p>
               </div>
             </div>

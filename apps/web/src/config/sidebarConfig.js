@@ -25,11 +25,11 @@ export const SIDEBAR_ITEMS = {
       label: 'Mis proyectos',
       icon: 'myProjects'
     },
-    {
-      path: '/favorite-projects',
-      label: 'Mis favoritos',
-      icon: 'favorites'
-    }
+    // {
+    //   path: '/favorite-projects',
+    //   label: 'Mis favoritos',
+    //   icon: 'favorites'
+    // }
   ],
   
   // STUDENT - Puede explorar y aplicar a proyectos
@@ -54,11 +54,11 @@ export const SIDEBAR_ITEMS = {
       label: 'Mis proyectos',
       icon: 'myProjects'
     },
-    {
-      path: '/favorite-projects',
-      label: 'Mis favoritos',
-      icon: 'favorites'
-    }
+    // {
+    //   path: '/favorite-projects',
+    //   label: 'Mis favoritos',
+    //   icon: 'favorites'
+    // }
   ],
   
   // PROFESSOR - Puede explorar, solicitar y gestionar proyectos
@@ -88,16 +88,16 @@ export const SIDEBAR_ITEMS = {
       label: 'Mis proyectos',
       icon: 'myProjects'
     },
-    {
-      path: '/favorite-projects',
-      label: 'Mis favoritos',
-      icon: 'favorites'
-    },
-    {
-      path: '/members',
-      label: 'Miembros',
-      icon: 'members'
-    }
+    // {
+    //   path: '/favorite-projects',
+    //   label: 'Mis favoritos',
+    //   icon: 'favorites'
+    // },
+    // {
+    //   path: '/members',
+    //   label: 'Miembros',
+    //   icon: 'members'
+    // }
   ],
   
   // ADMIN - Acceso completo + panel de administración
