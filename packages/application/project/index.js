@@ -6,6 +6,8 @@ import { getTeamCreationFormData } from "./getTeamCreationFormData.js";
 import { getDetailedProject } from "./getDetailedProject.js";
 import { updateTeamMember } from "./updateTeamMember.js";
 import { deleteTeamMember } from "./deleteTeamMember.js";
+import { start } from "./start.js";
+import { rollback } from "./rollback.js";
 
 /**
  * The 'project' entity in the application layer, grouping all project
@@ -13,6 +15,8 @@ import { deleteTeamMember } from "./deleteTeamMember.js";
  */
 const project = {
   create,
+  start,
+  rollback,
   myProjects,
   getProjects,
   createTeam,

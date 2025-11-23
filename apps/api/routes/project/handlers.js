@@ -142,3 +142,37 @@ export async function deleteTeamMemberHandler(req, res) {
     message: "Team member removed successfully.",
   });
 }
+
+/**
+ * Handles the starting of the project.
+ */
+export async function startProjectHandler(req, res) {
+  const user = req.user;
+  const { uuid: uuidProject } = req.params;
+
+  const { project: projectData } = await project.start(
+    uuidProject,
+    user.uuid_user
+  );
+
+  return res.status(201).json({
+    success: true,
+    data: { project: projectData },
+  });
+}
+
+/**
+ * Handles the rollback of a project to application status.
+ */
+export async function rollbackProjectHandler(req, res) {
+  const user = req.user;
+  const { uuid: uuidProject } = req.params;
+
+  await project.rollback(uuidProject, user.uuid_user);
+
+  return res.status(200).json({
+    success: true,
+    data: {},
+    message: "Project successfully rolled back to Application.",
+  });
+}
