@@ -12,6 +12,20 @@
       "example": "A brief summary of the project."
     },
     "uuidApplication": { "type": "string", "format": "uuid" },
+    "status": {
+      "type": "object",
+      "description": "The current status of the project.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Aprobado"
+        },
+        "slug": {
+          "type": "string",
+          "example": "approved"
+        }
+      }
+    },
     "bannerUrl": {
       "type": "string",
       "format": "url",

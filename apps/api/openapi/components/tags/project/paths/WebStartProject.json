@@ -1,0 +1,35 @@
+{
+  "post": {
+    "summary": "(Web) Start a Project",
+    "description": "Transitions a project from 'Approved' to 'In Progress'. Validates team composition and deadlines before execution.\n - Requires **\"professor\"** role.\n - User must be the **creator** of the project.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "required": true,
+        "description": "The unique identifier (UUID) of the project to start.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": "Project started successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/StartProjectSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

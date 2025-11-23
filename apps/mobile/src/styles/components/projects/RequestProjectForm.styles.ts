@@ -18,7 +18,7 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
       backgroundColor: palette.background,
     },
     titleInScroll: {
-      marginLeft: spacing.lg,
+      marginLeft: spacing.xl,
       fontSize: typography.xl3,
       fontWeight: '700',
       color: palette.text,
@@ -61,7 +61,6 @@ export const createRequestProjectFormStyles = (palette: ColorPalette) =>
     },
     form: {
       backgroundColor: palette.background,
-      margin: spacing.md,
       padding: spacing.lg,
       borderRadius: 12,
       shadowColor: '#000',

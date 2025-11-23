@@ -4,6 +4,9 @@
  * @param {object} rawProject
  * @param {string} rawProject.uuid_project
  * @param {string} rawProject.uuidApplication
+ * @param {object} rawProject.projectStatus
+ * @param {string} rawProject.projectStatus.name
+ * @param {string} rawProject.projectStatus.slug
  * @param {object} rawProject.application
  * @param {string} rawProject.application.title
  * @param {string} rawProject.application.shortDescription

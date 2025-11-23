@@ -55,8 +55,9 @@ model User {
   professor Professor?
   outsider  Outsider?
 
-  application Application[]
-  teamMembers Team_Member[]
+  application     Application[]
+  teamMembers     Team_Member[]
+  projectsCreated Project[]     @relation("ProjectCreator")
 
   @@index([email])
   @@map("Users")
@@ -144,6 +145,7 @@ model Outsider {
 model Application {
   uuid_application String   @id @default(uuid())
   uuidAuthor       String   @map("uuid_author")
+  statusId         Int      @map("status_id")
   title            String
   shortDescription String   @map("short_description")
   description      String
@@ -151,7 +153,8 @@ model Application {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
-  author User @relation(fields: [uuidAuthor], references: [uuid_user])
+  author            User               @relation(fields: [uuidAuthor], references: [uuid_user])
+  applicationStatus Application_Status @relation(fields: [statusId], references: [application_status_id])
 
   project                Project?
   applicationProjectType Application_Project_Type[]
@@ -195,12 +198,14 @@ model Application {
 model Project {
   uuid_project    String   @id @default(uuid())
   uuidApplication String   @unique @map("uuid_application")
-  statusId        Int?
+  uuidCreator     String   @map("uuid_creator")
+  statusId        Int
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  application   Application     @relation(fields: [uuidApplication], references: [uuid_application])
-  projectStatus Project_Status? @relation(fields: [statusId], references: [project_status_id])
+  application   Application    @relation(fields: [uuidApplication], references: [uuid_application])
+  projectStatus Project_Status @relation(fields: [statusId], references: [project_status_id])
+  creator       User           @relation("ProjectCreator", fields: [uuidCreator], references: [uuid_user])
 
   teamMembers Team_Member[]
 
@@ -306,7 +311,8 @@ model Student_Status {
 
 model Project_Status {
   project_status_id Int      @id @default(autoincrement())
-  name              String
+  name              String   @unique
+  slug              String   @unique
   description       String?
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -314,6 +320,19 @@ model Project_Status {
   Project Project[]
 
   @@map("Project_Statuses")
+}
+
+model Application_Status {
+  application_status_id Int      @id @default(autoincrement())
+  name                  String   @unique
+  slug                  String   @unique
+  description           String?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  Application Application[]
+
+  @@map("Application_Statuses")
 }
 
 model Team_Role {
@@ -375,7 +394,7 @@ model Team_Member {
   roleId           Int      @map("team_role_id")
   createdAt        DateTime @default(now()) @map("created_at")
 
-  project Project   @relation(fields: [uuidProject], references: [uuid_project])
+  project Project   @relation(fields: [uuidProject], references: [uuid_project], onDelete: Cascade)
   user    User      @relation(fields: [uuidUser], references: [uuid_user])
   role    Team_Role @relation(fields: [roleId], references: [team_role_id])
 

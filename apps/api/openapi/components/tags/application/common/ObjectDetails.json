@@ -19,6 +19,26 @@
       "format": "date-time",
       "example": "2026-01-15T23:59:59Z"
     },
+    "status": {
+      "type": "object",
+      "description": "The current status of the application.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "example": "Aprobado"
+        },
+        "slug": {
+          "type": "string",
+          "example": "approved"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2025-11-17T10:00:00Z",
+      "description": "Creation date of the application."
+    },
     "projectTypes": {
       "type": "array",
       "items": {
@@ -78,6 +98,13 @@
         "required": ["id", "name"]
       },
       "description": "A list of problem types associated with the application."
+    },
+    "project": {
+      "type": "string",
+      "format": "uuid",
+      "example": "123e4567-e89b-12d3-a456-426614174000",
+      "description": "The linked project ID, if the application has been approved and instantiated.",
+      "nullable": true
     }
   }
 }

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { register } from '../pages/authServiceNative'
+import { useAuth } from '../../../context/AuthContext'
 import { 
   ValidationError, 
   processFieldErrors, 
@@ -29,6 +30,7 @@ export default function useRegisterNative() {
   const [isLoading, setIsLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, any>>({})
   const nav = useNavigation<any>()
+  const { refreshUser } = useAuth()
 
   const handleChange = (field: keyof Form, value: string | boolean) => {
     // Limpiar error del campo al escribir
@@ -59,8 +61,16 @@ export default function useRegisterNative() {
       // Llamar al servicio (lanzará errores estructurados)
       await register(form)
 
-      // Éxito - Navegar al Dashboard
-      nav.navigate('Dashboard')
+      console.log('✅ Register successful')
+
+      // 2. Cargar usuario completo desde /auth/me 
+      await refreshUser()
+
+      console.log('✅ User session loaded')
+
+      // 3. NO navegar manualmente
+      // El AppNavigator detectará que user !== null
+      // y automáticamente mostrará el DashboardStack
 
     } catch (error: any) {
       console.error('Registration error:', error)

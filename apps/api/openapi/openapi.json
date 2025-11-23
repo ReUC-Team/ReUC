@@ -247,6 +247,24 @@
     },
     "/mobile/project/{uuid}/team/members/{uuidUser}": {
       "$ref": "./components/tags/project/paths/MobileTeamMember.json"
+    },
+    "/project/{uuid}/start": {
+      "$ref": "./components/tags/project/paths/WebStartProject.json"
+    },
+    "/mobile/project/{uuid}/start": {
+      "$ref": "./components/tags/project/paths/MobileStartProject.json"
+    },
+    "/project/{uuid}/rollback": {
+      "$ref": "./components/tags/project/paths/WebRollbackProject.json"
+    },
+    "/mobile/project/{uuid}/rollback": {
+      "$ref": "./components/tags/project/paths/MobileRollbackProject.json"
+    },
+    "/project/{uuid}/deadline": {
+      "$ref": "./components/tags/project/paths/WebUpdateDeadlineProject.json"
+    },
+    "/mobile/project/{uuid}/deadline": {
+      "$ref": "./components/tags/project/paths/MobileUpdateDeadlineProject.json"
     }
   }
 }

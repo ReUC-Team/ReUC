@@ -138,6 +138,9 @@ function _normalizeDetails(projectData) {
   const projectTypes = (appSource?.applicationProjectType || []).map((pt) => ({
     id: pt.projectTypeId.project_type_id,
     name: pt.projectTypeId.name,
+    minEstimatedMonths: pt.projectTypeId.minEstimatedMonths,
+    maxEstimatedMonths: pt.projectTypeId.maxEstimatedMonths,
+    requiredHours: pt.projectTypeId.requiredHours,
   }));
   const teamMembers = (projectData?.teamMembers || []).map((tm) => {
     const user = tm.user;
@@ -159,12 +162,14 @@ function _normalizeDetails(projectData) {
     shortDescription: appSource.shortDescription,
     description: appSource.description,
     deadline: appSource.deadline,
+    uuidCreator: projectData.uuidCreator,
     status: projectData.projectStatus,
+    createdAt: appSource.createdAt,
+    approvedAt: projectData.createdAt,
     projectTypes,
     faculties,
     problemTypes,
     teamMembers,
-    createdAt: appSource.createdAt,
   };
 }
 

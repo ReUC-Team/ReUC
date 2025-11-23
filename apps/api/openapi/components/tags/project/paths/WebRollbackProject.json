@@ -1,0 +1,35 @@
+{
+  "post": {
+    "summary": "(Web) Rollback Project",
+    "description": "Reverts a project back to the Application stage.\n\n**Destructive Action**: Deletes the project entity and resets the application status to 'In Review'.\n - Requires **\"professor\"** role.\n - User must be the **creator** of the project.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "required": true,
+        "description": "The unique identifier (UUID) of the project to rollback.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Project rolled back successfully.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/RollbackProjectSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

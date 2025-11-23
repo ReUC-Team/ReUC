@@ -1,11 +1,11 @@
-// apps/mobile/src/styles/components/sidebar/LeftSidebar.styles.ts
+// apps/mobile/src/styles/components/header/LeftSidebar.styles.ts
 
 import { StyleSheet } from 'react-native'
 import { ColorPalette } from '../../theme/colors'
 import { spacing } from '../../theme/spacing'
 import { typography } from '../../theme/typography'
 
-export const createLeftSidebarStyles = (palette: ColorPalette) =>
+export const createLeftSidebarStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -14,7 +14,7 @@ export const createLeftSidebarStyles = (palette: ColorPalette) =>
     },
     sidebar: {
       width: '80%',
-      maxWidth: 300,
+      maxWidth: 320,
       backgroundColor: palette.background,
       height: '100%',
       shadowColor: '#000',
@@ -23,49 +23,83 @@ export const createLeftSidebarStyles = (palette: ColorPalette) =>
         height: 0,
       },
       shadowOpacity: 0.25,
-      shadowRadius: 3.84,
+      shadowRadius: 8,
       elevation: 5,
     },
     header: {
+      backgroundColor: palette.primary,
+      paddingTop: spacing.xxl + spacing.lg,
+      paddingBottom: spacing.lg,
+      paddingHorizontal: spacing.lg,
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    },
+    headerContent: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      paddingHorizontal: spacing.md,
-      paddingTop: spacing.xxl + spacing.lg,
-      paddingBottom: spacing.lg,
-      borderBottomWidth: 1,
-      borderBottomColor: palette.grayExtraLight,
     },
     logo: {
-      fontSize: typography.xl2,
+      fontSize: typography.xl3,
       fontWeight: '900',
-      color: palette.primary,
+      color: palette.onPrimary,
+      letterSpacing: 1,
     },
     logoAccent: {
-      color: palette.text,
+      color: palette.onPrimary,
+      opacity: 0.8,
     },
     closeButton: {
       padding: spacing.xs,
+      borderRadius: 20,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
     closeIcon: {
-      color: palette.textSecondary,
+      color: palette.onPrimary,
     },
     menuContainer: {
       flex: 1,
-      paddingVertical: spacing.sm,
+      paddingTop: spacing.md,
+    },
+    menuSection: {
+      paddingHorizontal: spacing.md,
+      marginBottom: spacing.lg,
+    },
+    sectionTitle: {
+      fontSize: typography.sm,
+      fontWeight: '700',
+      color: palette.textSecondary,
+      letterSpacing: 0.5,
+      marginBottom: spacing.sm,
+      marginLeft: spacing.xs,
+      textTransform: 'uppercase',
     },
     menuItem: {
-      paddingHorizontal: spacing.md,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.sm,
       marginVertical: spacing.xxs,
+      borderRadius: 12,
+      backgroundColor: 'transparent',
     },
     menuItemContent: {
       flexDirection: 'row',
       alignItems: 'center',
+      flex: 1,
+    },
+    iconContainer: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: palette.grayExtraLight,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: spacing.sm,
     },
     menuIcon: {
-      color: palette.text,
-      marginRight: spacing.md,
+      color: palette.primary,
     },
     menuText: {
       fontSize: typography.base,
@@ -75,30 +109,7 @@ export const createLeftSidebarStyles = (palette: ColorPalette) =>
     },
     chevronIcon: {
       color: palette.textSecondary,
-      marginLeft: 'auto',
+      marginLeft: spacing.xs,
     },
-    submenuContainer: {
-      backgroundColor: palette.grayExtraLight,
-      marginLeft: spacing.xl + spacing.md,
-      marginRight: spacing.md,
-      borderRadius: spacing.xs,
-      marginBottom: spacing.xs,
-      paddingVertical: spacing.xs,
-    },
-    submenuItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
-    },
-    submenuAvatar: {
-      width: spacing.lg,
-      height: spacing.lg,
-      borderRadius: spacing.lg,
-      marginRight: spacing.sm,
-    },
-    submenuText: {
-      fontSize: typography.sm,
-      color: palette.text,
-    },
+
   })
