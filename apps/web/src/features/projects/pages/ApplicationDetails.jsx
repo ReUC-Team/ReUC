@@ -4,6 +4,7 @@ import ProjectImage from '../components/ProjectImage';
 import ProjectSummary from '../components/ProjectSummary';
 import ProjectInfoCard from '../components/ProjectInfoCard';
 import AttachmentCard from '../components/AttachmentCard';
+import ProjectStatusBadge from '../components/ProjectStatusBadge';
 import EditApplicationModal from '../components/EditApplicationModal';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments, approveApplication } from '../projectsService';
@@ -28,10 +29,10 @@ export default function ApplicationDetails() {
     Alerts.success("Cambios guardados exitosamente");
   };
 
-  const handleApproveSuccess = (projectUuid) => {
+  const handleApproveSuccess = () => {
     Alerts.success('¡Proyecto aprobado exitosamente!');
     setTimeout(() => {
-      navigate(`/my-projects/${projectUuid}`);
+      navigate(`/my-projects/`);
     }, 1500);
   };
 
@@ -123,7 +124,7 @@ export default function ApplicationDetails() {
         Alerts.success('¡Proyecto aprobado exitosamente!');
         
         setTimeout(() => {
-          navigate(`/my-projects/${projectUuid}`);
+          navigate(`/my-projects/`);
         }, 1500);
         
       } catch (error) {
@@ -222,6 +223,7 @@ export default function ApplicationDetails() {
     createdAt,
     dueDate,
     attachments = [],
+    projectUuid,
   } = application;
 
   const authorFirstName = author?.firstName || 'No especificado';
@@ -314,16 +316,38 @@ export default function ApplicationDetails() {
   
   return (
     <section className="w-full px-10 py-12">
-      {/* Botón de regreso */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Volver
-      </button>
+      {/* Header con estado y redirección */}
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-lime-600 dark:hover:text-lime-400 transition"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span className="font-semibold">Volver</span>
+        </button>
+
+        <div className="flex items-center gap-3">
+          {/* Badge de estado */}
+          {application?.status && (
+            <ProjectStatusBadge status={application.status} size="lg" />
+          )}
+
+          {/* Botón para ver proyecto aprobado */}
+          {application?.projectUuid && (
+            <button
+              onClick={() => navigate(`/my-projects/`)}
+              className="px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700 transition font-semibold flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              Ver Proyecto Aprobado
+            </button>
+          )}
+        </div>
+      </div>
 
       <h1 className="text-4xl font-bold">
         Detalles del <span className="text-lime-700">proyecto</span>
@@ -359,17 +383,73 @@ export default function ApplicationDetails() {
 
         {/* Columna derecha: Información y acciones */}
         <div className="w-7/12">
+          {/* Información de la Solicitud */}
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
+              Información de la Solicitud
+            </h2>
+            <div className="space-y-4">
+              {/* Estado actual */}
+              {application?.status && (
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Estado:</p>
+                  <ProjectStatusBadge status={application.status} size="md" />
+                </div>
+              )}
+
+              {/* Resto de campos existentes */}
+              {projectTypes?.length > 0 && (
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Tipo de proyecto:</p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {projectTypes.map(pt => pt.name).join(', ')}
+                  </p>
+                </div>
+              )}
+
+              {faculties?.length > 0 && (
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Facultades:</p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {faculties.map(f => f.name).join(', ')}
+                  </p>
+                </div>
+              )}
+
+              {problemTypes?.length > 0 && (
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Tipo de problemática:</p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {problemTypes.map(pt => pt.name).join(', ')}
+                  </p>
+                </div>
+              )}
+
+              {dueDate && (
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Fecha límite:</p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {formatDateStringSpanish(dueDate.split('T')[0])}
+                  </p>
+                </div>
+              )}
+
+              {createdAt && (
+                <div>
+                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Fecha de creación:</p>
+                  <p className="text-gray-800 dark:text-gray-200">
+                    {formatDateStringSpanish(createdAt.split('T')[0])}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Información del solicitante */}
           <h2 className="text-3xl font-bold mb-3">
             Información del <span className="text-lime-700">solicitante</span>
           </h2>
           <ProjectInfoCard items={applicantInfo} />
-
-          {/* Información del proyecto */}
-          <h2 className="text-3xl font-bold mb-3 mt-8">
-            Información del <span className="text-lime-700">proyecto</span>
-          </h2>
-          <ProjectInfoCard items={projectInfo} />
 
           {/* Botones de acción */}
           <div className="flex flex-col gap-3 pt-4 w-11/12">
@@ -392,7 +472,7 @@ export default function ApplicationDetails() {
                 {isAlreadyApproved ? 'Ya aprobado' : 'Editar proyecto'}
               </button>
 
-              {/* Botón Aceptar Proyecto (directo, sin editar) */}
+              {/* Botón Aceptar Proyecto */}
               <button 
                 onClick={handleApprove}
                 disabled={isApproving || isAlreadyApproved}
@@ -463,7 +543,7 @@ export default function ApplicationDetails() {
 
             {/* Mensaje informativo si ya está aprobado */}
             {isAlreadyApproved && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700 flex items-start gap-2">
+              <div className="p-3 bg-lime-50 border border-lime-200 rounded-lg text-sm text-lime-700 flex items-start gap-2">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>

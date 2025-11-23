@@ -69,7 +69,7 @@ const RequestProject = () => {
 
         {/* Panel de ayuda con recomendaciones */}
         {showHelp && (
-          <div className="max-w-4xl w-full bg-lime-100 border border-lime-300 text-sm text-lime-800 p-4 rounded mb-8">
+          <div className="max-w-4xl w-full bg-lime-50 border border-lime-200 text-sm text-lime-800 p-4 rounded mb-8">
             <p className="mb-2 font-semibold">Recomendaciones para llenar el formulario:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Título del proyecto:</strong> Sé claro y conciso. Usa un título que describa en pocas palabras el propósito del proyecto.</li>

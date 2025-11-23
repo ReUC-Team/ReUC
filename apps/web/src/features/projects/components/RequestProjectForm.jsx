@@ -136,13 +136,13 @@ export default function RequestProjectForm({
       {/* Información Básica */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-lime-100 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Información Básica</h3>
+            <h3 className="text-xl font-bold text-gray-900">Información <span className='text-lime-700'>Básica</span></h3>
             <p className="text-sm text-gray-500">Describe tu proyecto de manera clara y concisa</p>
           </div>
         </div>
@@ -226,14 +226,14 @@ export default function RequestProjectForm({
       {/* Clasificación del Proyecto */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
           </div>
           <div>
             <h3 className="text-xl font-bold text-gray-900">Clasificación</h3>
-            <p className="text-sm text-gray-500">Categoriza tu proyecto (opcional)</p>
+            <p className="text-sm text-gray-500">Categoriza tu proyecto <span className="text-lime-600">(opcional)</span></p>
           </div>
         </div>
 
@@ -256,8 +256,8 @@ export default function RequestProjectForm({
             </div>
             
             {showInfo && (
-              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                <p className="text-sm text-blue-800">
+              <div className="mb-4 p-4 bg-lime-50 border border-lime-200 rounded-xl">
+                <p className="text-sm text-lime-800">
                   Selecciona la modalidad académica a la que aplica tu proyecto.
                 </p>
               </div>
@@ -375,43 +375,43 @@ export default function RequestProjectForm({
       {/* Vigencia */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Fecha Límite</h3>
+            <h3 className="text-xl font-bold text-gray-900">Fecha<span className="text-lime-700"> Límite</span></h3>
             <p className="text-sm text-gray-500">¿Cuándo necesitas completar el proyecto?</p>
           </div>
         </div>
 
         {deadlineConstraints.projectTypeName ? (
-          <div className="mb-4 p-5 bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-xl">
+          <div className="mb-4 p-5 bg-gradient-to-br from-lime-50 to-lime-50 border border-lime-200 rounded-xl">
             <div className="flex gap-4">
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-lime-600 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-blue-900 mb-2">{deadlineConstraints.projectTypeName}</h4>
-                <div className="space-y-1.5 text-sm text-blue-800">
+                <h4 className="font-bold text-lime-700 mb-2">{deadlineConstraints.projectTypeName}</h4>
+                <div className="space-y-1.5 text-sm text-lime-800">
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     <span><strong>Inicio:</strong> {formatDateStringSpanish(deadlineConstraints.min)}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                     </svg>
                     <span><strong>Límite:</strong> {formatDateStringSpanish(deadlineConstraints.max)}</span>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-blue-200">
+                  <div className="mt-2 pt-2 border-t border-lime-200">
                     <span className="text-xs font-semibold">Duración: {deadlineConstraints.minMonths} a {deadlineConstraints.maxMonths} meses</span>
                   </div>
                 </div>
@@ -419,11 +419,11 @@ export default function RequestProjectForm({
             </div>
           </div>
         ) : (
-          <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-            <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-start gap-3">
+            <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
-            <p className="text-sm text-amber-800">
+            <p className="text-sm text-yellow-800">
               Selecciona un tipo de proyecto para ver el rango de fechas permitidas
             </p>
           </div>
@@ -457,11 +457,11 @@ export default function RequestProjectForm({
         )}
 
         {!fieldErrors?.deadline && form.deadline && deadlineConstraints.min && (
-          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center gap-2">
-            <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mt-3 p-3 bg-lime-50 border border-lime-200 rounded-xl flex items-center gap-2">
+            <svg className="w-5 h-5 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
-            <p className="text-sm text-green-700 font-medium">Fecha válida seleccionada</p>
+            <p className="text-sm text-lime-700 font-medium">Fecha válida seleccionada</p>
           </div>
         )}
       </div>
@@ -469,13 +469,13 @@ export default function RequestProjectForm({
       {/* Banner */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-pink-100 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Banner del Proyecto</h3>
+            <h3 className="text-xl font-bold text-gray-900">Banner del <span className="font-semibold text-lime-700">Proyecto</span></h3>
             <p className="text-sm text-gray-500">Imagen principal que representará tu proyecto</p>
           </div>
         </div>
@@ -557,14 +557,14 @@ export default function RequestProjectForm({
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Archivos Adjuntos</h3>
-              <p className="text-sm text-gray-500">Documentos de apoyo (máximo 5 archivos)</p>
+              <h3 className="text-xl font-bold text-gray-900">Archivos <span className="font-semibold text-lime-700">Adjuntos</span></h3>
+              <p className="text-sm text-gray-500">Documentos de apoyo <span className="font-semibold text-lime-600">(máximo 5 archivos)</span></p>
             </div>
           </div>
           <div className="px-4 py-2 bg-gray-100 rounded-lg">
@@ -662,9 +662,6 @@ export default function RequestProjectForm({
             </>
           ) : (
             <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
               <span>Enviar Solicitud</span>
             </>
           )}

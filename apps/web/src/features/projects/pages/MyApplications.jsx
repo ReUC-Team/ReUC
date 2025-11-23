@@ -117,6 +117,7 @@ export default function MyApplications() {
                 image={app.bannerUrl}
                 title={app.title}
                 description={app.shortDescription}
+                status={app.status}
                 onDetailsClick={() => handleApplicationClick(app.uuid_application)}
               />
             ))}

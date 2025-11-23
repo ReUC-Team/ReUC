@@ -18,13 +18,11 @@ const MyProjectsList = () => {
     );
   });
 
-const handleProjectClick = (uuid) => {
-  // ✅ Navegar con el UUID del proyecto, NO con uuidApplication
-  console.log("🔍 Navegando a proyecto:", uuid);
-  navigate(`/my-projects/${uuid}`);
-};
+  const handleProjectClick = (uuid) => {
+    console.log("🔍 Navegando a proyecto:", uuid);
+    navigate(`/my-projects/${uuid}`);
+  };
 
-  // NUEVA FUNCIÓN: Navegar a la página de equipo
   const handleTeamClick = (uuid) => {
     navigate(`/my-projects/${uuid}/team`);
   };
@@ -108,16 +106,17 @@ const handleProjectClick = (uuid) => {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-11/12 mb-10">
             {filteredProjects.map((proj) => (
-<ProjectCard
-  key={proj.uuid_project}
-  uuid={proj.uuid_project}  // ✅ Pasar uuid_project
-  image={proj.bannerUrl}
-  title={proj.title}
-  description={proj.shortDescription}
-  onDetailsClick={() => handleProjectClick(proj.uuid_project, proj.uuidApplication)}
-  showTeamButton={true}
-  onTeamClick={handleTeamClick}
-/>
+            <ProjectCard
+              key={proj.uuid_project}
+              uuid={proj.uuid_project}
+              image={proj.bannerUrl}
+              title={proj.title}
+              description={proj.shortDescription}
+              onDetailsClick={() => handleProjectClick(proj.uuid_project)}
+              showTeamButton={true}
+              status={proj.status}
+              onTeamClick={handleTeamClick}
+            />
             ))}
           </div>
 

@@ -126,7 +126,7 @@ export default function MyApplicationDetails() {
   const statusConfig = {
     pending: {
       label: 'Pendiente de revisión',
-      color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      color: 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-700',
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
@@ -135,7 +135,7 @@ export default function MyApplicationDetails() {
     },
     approved: {
       label: 'Aprobada',
-      color: 'bg-green-100 text-green-800 border-green-200',
+      color: 'bg-lime-100 text-lime-800 border-lime-200 dark:bg-lime-900/20 dark:text-lime-300 dark:border-lime-700',
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -144,7 +144,7 @@ export default function MyApplicationDetails() {
     },
     rejected: {
       label: 'Rechazada',
-      color: 'bg-red-100 text-red-800 border-red-200',
+      color: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700',
       icon: (
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -153,7 +153,9 @@ export default function MyApplicationDetails() {
     }
   };
 
-  const currentStatus = statusConfig[status] || statusConfig.pending;
+  // Obtener el slug del estado correctamente
+  const statusSlug = typeof status === 'object' && status !== null ? status.slug : status;
+  const currentStatus = statusConfig[statusSlug] || statusConfig.pending;
 
   // Información del proyecto
   const projectInfo = [
@@ -190,13 +192,13 @@ export default function MyApplicationDetails() {
   ];
 
   // Manejar contacto con soporte
-  const handleContact = () => {
-    if (outsider?.email) {
-      window.location.href = `mailto:${outsider.email}?subject=Consulta sobre solicitud: ${title}`;
-    } else {
-      alert('No hay correo de contacto disponible');
-    }
-  };
+  // const handleContact = () => {
+  //   if (outsider?.email) {
+  //     window.location.href = `mailto:${outsider.email}?subject=Consulta sobre solicitud: ${title}`;
+  //   } else {
+  //     alert('No hay correo de contacto disponible');
+  //   }
+  // };
   
   return (
     <section className="w-full px-10 py-12">
@@ -263,22 +265,22 @@ export default function MyApplicationDetails() {
           <ProjectInfoCard items={projectInfo} />
 
           {/* Si fue aprobada, mostrar info del proyecto creado */}
-          {status === 'approved' && project && (
-            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          {statusSlug === 'approved' && project && (
+            <div className="mt-6 p-4 bg-lime-50 border border-lime-200 rounded-lg dark:bg-lime-900/20 dark:border-lime-700">
               <div className="flex items-start gap-3">
-                <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-6 h-6 text-lime-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-green-800 mb-2">
+                  <h3 className="font-semibold text-lime-800 dark:text-lime-300 mb-2">
                     ¡Tu solicitud fue aprobada!
                   </h3>
-                  <p className="text-sm text-green-700 mb-3">
+                  <p className="text-sm text-lime-700 dark:text-lime-400 mb-3">
                     Esta solicitud se convirtió en un proyecto activo el {formatDateStringSpanish(project.createdAt.split('T')[0])}
                   </p>
                   <button
                     onClick={() => navigate(`/project/${project.uuid_project}`)}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition text-sm font-semibold"
+                    className="bg-lime-600 text-white px-4 py-2 rounded-lg hover:bg-lime-700 transition text-sm font-semibold"
                   >
                     Ver proyecto activo
                   </button>
@@ -322,7 +324,7 @@ export default function MyApplicationDetails() {
             )}
             
             {/* Botón Ponerse en Contacto (solo si está pendiente o rechazada) */}
-            {status !== 'approved' && (
+            {/* {statusSlug !== 'approved' && (
               <button 
                 onClick={handleContact}
                 disabled={!outsider?.email}
@@ -330,10 +332,10 @@ export default function MyApplicationDetails() {
               >
                 Contactar soporte
               </button>
-            )}
+            )} */}
 
             {/* Nota informativa según estado */}
-            {status === 'pending' && (
+            {statusSlug === 'pending' && (
               <div className="p-3 bg-yellow-100 border border-yellow-200 rounded-lg text-sm text-yellow-700 flex items-start gap-2">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -347,7 +349,7 @@ export default function MyApplicationDetails() {
               </div>
             )}
 
-            {status === 'rejected' && (
+            {statusSlug === 'rejected' && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-start gap-2">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
