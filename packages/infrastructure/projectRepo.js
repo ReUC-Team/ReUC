@@ -640,4 +640,58 @@ export const projectRepo = {
       );
     }
   },
+  /**
+   * Updates the deadline of an application through a project entity.
+   * This is treated as a Project update because the context is the Project Lifecycle.
+   * @param {string} uuidProject - The UUID of the project to update.
+   * @param {string|Date} newDeadline - The new date to set.
+   *
+   * @throws {InfrastructureError.NotFoundError} If record was not found (P2025).
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async updateDeadline(uuidProject, newDeadline) {
+    try {
+      return db.project.update({
+        where: { uuid_project: uuidProject },
+        data: {
+          application: {
+            update: {
+              deadline: newDeadline,
+            },
+          },
+        },
+        select: {
+          uuid_project: true,
+          application: { select: { deadline: true } },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2025") {
+          const message = err.meta?.cause || "Record to update not found.";
+
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuidProject} project found to update.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while updating project deadline: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      const context = JSON.stringify({ uuidProject, newDeadline });
+      console.error(
+        `Infrastructure error (projectRepo.updateDeadline) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while updating project deadline.",
+        { cause: err }
+      );
+    }
+  },
 };

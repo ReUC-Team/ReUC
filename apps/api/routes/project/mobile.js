@@ -12,6 +12,7 @@ import {
   deleteTeamMemberHandler,
   startProjectHandler,
   rollbackProjectHandler,
+  updateDeadlineProjectHandler,
 } from "./handlers.js";
 
 export const mobileProjectRouter = express.Router();
@@ -39,4 +40,8 @@ mobileProjectRouter.post("/:uuid/start", asyncHandler(startProjectHandler));
 mobileProjectRouter.post(
   "/:uuid/rollback",
   asyncHandler(rollbackProjectHandler)
+);
+mobileProjectRouter.patch(
+  "/:uuid/deadline",
+  asyncHandler(updateDeadlineProjectHandler)
 );
