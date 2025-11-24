@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getApplicationDetails } from "../projectsService";
 import { Alerts } from "@/shared/alerts";
 import { getDisplayMessage, AuthenticationError, NotFoundError } from "@/utils/errorHandler";
@@ -10,45 +10,50 @@ export default function useApplicationDetails(uuid) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchDetails = useCallback(async () => {
     if (!uuid) {
       setError("UUID de aplicación no proporcionado");
       setIsLoading(false);
       return;
     }
 
-    const fetchDetails = async () => {
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const data = await getApplicationDetails(uuid);
-        setApplication(data);
-      } catch (err) {
-        console.error("Error fetching application details:", err);
+    try {
+      const data = await getApplicationDetails(uuid);
+      setApplication(data);
+    } catch (err) {
+      console.error("Error fetching application details:", err);
 
-        if (err instanceof AuthenticationError) {
-          Alerts.warning("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
-          setTimeout(() => navigate("/login"), 2000);
-          return;
-        }
-
-        if (err instanceof NotFoundError) {
-          Alerts.error("Proyecto no encontrado");
-          setTimeout(() => navigate("/explore-projects"), 2000);
-          return;
-        }
-
-        const errorMessage = getDisplayMessage(err);
-        setError(errorMessage);
-        Alerts.error(errorMessage);
-      } finally {
-        setIsLoading(false);
+      if (err instanceof AuthenticationError) {
+        Alerts.warning("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+        setTimeout(() => navigate("/login"), 2000);
+        return;
       }
-    };
 
-    fetchDetails();
+      if (err instanceof NotFoundError) {
+        Alerts.error("Proyecto no encontrado");
+        setTimeout(() => navigate("/explore-projects"), 2000);
+        return;
+      }
+
+      const errorMessage = getDisplayMessage(err);
+      setError(errorMessage);
+      Alerts.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   }, [uuid, navigate]);
 
-  return { application, isLoading, error };
+  useEffect(() => {
+    fetchDetails();
+  }, [fetchDetails]);
+
+  return { 
+    application, 
+    isLoading, 
+    error,
+    refetch: fetchDetails // ✅ Exponer función para refrescar
+  };
 }

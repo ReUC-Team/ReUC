@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createApplication } from "../projectsService.js";
 import { ValidationError, processFieldErrors, getDisplayMessage } from "@/utils/errorHandler";
 import { Alerts } from "@/shared/alerts";
+import useFormProjectMetadata from "./useFormProjectMetadata.js";
 
 export default function useRequestProject() {
   const navigate = useNavigate();
+  const { projectTypes } = useFormProjectMetadata();
   const [fieldErrors, setFieldErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,6 +26,64 @@ export default function useRequestProject() {
     attachments: [],
   });
 
+  const [deadlineConstraints, setDeadlineConstraints] = useState({
+    min: null,
+    max: null,
+    projectTypeName: null,
+    minMonths: 0,
+    maxMonths: 0,
+  });
+
+  // Helper para formatear fecha local sin zona horaria
+  const formatDateLocal = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // Calcular constraints de fecha cuando cambie el tipo de proyecto
+  useEffect(() => {
+    if (form.projectType.length > 0 && projectTypes.length > 0) {
+      const selectedTypeId = Number(form.projectType[0]);
+      const projectType = projectTypes.find(pt => pt.project_type_id === selectedTypeId);
+      
+      if (projectType) {
+        // Fecha actual en zona horaria local
+        const today = new Date();
+        const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        
+        const minMonths = projectType.minEstimatedMonths || 0;
+        const maxMonths = projectType.maxEstimatedMonths || 24;
+        
+        // Calcular fecha mínima (hoy + minMonths)
+        const minDate = new Date(todayLocal);
+        minDate.setMonth(minDate.getMonth() + minMonths);
+        
+        // Calcular fecha máxima (hoy + maxMonths + 1 mes de buffer)
+        const maxDate = new Date(todayLocal);
+        maxDate.setMonth(maxDate.getMonth() + maxMonths + 1);
+        
+        setDeadlineConstraints({
+          min: formatDateLocal(minDate),
+          max: formatDateLocal(maxDate),
+          projectTypeName: projectType.name,
+          minMonths,
+          maxMonths: maxMonths + 1
+        });
+      }
+    } else {
+      setDeadlineConstraints({ 
+        min: null, 
+        max: null, 
+        projectTypeName: null,
+        minMonths: 0,
+        maxMonths: 0
+      });
+    }
+  }, [form.projectType, projectTypes]);
+
+  // Manejar cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
 
@@ -36,27 +96,34 @@ export default function useRequestProject() {
       });
     }
 
-    // MANEJO DE CHECKBOXES (projectType, faculty, problemType)
+    // Manejo de radio button para faculty
+    if (type === "radio" && name === "faculty") {
+      setForm(prevForm => ({
+        ...prevForm,
+        faculty: [String(value)]
+      }));
+      return;
+    }
+
+    // Manejo de checkboxes (projectType, problemType)
     if (type === "checkbox") {
-      if (name === "projectType" || name === "faculty" || name === "problemType") {
+      if (name === "projectType" || name === "problemType") {
         setForm(prevForm => {
           const currentArray = prevForm[name] || [];
           
           if (checked) {
-            // Agregar valor si está checkeado
             return {
               ...prevForm,
               [name]: [...currentArray, value]
             };
           } else {
-            // Remover valor si está desmarcado
             return {
               ...prevForm,
               [name]: currentArray.filter(item => item !== value)
             };
           }
         });
-        return; // salir de la función aquí
+        return;
       }
     }
 
@@ -66,7 +133,7 @@ export default function useRequestProject() {
         ...form,
         customBannerFile: files[0],
         customBannerName: files[0].name,
-        selectedBannerUuid: "", // Limpiar UUID si se sube archivo
+        selectedBannerUuid: "",
       });
       return;
     } 
@@ -78,7 +145,43 @@ export default function useRequestProject() {
         attachments: Array.from(files),
       });
       return;
-    } 
+    }
+
+    // Validar fecha en tiempo real
+    if (name === "deadline" && value && deadlineConstraints.min) {
+      const [year, month, day] = value.split('-').map(Number);
+      const selectedDate = new Date(year, month - 1, day);
+      
+      const [minYear, minMonth, minDay] = deadlineConstraints.min.split('-').map(Number);
+      const minDate = new Date(minYear, minMonth - 1, minDay);
+      
+      const [maxYear, maxMonth, maxDay] = deadlineConstraints.max.split('-').map(Number);
+      const maxDate = new Date(maxYear, maxMonth - 1, maxDay);
+
+      const today = new Date();
+      const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      // Calcular meses desde hoy
+      const monthsDiff = Math.round(
+        (selectedDate.getFullYear() - todayLocal.getFullYear()) * 12 +
+        (selectedDate.getMonth() - todayLocal.getMonth()) +
+        (selectedDate.getDate() - todayLocal.getDate()) / 30
+      );
+
+      if (selectedDate < minDate) {
+        Alerts.warning(
+          `Fecha demasiado pronto. El proyecto debe durar al menos ${deadlineConstraints.minMonths} meses desde hoy`
+        );
+      } else if (selectedDate > maxDate) {
+        Alerts.warning(
+          `Fecha demasiado lejana. No puede superar ${deadlineConstraints.maxMonths} meses desde hoy`
+        );
+      } else {
+        Alerts.success(
+          `Fecha válida: ${monthsDiff} meses desde hoy`
+        );
+      }
+    }
     
     // Campos de texto normales
     setForm({
@@ -87,34 +190,7 @@ export default function useRequestProject() {
     });
   };
 
-  // Manejo de banner predefinido (llamado desde RequestProjectForm)
-  const handleBannerSelection = (uuid) => {
-    setForm({
-      ...form,
-      selectedBannerUuid: uuid,
-      customBannerFile: null,
-      customBannerName: "",
-    });
-
-    // Limpiar error de banner
-    if (fieldErrors.banner) {
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.banner;
-        return newErrors;
-      });
-    }
-  };
-
-  // Remover archivo adjunto (llamado desde RequestProjectForm)
-  const handleRemoveAttachment = (index) => {
-    setForm(prevForm => ({
-      ...prevForm,
-      attachments: prevForm.attachments.filter((_, i) => i !== index),
-    }));
-  };
-
-  // Validación del formulario
+  // Validar formulario antes de enviar
   const validateForm = () => {
     const errors = {};
 
@@ -131,23 +207,78 @@ export default function useRequestProject() {
     }
 
     if (!form.deadline) {
-      errors.deadline = "La fecha límite es requerida";
+      errors.deadline = "La fecha de vigencia es obligatoria";
+    } else if (deadlineConstraints.min && deadlineConstraints.max) {
+      const [year, month, day] = form.deadline.split('-').map(Number);
+      const selectedDate = new Date(year, month - 1, day);
+      
+      const [minYear, minMonth, minDay] = deadlineConstraints.min.split('-').map(Number);
+      const minDate = new Date(minYear, minMonth - 1, minDay);
+      
+      const [maxYear, maxMonth, maxDay] = deadlineConstraints.max.split('-').map(Number);
+      const maxDate = new Date(maxYear, maxMonth - 1, maxDay);
+
+      const today = new Date();
+      const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      const monthsDiff = Math.round(
+        (selectedDate.getFullYear() - todayLocal.getFullYear()) * 12 +
+        (selectedDate.getMonth() - todayLocal.getMonth()) +
+        (selectedDate.getDate() - todayLocal.getDate()) / 30
+      );
+
+      if (selectedDate < minDate) {
+        errors.deadline = `Fecha demasiado pronto. El proyecto debe durar al menos ${deadlineConstraints.minMonths} meses desde hoy. Fecha mínima: ${minDate.toLocaleDateString('es-MX', { 
+          day: 'numeric',
+          month: 'long', 
+          year: 'numeric' 
+        })}`;
+      } else if (selectedDate > maxDate) {
+        errors.deadline = `Fecha demasiado lejana. No puede superar ${deadlineConstraints.maxMonths} meses desde hoy (incluyendo 1 mes de margen). Fecha máxima: ${maxDate.toLocaleDateString('es-MX', { 
+          day: 'numeric',
+          month: 'long', 
+          year: 'numeric' 
+        })}`;
+      }
     }
 
     if (!form.selectedBannerUuid && !form.customBannerFile) {
       errors.banner = "Debes seleccionar o subir un banner";
     }
 
-    // Validar que los arrays tengan al menos un elemento (si son requeridos)
-    // Según el formulario, estos son opcionales, así que no validamos
-
     return errors;
   };
 
+  // Seleccionar banner predeterminado
+  const handleBannerSelection = (uuid) => {
+    setForm({
+      ...form,
+      selectedBannerUuid: uuid,
+      customBannerFile: null,
+      customBannerName: "",
+    });
+
+    if (fieldErrors.banner) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors.banner;
+        return newErrors;
+      });
+    }
+  };
+
+  // Remover archivo adjunto por índice
+  const handleRemoveAttachment = (index) => {
+    setForm(prevForm => ({
+      ...prevForm,
+      attachments: prevForm.attachments.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Enviar formulario de solicitud
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar formulario
     const errors = validateForm();
     
     if (Object.keys(errors).length > 0) {
@@ -160,24 +291,19 @@ export default function useRequestProject() {
     setFieldErrors({});
 
     try {
-      // Construir FormData
       const formData = new FormData();
 
-      // Campos básicos
       formData.append("title", form.title);
       formData.append("shortDescription", form.shortDescription);
       formData.append("description", form.description);
       formData.append("deadline", form.deadline);
 
-      // Banner (UUID o archivo, exclusivo)
       if (form.selectedBannerUuid) {
         formData.append("selectedBannerUuid", form.selectedBannerUuid);
       } else if (form.customBannerFile) {
         formData.append("customBannerFile", form.customBannerFile);
       }
 
-      // Enviar cada ID individualmente con []
-      // Solo enviar si hay elementos
       if (form.projectType && form.projectType.length > 0) {
         form.projectType.forEach(id => {
           formData.append("projectType[]", id);
@@ -196,24 +322,17 @@ export default function useRequestProject() {
         });
       }
 
-      // Tipo de problemática "Otro"
       if (form.problemTypeOther?.trim()) {
         formData.append("problemTypeOther", form.problemTypeOther);
       }
 
-      // Archivos adjuntos
       if (form.attachments && form.attachments.length > 0) {
         form.attachments.forEach((file) => {
           formData.append("attachments", file);
         });
       }
 
-      for (let [key, value] of formData.entries()) {
-        console.log(`  ${key}:`, value instanceof File ? `File: ${value.name}` : value);
-      }
-
-      // Enviar al backend
-      const response = await createApplication(formData);
+      await createApplication(formData);
 
       Alerts.success("¡Tu proyecto ha sido enviado correctamente!");
       
@@ -222,8 +341,6 @@ export default function useRequestProject() {
       }, 2000);
 
     } catch (error) {
-
-      // Manejo de errores de validación
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
           const processedErrors = processFieldErrors(error.details);
@@ -233,9 +350,7 @@ export default function useRequestProject() {
         } else {
           Alerts.error(getDisplayMessage(error));
         }
-      } 
-      // Otros errores
-      else {
+      } else {
         Alerts.error(getDisplayMessage(error));
       }
     } finally {
@@ -251,5 +366,6 @@ export default function useRequestProject() {
     handleBannerSelection,
     handleRemoveAttachment,
     handleSubmit,
+    deadlineConstraints,
   };
 }

@@ -62,8 +62,8 @@ export default function TeamMembersList({ members, roles, projectUuid, onRefresh
       html: `¿Estás seguro de eliminar a <strong>${memberName}</strong> del equipo?<br><small class="text-gray-500">Esta acción no se puede deshacer.</small>`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#dc2626', // red-600
-      cancelButtonColor: '#6b7280', // gray-500
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#6b7280',
       confirmButtonText: 'Sí, eliminar',
       cancelButtonText: 'Cancelar',
       reverseButtons: true,
@@ -79,7 +79,7 @@ export default function TeamMembersList({ members, roles, projectUuid, onRefresh
         title: '¡Eliminado!',
         text: `${memberName} fue eliminado del equipo.`,
         icon: 'success',
-        confirmButtonColor: '#84cc16', // lime-500
+        confirmButtonColor: '#84cc16',
         timer: 2000,
         timerProgressBar: true,
       });
@@ -143,96 +143,101 @@ export default function TeamMembersList({ members, roles, projectUuid, onRefresh
           return (
             <div
               key={member.uuidUser}
-              className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm"
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm"
             >
+              {/* Avatar */}
               <div className="w-12 h-12 bg-gradient-to-br from-lime-400 to-lime-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                 {avatarInitials}
               </div>
 
-              {/* Info */}
-              <div className="flex-1">
-                <p className="font-semibold text-gray-900 dark:text-gray-100">
+              {/* Info - Con truncado de texto */}
+              <div className="flex-1 min-w-0 w-full sm:w-auto">
+                <p className="font-semibold text-gray-900 dark:text-gray-100 truncate">
                   {fullName}
                 </p>
                 <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <span>{member.email}</span>
+                  <span className="truncate">{member.email}</span>
                 </div>
               </div>
 
               {/* Rol Badge o Selector */}
-              {isEditing && canEdit ? (
-                <div className="flex items-center gap-2">
-                  <select
-                    value={selectedRoleId || ""}
-                    onChange={(e) => setSelectedRoleId(Number(e.target.value))}
-                    className="px-3 py-1 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-sm"
-                    disabled={isUpdating}
-                  >
-                    {roles.map((role) => (
-                      <option key={role.id} value={role.id}>
-                        {role.name}
-                      </option>
-                    ))}
-                  </select>
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                {isEditing && canEdit ? (
+                  <>
+                    <select
+                      value={selectedRoleId || ""}
+                      onChange={(e) => setSelectedRoleId(Number(e.target.value))}
+                      className="px-3 py-1 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-sm flex-1 sm:flex-initial"
+                      disabled={isUpdating}
+                    >
+                      {roles.map((role) => (
+                        <option key={role.id} value={role.id}>
+                          {role.name}
+                        </option>
+                      ))}
+                    </select>
 
-                  <button
-                    onClick={() => handleSaveEdit(member.uuidUser)}
-                    disabled={isUpdating}
-                    className="p-1.5 text-lime-600 hover:bg-lime-50 rounded transition"
-                    title="Guardar"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </button>
-
-                  <button
-                    onClick={handleCancelEdit}
-                    disabled={isUpdating}
-                    className="p-1.5 text-gray-600 hover:bg-gray-50 rounded transition"
-                    title="Cancelar"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-br from-lime-500 to-lime-700 dark:bg-lime-900 text-white dark:text-lime-300 rounded-lg text-sm font-medium shadow-lg ">
-                    {getRoleIcon(member.roleName)}
-                    <span>{member.roleName}</span>
-                  </div>
-
-                  {/* Solo mostrar botones si puede editar */}
-                  {canEdit && (
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handleEditClick(member)}
-                        className="p-1.5 text-gray-600 hover:bg-gray-50 rounded transition cursor-pointer"
-                        title="Editar rol"
+                        onClick={() => handleSaveEdit(member.uuidUser)}
+                        disabled={isUpdating}
+                        className="p-1.5 text-lime-600 hover:bg-lime-50 rounded transition"
+                        title="Guardar"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                       </button>
 
                       <button
-                        onClick={() => handleDelete(member.uuidUser, fullName)}
-                        className="p-1.5 text-red-600 hover:bg-red-50 rounded transition cursor-pointer"
-                        title="Eliminar miembro"
+                        onClick={handleCancelEdit}
+                        disabled={isUpdating}
+                        className="p-1.5 text-gray-600 hover:bg-gray-50 rounded transition"
+                        title="Cancelar"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>
                     </div>
-                  )}
-                </>
-              )}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-br from-lime-500 to-lime-700 dark:bg-lime-900 text-white dark:text-lime-300 rounded-lg text-sm font-medium shadow-lg">
+                      {getRoleIcon(member.roleName)}
+                      <span className="whitespace-nowrap">{member.roleName}</span>
+                    </div>
+
+                    {/* Solo mostrar botones si puede editar */}
+                    {canEdit && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleEditClick(member)}
+                          className="p-1.5 text-gray-600 hover:bg-gray-50 rounded transition cursor-pointer"
+                          title="Editar rol"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </button>
+
+                        <button
+                          onClick={() => handleDelete(member.uuidUser, fullName)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded transition cursor-pointer"
+                          title="Eliminar miembro"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
           );
         })}

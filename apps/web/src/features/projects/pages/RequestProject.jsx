@@ -12,21 +12,22 @@ const RequestProject = () => {
     handleChange, 
     handleBannerSelection,
     handleRemoveAttachment,
-    handleSubmit 
+    handleSubmit,
+    deadlineConstraints,
   } = useRequestProject();
 
   const { isComplete, isLoading: profileLoading } = useProfileStatus();
   const [showHelp, setShowHelp] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
+  // Mostrar modal si el perfil está incompleto
   useEffect(() => {
-    // Mostrar modal si el perfil está incompleto
     if (!profileLoading && !isComplete) {
       setShowModal(true);
     }
   }, [profileLoading, isComplete]);
 
-  // Mostrar loading mientras se verifica el perfil
+  // Loading state mientras se verifica el perfil
   if (profileLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -43,7 +44,7 @@ const RequestProject = () => {
       <ProfileIncompleteModal 
         isOpen={showModal} 
         onClose={() => setShowModal(false)}
-        showCloseButton={false} // No permitir cerrar sin completar perfil
+        showCloseButton={false}
       />
       
       <section className="flex flex-col items-center justify-start w-full min-h-screen p-10">
@@ -66,8 +67,9 @@ const RequestProject = () => {
           </button>
         </div>
 
+        {/* Panel de ayuda con recomendaciones */}
         {showHelp && (
-          <div className="max-w-4xl w-full bg-lime-100 border border-lime-300 text-sm text-lime-800 p-4 rounded mb-8">
+          <div className="max-w-4xl w-full bg-lime-50 border border-lime-200 text-sm text-lime-800 p-4 rounded mb-8">
             <p className="mb-2 font-semibold">Recomendaciones para llenar el formulario:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Título del proyecto:</strong> Sé claro y conciso. Usa un título que describa en pocas palabras el propósito del proyecto.</li>
@@ -83,6 +85,7 @@ const RequestProject = () => {
           </div>
         )}
 
+        {/* Formulario de solicitud */}
         <RequestProjectForm
           form={form}
           fieldErrors={fieldErrors}
@@ -91,6 +94,7 @@ const RequestProject = () => {
           handleBannerSelection={handleBannerSelection}
           handleRemoveAttachment={handleRemoveAttachment}
           handleSubmit={handleSubmit}
+          deadlineConstraints={deadlineConstraints}
         />
       </section>
     </>

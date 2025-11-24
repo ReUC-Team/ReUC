@@ -8,9 +8,10 @@ import { getDisplayMessage } from "../../../utils/errorHandler.js";
  * @param {string} projectUuid - UUID del proyecto
  * @param {Array} roles - Roles disponibles
  * @param {Object} constraints - Límites por rol
+ * @param {Array} existingMembers - Miembros actuales del equipo
  * @returns {Object} { pendingMembers, addMember, removeMember, updateMemberRole, saveTeam, ... }
  */
-export default function useTeamManagement(projectUuid, roles, constraints) {
+export default function useTeamManagement(projectUuid, roles, constraints, existingMembers = []) {
   const [pendingMembers, setPendingMembers] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -95,23 +96,29 @@ export default function useTeamManagement(projectUuid, roles, constraints) {
       return false;
     }
 
-    // Validar límites mínimos y máximos
+    // Validar límites mínimos y máximos considerando miembros existentes + pendientes
     for (const role of roles) {
       const constraint = constraints[role.name];
       if (!constraint) continue;
 
-      const count = pendingMembers.filter((m) => m.roleId === role.id).length;
+      // Contar miembros existentes con este rol
+      const existingCount = existingMembers.filter(m => m.roleName === role.name).length || 0;
+      // Contar miembros pendientes con este rol
+      const pendingCount = pendingMembers.filter((m) => m.roleId === role.id).length;
+      // Total
+      const totalCount = existingCount + pendingCount;
 
-      if (constraint.min > 0 && count < constraint.min) {
+      if (constraint.min > 0 && totalCount < constraint.min) {
+        const needed = constraint.min - totalCount;
         Alerts.warning(
-          `Debes agregar al menos ${constraint.min} ${role.name}(s)`
+          `Necesitas ${needed} ${role.name}(s) más (tienes ${totalCount}, necesitas ${constraint.min})`
         );
         return false;
       }
 
-      if (constraint.max !== null && constraint.max !== Infinity && count > constraint.max) {
+      if (constraint.max !== null && constraint.max !== Infinity && totalCount > constraint.max) {
         Alerts.warning(
-          `No puedes tener más de ${constraint.max} ${role.name}(s)`
+          `No puedes tener más de ${constraint.max} ${role.name}(s) (tienes${totalCount})`
         );
         return false;
       }
