@@ -45,9 +45,9 @@ export const STATUS_CONFIG = {
     border: "border-lime-300 dark:border-lime-700"
   },
   project_in_progress: {
-    bg: "bg-lime-700 dark:bg-lime-900/20",
-    text: "text-white dark:text-lime-300",
-    border: "border-lime-700 dark:border-lime-700"
+    bg: "bg-slate-300 dark:bg-lime-900/20",
+    text: "text-sky-800 dark:text-lime-300",
+    border: "border-sky-800 dark:border-lime-700"
   },
   completed: {
     bg: "bg-purple-100 dark:bg-purple-900/20",

@@ -37,9 +37,10 @@ export default function TeamPage() {
   const { isStarting, handleStart } = useProjectActions(uuid);
   const [showStartModal, setShowStartModal] = useState(false);
 
-  // Verificar permisos
-  const isCreator = user?.uuid_user === project?.uuidCreator;
-  const canStart = project?.status?.slug === 'project_approved' && isCreator;
+  // Verificar permisos basados en rol
+  const isProfessor = role?.name === 'professor' || role?.slug === 'professor';
+  const canManageTeam = isProfessor; // Solo profesores pueden modificar el equipo
+  const canStart = project?.status?.slug === 'project_approved' && isProfessor;
   const isProjectStarted = project?.status?.slug === 'project_in_progress' || project?.status?.slug === 'completed';
 
   // Handler para iniciar proyecto
@@ -49,11 +50,12 @@ export default function TeamPage() {
       setShowStartModal(false);
       await refetchProject();
       await refreshTeam();
+      setTimeout(() => {
+        refetchProject();
+      }, 500);
     }
   };
-
-  // Verificar si el usuario es profesor
-  const canEdit = role?.name?.toLowerCase() === 'professor';
+  const canEdit = isProfessor; // Solo profesores pueden editar el equipo
   
   const handleSaveTeam = async () => {
     const success = await saveTeam();
