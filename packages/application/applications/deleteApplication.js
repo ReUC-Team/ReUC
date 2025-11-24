@@ -1,5 +1,5 @@
 import * as ApplicationError from "../errors/index.js";
-import { validateUuid } from "./validators.js";
+import { validateUuid } from "../shared/validators.js";
 import { deleteApplication as deleteDomain } from "@reuc/domain/application/deleteApplication.js";
 import * as DomainError from "@reuc/domain/errors/index.js";
 
