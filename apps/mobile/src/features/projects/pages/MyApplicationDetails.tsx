@@ -16,11 +16,13 @@ import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyle
 import { createApplicationDetailsStyles } from '../../../styles/screens/ApplicationDetails.styles'
 import useApplicationDetails from '../hooks/useApplicationDetails'
 import { downloadAllAttachments } from '../services/projectsService'
+import { formatDateStringSpanish } from '../../../utils/dateUtils'
 import Toast from 'react-native-toast-message'
 import ProjectImage from '../components/ProjectImage'
 import ProjectSummary from '../components/ProjectSummary'
 import ProjectInfoCard from '../components/ProjectInfoCard'
 import AttachmentCard from '../components/AttachmentCard'
+import ProjectStatusBadge from '../components/ProjectStatusBadge'
 
 const MyApplicationDetails: React.FC = () => {
   const styles = useThemedStyles(createApplicationDetailsStyles)
@@ -32,14 +34,51 @@ const MyApplicationDetails: React.FC = () => {
   const { application, isLoading, error } = useApplicationDetails(uuid)
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
 
-  // Formatear fechas
+  
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'No especificada'
-    return new Date(dateString).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    
+    
+    if (!dateString) {
+      console.log(' No date string provided')
+      return 'No especificada'
+    }
+    
+    try {
+      const formatted = formatDateStringSpanish(dateString)
+      
+      
+      if (!formatted || formatted === 'Invalid Date' || formatted === 'Invalid date') {
+        console.log(' Invalid formatted date')
+        return 'No especificada'
+      }
+      return formatted
+    } catch (error) {
+      console.error(' Error formatting date:', error)
+      return 'No especificada'
+    }
+  }
+
+  //  Helper para extraer nombres de arrays
+  const extractNames = (items: any[] | null | undefined, fallback: string = 'No especificado'): string => {
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return fallback
+    }
+    
+    try {
+      const names = items
+        .filter(item => item != null)
+        .map(item => {
+          if (typeof item === 'string') return item
+          if (typeof item === 'object' && item.name) return item.name
+          return String(item)
+        })
+        .filter(name => name && name !== 'undefined' && name !== 'null')
+      
+      return names.length > 0 ? names.join(', ') : fallback
+    } catch (err) {
+      console.error('Error extracting names:', err)
+      return fallback
+    }
   }
 
   // Manejar descarga de todos los archivos
@@ -77,7 +116,7 @@ const MyApplicationDetails: React.FC = () => {
 
   // Manejar contacto con soporte
   const handleContactSupport = () => {
-    const supportEmail = 'soporte@reuc.com' 
+    const supportEmail = 'soporte@reuc.com'
     Linking.openURL(
       `mailto:${supportEmail}?subject=Consulta sobre solicitud: ${application?.title}`
     )
@@ -113,100 +152,44 @@ const MyApplicationDetails: React.FC = () => {
     )
   }
 
-  // Información del proyecto
+  //  Información del proyecto con labels correctos
   const projectInfo = [
     {
       label: 'Tipo de proyecto',
-      value:
-        application.projectTypes?.length > 0
-          ? application.projectTypes
-              .map((pt: any) => (typeof pt === 'object' ? pt.name : pt))
-              .join(', ')
-          : 'No especificado',
+      value: extractNames(application.projectTypes),
     },
     {
       label: 'Facultades',
-      value:
-        application.faculties?.length > 0
-          ? application.faculties.map((f: any) => (typeof f === 'object' ? f.name : f)).join(', ')
-          : 'No especificada',
+      value: extractNames(application.faculties, 'No especificada'),
     },
     {
       label: 'Tipo de problemática',
-      value:
-        application.problemTypes?.length > 0
-          ? application.problemTypes
-              .map((pt: any) => (typeof pt === 'object' ? pt.name : pt))
-              .join(', ')
-          : 'No especificado',
+      value: extractNames(application.problemTypes),
     },
     {
-      label: 'Fecha estimada',
+      label: 'Fecha límite',  
       value: formatDate(application.deadline),
     },
     {
       label: 'Fecha de creación',
       value: formatDate(application.createdAt),
     },
-    {
-      label: 'Estado',
-      value:
-        application.status === 'pending'
-          ? 'Pendiente'
-          : application.status === 'approved'
-          ? 'Aprobado'
-          : application.status === 'rejected'
-          ? 'Rechazado'
-          : application.status,
-    },
   ]
-
-  // Determinar el color e ícono del badge según el estado
-  const getStatusBadgeStyles = () => {
-    if (application.status === 'pending') {
-      return {
-        backgroundColor: `${palette.warning || '#FFA500'}20`,
-        iconName: 'time-outline' as const,
-        iconColor: palette.warning || '#FFA500',
-        text: 'Pendiente de revisión',
-      }
-    } else if (application.status === 'approved') {
-      return {
-        backgroundColor: `${palette.success || '#4CAF50'}20`,
-        iconName: 'checkmark-circle' as const,
-        iconColor: palette.success || '#4CAF50',
-        text: 'Aprobado',
-      }
-    } else if (application.status === 'rejected') {
-      return {
-        backgroundColor: `${palette.error || '#F44336'}20`,
-        iconName: 'close-circle' as const,
-        iconColor: palette.error || '#F44336',
-        text: 'Rechazado',
-      }
-    }
-    return {
-      backgroundColor: `${palette.gray || '#9E9E9E'}20`,
-      iconName: 'help-circle-outline' as const,
-      iconColor: palette.gray || '#9E9E9E',
-      text: application.status,
-    }
-  }
-
-  const statusBadge = getStatusBadgeStyles()
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>
           Detalles de <Text style={styles.titleAccent}>solicitud</Text>
         </Text>
 
         {/* Badge de estado */}
-        <View style={[styles.statusBadge, { backgroundColor: statusBadge.backgroundColor }]}>
-          <Ionicons name={statusBadge.iconName} size={16} color={statusBadge.iconColor} />
-          <Text style={styles.statusBadgeText}>{statusBadge.text}</Text>
-        </View>
+        {application.status && (
+          <View style={{ marginTop: 8, alignItems: 'center' }}>
+            <ProjectStatusBadge status={application.status} />
+          </View>
+        )}
       </View>
 
       <View style={styles.content}>

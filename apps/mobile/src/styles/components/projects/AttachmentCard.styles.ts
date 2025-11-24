@@ -7,7 +7,7 @@ import { typography } from '../../theme/typography'
 
 export const createAttachmentCardStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
-    container: {
+    card: {
       backgroundColor: palette.background,
       borderRadius: 8,
       borderWidth: 1,
@@ -16,22 +16,17 @@ export const createAttachmentCardStyles = (palette: ColorPalette, fontMode: stri
       marginBottom: spacing.sm,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
       shadowRadius: 2,
       elevation: 2,
     },
-    containerDisabled: {
+    cardDisabled: {
       opacity: 0.5,
     },
     content: {
       flexDirection: 'row',
       alignItems: 'center',
     },
-    leftContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-    },
+
     iconContainer: {
       width: 40,
       height: 40,
@@ -41,10 +36,10 @@ export const createAttachmentCardStyles = (palette: ColorPalette, fontMode: stri
       alignItems: 'center',
       marginRight: spacing.sm,
     },
-    fileInfo: {
+    infoContainer: {
       flex: 1,
     },
-    fileName: {
+    filename: {
       fontSize: typography.sm,
       fontWeight: '600',
       color: palette.text,
@@ -61,7 +56,7 @@ export const createAttachmentCardStyles = (palette: ColorPalette, fontMode: stri
       color: palette.textSecondary,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
-    pdfHint: {
+    previewHint: {
       fontSize: typography.sm,
       color: palette.primary,
       fontWeight: '500',

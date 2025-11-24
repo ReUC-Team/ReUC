@@ -2,564 +2,315 @@
 
 import { fetchWithAuthAndAutoRefresh } from '../../../lib/api/client'
 import { API_URL } from '@env'
+import type {
+  ApplicationDetails,
+  ProjectDetails,
+  ApplicationListItem,
+  ProjectListItem,
+} from '../types/project.types'
 
 /**
- * Obtiene el token CSRF necesario para peticiones POST
+ * ============================================================================
+ * METADATA ENDPOINTS
+ * ============================================================================
  */
-export async function getCSRFToken(): Promise<string> {
-  try {
-    const res = await fetch(`${API_URL}/csrf-token`, {
-      credentials: 'include',
-    })
-    const { csrfToken } = await res.json()
-    return csrfToken
-  } catch (error) {
-    console.error('Error getting CSRF token:', error)
-    throw error
-  }
+
+export const getFormMetadata = async () => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/application/metadata/create`)
+  return response.data
 }
 
-/**
- * Obtiene metadata para crear una aplicación (facultades, tipos de proyecto, banners, etc.)
- */
-export async function getCreateMetadata() {
-
-  try {
-    const response = await fetchWithAuthAndAutoRefresh(
-      `${API_URL}/application/metadata/create`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
-
-    console.log('✅ Response received:', response)
-
-    const metadata = response.data.metadata
-
-    // Convertir URLs relativas a absolutas para los banners
-    if (metadata.defaultBanners) {
-      metadata.defaultBanners = metadata.defaultBanners.map((banner: any) => ({
-        ...banner,
-        url: banner.url?.startsWith('http')
-          ? banner.url
-          : `${API_URL}${banner.url}`,
-      }))
-    }
-
-    console.log('✅ Metadata processed successfully')
-    return metadata
-  } catch (error) {
-    console.error('❌ Error in getCreateMetadata:', error)
-    console.error('❌ Error type:', error instanceof Error ? error.constructor.name : typeof error)
-    console.error('❌ Error message:', error instanceof Error ? error.message : String(error))
-    throw error
-  }
-}
-
-/**
- * Crea una nueva aplicación/proyecto
- * @param formData - FormData con todos los campos del formulario
- */
-export async function createApplication(formData: FormData) {
-  const csrfToken = await getCSRFToken()
-
-  const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/mobile/application/create`,
-    {
-      method: 'POST',
-      headers: {
-        'csrf-token': csrfToken,
-      },
-      body: formData,
-    }
-  )
-
+export const getExploreApplicationsMetadata = async () => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/application/metadata/explore`)
   return response.data
 }
 
 /**
- * Obtiene metadata para explorar aplicaciones (facultades disponibles)
+ * ============================================================================
+ * APPLICATION ENDPOINTS
+ * ============================================================================
  */
-export async function getExploreApplicationsMetadata() {
-  const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/metadata/explore`,
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    }
-  )
 
-  return response.data
-}
-
-/**
- * Explora aplicaciones con filtros opcionales
- * @param facultyName - Nombre/abreviación de facultad para filtrar (opcional)
- * @param page - Número de página
- * @param perPage - Items por página
- */
-export async function exploreApplications(
-  facultyName: string | null = null,
-  page: number = 1,
-  perPage: number = 9
-) {
-  // Construir URL base
-  let url = `${API_URL}/application/explore`
-  
-  // Agregar facultad como path parameter si existe
-  if (facultyName) {
-    url += `/${facultyName}`
-  }
-  
-  // Agregar query parameters
-  url += `?page=${page}&perPage=${perPage}`
-
-  const response = await fetchWithAuthAndAutoRefresh(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
+export const createApplication = async (formData: FormData) => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/application/create`, {
+    method: 'POST',
+    body: formData,
   })
+  return response.data
+}
 
-  const records = response.data.applications.records
-  const paginationData = response.data.applications.metadata.pagination
+export const getMyApplications = async (page: number = 1, perPage: number = 9) => {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/my-applications?page=${page}&perPage=${perPage}`
+  )
 
-  // Convertir URLs relativas a absolutas
-  const applications = records.map((app: any) => ({
-    ...app,
-    bannerUrl: app.bannerUrl?.startsWith('http')
-      ? app.bannerUrl
-      : app.bannerUrl
-      ? `${API_URL}${app.bannerUrl}`
-      : null,
-  }))
+  const records = response.data.applications.records || []
+  const metadata = response.data.applications.metadata || {}
 
   return {
-    applications,
-    pagination: paginationData,
+    applications: records.map((app: any) => ({
+      uuid_application: app.uuid_application,
+      title: app.title,
+      shortDescription: app.shortDescription,
+      bannerUrl: app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+      status: app.status,
+      createdAt: app.createdAt,
+    })) as ApplicationListItem[],
+    pagination: metadata.pagination || {
+      page: 1,
+      perPage: 9,
+      totalPages: 1,
+      filteredItems: 0,
+      totalItems: 0,
+    },
   }
 }
 
 /**
- * Obtiene los detalles de una aplicación específica
- * @param uuid - UUID de la aplicación
+ * Obtiene detalles de una aplicación específica
+ * 
  */
-export async function getApplicationDetails(uuid: string) {
-  const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/application/${uuid}`,
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    }
-  )
+export const getApplicationDetails = async (uuid: string): Promise<ApplicationDetails> => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/application/${uuid}`)
+
+  console.log('📦 API Response completa:', JSON.stringify(response.data, null, 2))
 
   const app = response.data.application
 
+  const details = app.details || {}
+  
+  console.log('📋 Details extraídos:', {
+    deadline: details.deadline,
+    createdAt: details.createdAt,
+    title: details.title
+  })
+
   return {
-    uuid_application: app.uuid_application,
-    
-    // Información básica
-    title: app.details?.title || 'Sin título',
-    shortDescription: app.details?.shortDescription || 'Sin descripción corta',
-    detailedDescription:
-      app.details?.description ||
-      app.details?.shortDescription ||
-      'Sin descripción',
-
-    // Fechas
-    deadline: app.details?.deadline,
-    createdAt: app.createdAt,
-    status: app.status || 'pending',
-
-    // Banner
-    bannerUrl: app.bannerUrl?.startsWith('http')
-      ? app.bannerUrl
-      : app.bannerUrl
-      ? `${API_URL}${app.bannerUrl}`
-      : null,
-
-    // Attachments
-    attachments: (app.attachments || []).map((a: any) => ({
-      downloadUrl: a.downloadUrl?.startsWith('http')
-        ? a.downloadUrl
-        : `${API_URL}${a.downloadUrl}`,
-      name: a.name,
-      size: a.size,
-      type: a.type,
-    })),
-
-    // Autor (genérico - puede ser outsider o professor)
+    uuid_application: uuid,
+    title: details.title || '',
+    shortDescription: details.shortDescription || '',
+    detailedDescription: details.description || '',
+    deadline: details.deadline || '',  
+    createdAt: details.createdAt || '',  
+    status: details.status || { name: 'Desconocido', slug: 'unknown' },
+    bannerUrl: app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+    attachments: app.attachments?.map((file: any) => ({
+      uuid_file: file.uuid,
+      filename: file.name,
+      mimeType: file.type,
+      size: file.size,
+      url: `${API_URL}${file.downloadUrl}`,
+    })) || [],
     author: {
-      fullName: app.author?.fullName || 'No especificado',
-      firstName: app.author?.fullName?.split(' ')[0] || 'No especificado',
+      fullName: app.author?.fullName || 'Desconocido',
+      firstName: app.author?.fullName?.split(' ')[0] || '',
       lastName: app.author?.fullName?.split(' ').slice(1).join(' ') || '',
       email: app.author?.email || null,
       organizationName: app.author?.organizationName || null,
       phoneNumber: app.author?.phoneNumber || null,
       location: app.author?.location || null,
     },
-
-    // Arrays
-    faculties: app.details?.faculties || [],
-    projectTypes: app.details?.projectTypes || [],
-    problemTypes: app.details?.problemTypes || [],
+    faculties: details.faculties?.map((f: any) => ({
+      faculty_id: f.id,
+      name: f.name,
+    })) || [],
+    projectTypes: details.projectTypes?.map((pt: any) => ({
+      project_type_id: pt.id,
+      name: pt.name,
+    })) || [],
+    problemTypes: details.problemTypes?.map((pt: any) => ({
+      problem_type_id: pt.id,
+      name: pt.name,
+    })) || [],
+    project: details.project || null,
   }
 }
 
-/**
- * Obtiene las aplicaciones (solicitudes) del usuario autenticado
- * @param page - Número de página
- * @param perPage - Items por página
- */
-export async function getMyApplications(page: number = 1, perPage: number = 9) {
-  const url = `${API_URL}/application/my-applications?page=${page}&perPage=${perPage}`
-
-  const response = await fetchWithAuthAndAutoRefresh(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  })
-
-  const records = response.data.applications.records
-  const paginationData = response.data.applications.metadata.pagination
-
-  // Convertir URLs relativas a absolutas
-  const applications = records.map((app: any) => ({
-    ...app,
-    bannerUrl: app.bannerUrl?.startsWith('http')
-      ? app.bannerUrl
-      : app.bannerUrl
-      ? `${API_URL}${app.bannerUrl}`
-      : null,
-  }))
-
-  return {
-    applications,
-    pagination: paginationData,
-  }
-}
-
-/**
- * Obtiene los proyectos aprobados del usuario autenticado
- * @param page - Número de página
- * @param perPage - Items por página
- */
-export async function getMyProjects(page: number = 1, perPage: number = 9) {
-  const url = `${API_URL}/project/my-projects?page=${page}&perPage=${perPage}`
-
-  const response = await fetchWithAuthAndAutoRefresh(url, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  })
-
-  const records = response.data.projects.records
-  const paginationData = response.data.projects.metadata.pagination
-
+export const exploreApplications = async (
+  facultyName: string | null = null,
+  page: number = 1,
+  perPage: number = 9
+) => {
+  let url = `${API_URL}/application/explore/all?page=${page}&perPage=${perPage}`
   
-  const projects = records.map((project: any) => ({
-    uuid_application: project.uuidApplication,  
-    uuid_project: project.uuid_project,        
-    title: project.title,
-    shortDescription: project.shortDescription,
-    bannerUrl: project.bannerUrl?.startsWith('http')
-      ? project.bannerUrl
-      : project.bannerUrl
-      ? `${API_URL}${project.bannerUrl}`
-      : null,
-    status: project.status || 'approved',
-    createdAt: project.createdAt,
-  }))
+  if (facultyName) {
+    url = `${API_URL}/application/explore/${encodeURIComponent(facultyName)}?page=${page}&perPage=${perPage}`
+  }
+
+  const response = await fetchWithAuthAndAutoRefresh(url)
+
+  const records = response.data.applications.records || []
+  const metadata = response.data.applications.metadata || {}
 
   return {
-    projects,
-    pagination: paginationData,
+    applications: records.map((app: any) => ({
+      uuid_application: app.uuid_application,
+      title: app.title,
+      shortDescription: app.shortDescription,
+      bannerUrl: app.bannerUrl ? `${API_URL}${app.bannerUrl}` : null,
+      status: app.status,
+      createdAt: app.createdAt,
+    })) as ApplicationListItem[],
+    pagination: metadata.pagination || {
+      page: 1,
+      perPage: 9,
+      totalPages: 1,
+      filteredItems: 0,
+    },
+  }
+}
+
+export const updateApplication = async (uuid: string, data: any) => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/application/${uuid}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+  return response.data
+}
+
+/**
+ * ============================================================================
+ * PROJECT ENDPOINTS
+ * ============================================================================
+ */
+
+export const approveApplication = async (uuidApplication: string, projectData: any) => {
+  const payload = {
+    uuidApplication,
+    ...projectData,
+  }
+
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/project/create`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+
+  return response.data
+}
+
+export const getMyProjects = async (page: number = 1, perPage: number = 9) => {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/my-projects?page=${page}&perPage=${perPage}`
+  )
+
+  const records = response.data.projects.records || []
+  const metadata = response.data.projects.metadata || {}
+
+  return {
+    projects: records.map((project: any) => ({
+      uuid_project: project.uuid_project,
+      uuid_application: project.uuid_application,
+      title: project.title,
+      shortDescription: project.shortDescription,
+      bannerUrl: project.bannerUrl ? `${API_URL}${project.bannerUrl}` : null,
+      status: project.status,
+      createdAt: project.createdAt,
+      approvedAt: project.approvedAt,
+    })) as ProjectListItem[],
+    pagination: metadata.pagination || {
+      page: 1,
+      perPage: 9,
+      totalPages: 1,
+      filteredItems: 0,
+      totalItems: 0,
+    },
   }
 }
 
 /**
- * Obtiene los detalles de un proyecto aprobado
- * @param uuid - UUID del proyecto
+ * Obtiene detalles de un proyecto específico
  */
-export async function getProjectDetails(uuid: string) {
-  const response = await fetchWithAuthAndAutoRefresh(
-    `${API_URL}/project/${uuid}`,
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    }
-  )
+export const getProjectDetails = async (uuid: string): Promise<ProjectDetails> => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/project/${uuid}`)
+
+  console.log('📦 Project API Response:', JSON.stringify(response.data, null, 2))
 
   const project = response.data.project
 
-  console.log('🔍 Raw project from API:', JSON.stringify(project, null, 2))
-
   return {
-    uuid_application: project.uuid_application || project.details?.uuid_application,
-    
-    // Información básica
-    title: project.details?.title || 'Sin título',
-    shortDescription: project.details?.shortDescription || 'Sin descripción corta',
-    detailedDescription:
-      project.details?.description ||
-      project.details?.shortDescription ||
-      'Sin descripción',
-
-    // Fechas
-    deadline: project.details?.estimatedDate,
-    createdAt: project.details?.createdAt,
-    status: project.details?.status || 'approved',
-
-    // Banner
-    bannerUrl: project.bannerUrl?.startsWith('http')
-      ? project.bannerUrl
-      : project.bannerUrl
-      ? `${API_URL}${project.bannerUrl}`
-      : null,
-
-    attachments: (project.appAttachments || []).map((a: any) => ({
-      downloadUrl: a.downloadUrl?.startsWith('http')
-        ? a.downloadUrl
-        : `${API_URL}${a.downloadUrl}`,
-      name: a.name,
-      size: a.size,
-      type: a.type,
-    })),
-
-    // Autor
+    uuid_project: uuid,
+    uuid_application: project.uuid_application || '',
+    title: project.details.title,
+    shortDescription: project.details.shortDescription,
+    detailedDescription: project.details.description,
+    estimatedDate: project.details.deadline,  
+    createdAt: project.details.createdAt,
+    approvedAt: project.details.approvedAt,
+    status: project.details.status,
+    bannerUrl: project.bannerUrl ? `${API_URL}${project.bannerUrl}` : null,
+    attachments: project.appAttachments?.map((file: any) => ({
+      uuid_file: file.uuid,
+      filename: file.name,
+      mimeType: file.type,
+      size: file.size,
+      url: `${API_URL}${file.downloadUrl}`,
+    })) || [],
     author: {
-      fullName: project.author?.fullName || 'No especificado',
-      firstName: project.author?.fullName?.split(' ')[0] || 'No especificado',
+      fullName: project.author?.fullName || 'Desconocido',
+      firstName: project.author?.fullName?.split(' ')[0] || '',
       lastName: project.author?.fullName?.split(' ').slice(1).join(' ') || '',
       email: project.author?.email || null,
       organizationName: project.author?.outsider?.organizationName || null,
       phoneNumber: project.author?.outsider?.phoneNumber || null,
       location: project.author?.outsider?.location || null,
     },
-
-    faculties: project.details?.faculties || [],
-    projectTypes: project.details?.projectType ? [project.details.projectType] : [],
-    problemTypes: project.details?.problemTypes || [],
-  }
-}
-/**
- * Descarga un archivo desde una URL
- * @param url - URL del archivo
- * @param filename - Nombre del archivo
- */
-export async function downloadFile(url: string, filename: string) {
-  try {
-    // En React Native, abrir el archivo en el navegador
-    const { Linking } = await import('react-native')
-    await Linking.openURL(url)
-  } catch (error) {
-    console.error('Error downloading file:', error)
-    throw error
+    uuidCreator: project.details.uuidCreator,
+    faculties: project.details.faculties || [],
+    projectTypes: project.details.projectTypes || [],
+    problemTypes: project.details.problemTypes || [],
+    teamMembers: project.details.teamMembers || [],
+    teamConstraints: project.teamConstraints || {},
   }
 }
 
+export const startProject = async (uuid: string) => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/project/${uuid}/start`, {
+    method: 'POST',
+  })
+  return response.data
+}
+
+export const rollbackProject = async (uuid: string) => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/project/${uuid}/rollback`, {
+    method: 'POST',
+  })
+  return response.data
+}
+
+export const updateProjectDeadline = async (uuid: string, newDeadline: string) => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/project/${uuid}/deadline`, {
+    method: 'PATCH',
+    body: JSON.stringify({ deadline: newDeadline }),
+  })
+  return response.data
+}
+
 /**
- * Descarga todos los archivos adjuntos
- * @param attachments - Array de attachments
+ * ============================================================================
+ * FILE DOWNLOAD UTILITIES
+ * ============================================================================
  */
-export async function downloadAllAttachments(attachments: any[]) {
+
+export const downloadAllAttachments = async (attachments: any[]) => {
   const results = {
     successful: 0,
     failed: 0,
     errors: [] as string[],
   }
 
-  for (const attachment of attachments) {
+  for (const file of attachments) {
     try {
-      await downloadFile(attachment.downloadUrl, attachment.name)
       results.successful++
     } catch (error: any) {
       results.failed++
-      results.errors.push(`${attachment.name}: ${error.message}`)
+      results.errors.push(`${file.filename}: ${error.message}`)
     }
   }
 
   return results
 }
 
-// ============================================
-// FUNCIONES LEGACY (mantener compatibilidad)
-// ============================================
-
-export async function create(data: any) {
-  try {
-    const csrfToken = await getCSRFToken()
-
-    const res = await fetch(`${API_URL}/project/create`, {
-      method: 'POST',
-      headers: {
-        'X-CSRF-Token': csrfToken,
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    })
-
-    const bodyRes = await res.json()
-
-    if (!res.ok) {
-      if (res.status === 403)
-        return { success: false, err: bodyRes.err, logout: true }
-
-      return { success: false, err: bodyRes.err, logout: false }
-    }
-
-    return { success: true, data: bodyRes.data.application }
-  } catch (error: any) {
-    return { success: false, err: error.message, logout: false }
-  }
-}
-
-export async function getProjects() {
-  try {
-    const res = await fetch(`${API_URL}/projects`, {
-      credentials: 'include',
-    })
-
-    const bodyRes = await res.json()
-
-    if (!res.ok) {
-      return { success: false, err: bodyRes.err }
-    }
-
-    return { success: true, data: bodyRes.data }
-  } catch (error: any) {
-    return { success: false, err: error.message }
-  }
-}
-
-export async function getProjectById(id: string) {
-  try {
-    const res = await fetch(`${API_URL}/projects/${id}`, {
-      credentials: 'include',
-    })
-
-    const bodyRes = await res.json()
-
-    if (!res.ok) {
-      return { success: false, err: bodyRes.err }
-    }
-
-    return { success: true, data: bodyRes.data }
-  } catch (error: any) {
-    return { success: false, err: error.message }
-  }
-}
-
-export async function updateProject(id: string, data: any) {
-  try {
-    const csrfToken = await getCSRFToken()
-
-    const res = await fetch(`${API_URL}/projects/${id}`, {
-      method: 'PUT',
-      headers: {
-        'X-CSRF-Token': csrfToken,
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    })
-
-    const bodyRes = await res.json()
-
-    if (!res.ok) {
-      return { success: false, err: bodyRes.err }
-    }
-
-    return { success: true, data: bodyRes.data }
-  } catch (error: any) {
-    return { success: false, err: error.message }
-  }
-}
-
-export async function deleteProject(id: string) {
-  try {
-    const csrfToken = await getCSRFToken()
-
-    const res = await fetch(`${API_URL}/projects/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-Token': csrfToken,
-      },
-      credentials: 'include',
-    })
-
-    const bodyRes = await res.json()
-
-    if (!res.ok) {
-      return { success: false, err: bodyRes.err }
-    }
-
-    return { success: true }
-  } catch (error: any) {
-    return { success: false, err: error.message }
-  }
-}
-
-export async function toggleFavorite(projectId: string) {
-  try {
-    const csrfToken = await getCSRFToken()
-
-    const res = await fetch(`${API_URL}/projects/${projectId}/favorite`, {
-      method: 'POST',
-      headers: {
-        'X-CSRF-Token': csrfToken,
-      },
-      credentials: 'include',
-    })
-
-    const bodyRes = await res.json()
-
-    if (!res.ok) {
-      return { success: false, err: bodyRes.err }
-    }
-
-    return { success: true, data: bodyRes.data }
-  } catch (error: any) {
-    return { success: false, err: error.message }
-  }
-}
-
-export async function approveApplication(
-  uuid_application: string,
-  projectData?: any
-): Promise<any> {
-  const csrfToken = await getCSRFToken()
-
-  const bodyData = {
-    uuidApplication: uuid_application,
-    projectType: projectData?.projectType || [], 
-    title: projectData?.title,
-    shortDescription: projectData?.shortDescription,
-    description: projectData?.description,
-    estimatedEffortHours: projectData?.estimatedEffortHours,
-    estimatedDate: projectData?.estimatedDate,
-    faculty: projectData?.faculty,
-    problemType: projectData?.problemType,
-    problemTypeOther: projectData?.problemTypeOther,
-  }
-
-  console.log(' Body being sent:', JSON.stringify(bodyData, null, 2))
-
-  try {
-    const response = await fetchWithAuthAndAutoRefresh(
-      `${API_URL}/project/create`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'csrf-token': csrfToken,
-        },
-        body: JSON.stringify(bodyData),
-      }
-    )
-
-    console.log(' Response from API:', JSON.stringify(response, null, 2))
-    return response.data
-  } catch (error) {
-    console.error(' Error in approveApplication:', error)
-    throw error
-  }
+export const downloadFile = async (url: string, filename: string) => {
+  console.log('Download requested:', filename, url)
+  return url
 }

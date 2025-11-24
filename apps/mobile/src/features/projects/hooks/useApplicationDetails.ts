@@ -5,46 +5,13 @@ import { useNavigation } from '@react-navigation/native'
 import { getApplicationDetails } from '../services/projectsService'
 import { AuthenticationError, NotFoundError, getDisplayMessage } from '../../../utils/errorHandler'
 import Toast from 'react-native-toast-message'
-
-interface ApplicationDetails {
-  uuid_application: string
-  title: string
-  shortDescription: string
-  detailedDescription: string
-  deadline: string
-  createdAt: string
-  status: string
-  bannerUrl: string | null
-  attachments: any[]
-  author: {
-    fullName: string
-    firstName: string
-    lastName: string
-    email: string | null
-    organizationName: string | null
-    phoneNumber: string | null
-    location: string | null
-  }
-  faculties: any[]
-  projectTypes: any[]
-  problemTypes: any[]
-}
+import type { ApplicationDetails } from '../types/project.types'
 
 export default function useApplicationDetails(uuid: string | undefined) {
   const [application, setApplication] = useState<ApplicationDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const navigation = useNavigation<any>()
-
-  useEffect(() => {
-    if (!uuid) {
-      setError('UUID de aplicación no proporcionado')
-      setIsLoading(false)
-      return
-    }
-
-    fetchDetails()
-  }, [uuid])
 
   const fetchDetails = async () => {
     if (!uuid) return
@@ -54,7 +21,7 @@ export default function useApplicationDetails(uuid: string | undefined) {
 
     try {
       const data = await getApplicationDetails(uuid)
-      setApplication(data as ApplicationDetails)
+      setApplication(data)
     } catch (err: any) {
       console.error('Error fetching application details:', err)
 
@@ -92,5 +59,27 @@ export default function useApplicationDetails(uuid: string | undefined) {
     }
   }
 
-  return { application, isLoading, error }
+  useEffect(() => {
+    if (!uuid) {
+      setError('UUID de aplicación no proporcionado')
+      setIsLoading(false)
+      return
+    }
+
+    //  Recargar cada vez que se enfoca la pantalla
+    const unsubscribeFocus = navigation.addListener('focus', () => {
+      console.log(' Pantalla enfocada, recargando detalles...')
+      fetchDetails()
+    })
+
+    // Carga inicial
+    fetchDetails()
+
+    // Cleanup
+    return () => {
+      unsubscribeFocus()
+    }
+  }, [uuid])
+
+  return { application, isLoading, error, refetch: fetchDetails }
 }

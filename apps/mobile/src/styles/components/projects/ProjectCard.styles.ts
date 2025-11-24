@@ -17,10 +17,34 @@ export const createProjectCardStyles = (palette: ColorPalette, fontMode: string)
       overflow: 'hidden',
       position: 'relative',
     },
-    favoriteButton: {
+    imageContainer: {
+      position: 'relative',
+      width: '100%',
+      height: 200,
+    },
+    image: {
+      width: '100%',
+      height: '100%',
+      resizeMode: 'cover',
+    },
+    imageOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.15)',
+    },
+    statusBadgeContainer: {
       position: 'absolute',
       top: spacing.sm,
       right: spacing.sm,
+      zIndex: 10,
+    },
+    favoriteButton: {
+      position: 'absolute',
+      top: spacing.sm,
+      left: spacing.sm,
       zIndex: 10,
       backgroundColor: 'rgba(255, 255, 255, 0.9)',
       borderRadius: 20,
@@ -30,11 +54,6 @@ export const createProjectCardStyles = (palette: ColorPalette, fontMode: string)
       shadowOpacity: 0.2,
       shadowRadius: 3,
       elevation: 5,
-    },
-    image: {
-      width: '100%',
-      height: 200,
-      resizeMode: 'cover',
     },
     content: {
       padding: spacing.md,

@@ -4,16 +4,7 @@ import { useState, useEffect } from 'react'
 import { getMyProjects } from '../services/projectsService'
 import { AuthenticationError, getDisplayMessage } from '../../../utils/errorHandler'
 import Toast from 'react-native-toast-message'
-
-interface Project {
-  uuid_application: string  
-  uuid_project: string     
-  title: string
-  shortDescription: string
-  bannerUrl: string | null
-  status: string
-  createdAt: string
-}
+import type { ProjectListItem } from '../types/project.types'
 
 interface Pagination {
   page: number
@@ -24,7 +15,7 @@ interface Pagination {
 }
 
 export default function useMyProjects(initialPage: number = 1) {
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<ProjectListItem[]>([])
   const [pagination, setPagination] = useState<Pagination>({
     page: initialPage,
     perPage: 9,

@@ -8,11 +8,13 @@ import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyle
 import { createProjectDetailsStyles } from '../../../styles/screens/ProjectDetails.styles'
 import useProjectDetails from '../hooks/useProjectDetails'
 import { downloadAllAttachments } from '../services/projectsService'
+import { formatDateStringSpanish } from '../../../utils/dateUtils'
 import Toast from 'react-native-toast-message'
 import ProjectImage from '../components/ProjectImage'
 import ProjectSummary from '../components/ProjectSummary'
 import ProjectInfoCard from '../components/ProjectInfoCard'
 import AttachmentCard from '../components/AttachmentCard'
+import ProjectStatusBadge from '../components/ProjectStatusBadge'
 
 const ProjectDetails: React.FC = () => {
   const styles = useThemedStyles(createProjectDetailsStyles)
@@ -22,21 +24,51 @@ const ProjectDetails: React.FC = () => {
   const { uuid } = route.params || {}
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
 
-  console.log('🔍 ProjectDetails - Route params:', route.params)
-  console.log('🔍 ProjectDetails - UUID:', uuid)
-
   const { project, isLoading, error } = useProjectDetails(uuid)
-  console.log('📦 Project data:', project)
-  console.log('📎 Attachments:', project?.attachments)
-  console.log('📎 Attachments length:', project?.attachments?.length)
-  // Formatear fechas
+
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'No especificada'
-    return new Date(dateString).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    console.log(' Formatting date:', dateString) 
+    
+    if (!dateString) {
+      console.log(' No date string provided')
+      return 'No especificada'
+    }
+    
+    try {
+      const formatted = formatDateStringSpanish(dateString)
+      console.log(' Formatted result:', formatted) 
+      
+      if (!formatted || formatted === 'Invalid Date' || formatted === 'Invalid date') {
+        console.log(' Invalid formatted date')
+        return 'No especificada'
+      }
+      return formatted
+    } catch (error) {
+      console.error(' Error formatting date:', error)
+      return 'No especificada'
+    }
+  }
+
+  const extractNames = (items: any[] | null | undefined, fallback: string = 'No especificado'): string => {
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return fallback
+    }
+    
+    try {
+      const names = items
+        .filter(item => item != null)
+        .map(item => {
+          if (typeof item === 'string') return item
+          if (typeof item === 'object' && item.name) return item.name
+          return String(item)
+        })
+        .filter(name => name && name !== 'undefined' && name !== 'null')
+      
+      return names.length > 0 ? names.join(', ') : fallback
+    } catch (err) {
+      console.error('Error extracting names:', err)
+      return fallback
+    }
   }
 
   // Manejar contacto
@@ -66,7 +98,7 @@ const ProjectDetails: React.FC = () => {
       } else {
         Toast.show({
           type: 'success',
-          text1: '✅ Archivos descargados',
+          text1: '✓ Archivos descargados',
           text2: `Se descargaron ${result.successful} archivos exitosamente`,
           position: 'bottom',
           visibilityTime: 3000,
@@ -134,40 +166,27 @@ const ProjectDetails: React.FC = () => {
       : []),
   ]
 
-  // Información del proyecto
+ 
   const projectInfo = [
     {
       label: 'Tipo de proyecto',
-      value:
-        project.projectTypes?.length > 0
-          ? project.projectTypes.map((pt: any) => (typeof pt === 'object' ? pt.name : pt)).join(', ')
-          : 'No especificado',
+      value: extractNames(project.projectTypes),
     },
     {
       label: 'Facultades',
-      value:
-        project.faculties?.length > 0
-          ? project.faculties.map((f: any) => (typeof f === 'object' ? f.name : f)).join(', ')
-          : 'No especificada',
+      value: extractNames(project.faculties, 'No especificada'),
     },
     {
       label: 'Tipo de problemática',
-      value:
-        project.problemTypes?.length > 0
-          ? project.problemTypes.map((pt: any) => (typeof pt === 'object' ? pt.name : pt)).join(', ')
-          : 'No especificado',
+      value: extractNames(project.problemTypes),
     },
     {
-      label: 'Fecha estimada',
-      value: formatDate(project.deadline),
+      label: 'Fecha límite',  
+      value: formatDate(project.estimatedDate),
     },
     {
       label: 'Fecha de creación',
       value: formatDate(project.createdAt),
-    },
-    {
-      label: 'Estado',
-      value: project.status === 'approved' ? 'Aprobado' : project.status === 'pending' ? 'Pendiente' : project.status,
     },
   ]
 
@@ -177,6 +196,11 @@ const ProjectDetails: React.FC = () => {
         <Text style={styles.title}>
           Detalles del <Text style={styles.titleAccent}>proyecto</Text>
         </Text>
+        {project.status && (
+          <View style={{ marginTop: 8 }}>
+            <ProjectStatusBadge status={project.status} />
+          </View>
+        )}
       </View>
 
       <View style={styles.content}>
@@ -212,7 +236,6 @@ const ProjectDetails: React.FC = () => {
 
         {/* Botones de acción */}
         <View style={styles.actionsContainer}>
-          {/* Botón Descargar Todos */}
           {project.attachments && project.attachments.length > 0 && (
             <TouchableOpacity
               style={[
@@ -238,7 +261,6 @@ const ProjectDetails: React.FC = () => {
             </TouchableOpacity>
           )}
 
-          {/* Botón Ponerse en Contacto */}
           {project.author?.email && (
             <TouchableOpacity
               style={[

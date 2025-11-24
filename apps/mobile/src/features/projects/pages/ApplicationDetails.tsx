@@ -17,11 +17,13 @@ import { createApplicationDetailsStyles } from '../../../styles/screens/Applicat
 import useApplicationDetails from '../hooks/useApplicationDetails'
 import { approveApplication, downloadAllAttachments } from '../services/projectsService'
 import { getDisplayMessage } from '../../../utils/errorHandler'
+import { formatDateStringSpanish } from '../../../utils/dateUtils'
 import Toast from 'react-native-toast-message'
 import ProjectImage from '../components/ProjectImage'
 import ProjectSummary from '../components/ProjectSummary'
 import ProjectInfoCard from '../components/ProjectInfoCard'
 import AttachmentCard from '../components/AttachmentCard'
+import ProjectStatusBadge from '../components/ProjectStatusBadge'
 
 const ApplicationDetails: React.FC = () => {
   const styles = useThemedStyles(createApplicationDetailsStyles)
@@ -34,30 +36,25 @@ const ApplicationDetails: React.FC = () => {
   const [isApproving, setIsApproving] = useState(false)
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
 
-  // Formatear fechas
+  // Formatear fechas usando la utilidad
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'No especificada'
-    return new Date(dateString).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    return formatDateStringSpanish(dateString)
   }
 
   // Manejar contacto
   const handleContact = () => {
-  if (application.author?.email) {
-    Linking.openURL(
-      `mailto:${application.author.email}?subject=Consulta sobre proyecto: ${application.title}`
-    )
-    return
-  }
+    if (application?.author?.email) {
+      Linking.openURL(
+        `mailto:${application.author.email}?subject=Consulta sobre proyecto: ${application.title}`
+      )
+      return
+    }
 
-  if (application.author?.phoneNumber) {
-    Linking.openURL(`tel:${application.author.phoneNumber}`)
+    if (application?.author?.phoneNumber) {
+      Linking.openURL(`tel:${application.author.phoneNumber}`)
+    }
   }
-}
-
 
   // Manejar descarga de todos los archivos
   const handleDownloadAll = async () => {
@@ -79,7 +76,7 @@ const ApplicationDetails: React.FC = () => {
       } else {
         Toast.show({
           type: 'success',
-          text1: ' Archivos descargados',
+          text1: '✓ Archivos descargados',
           text2: `Se descargaron ${result.successful} archivos exitosamente`,
           position: 'bottom',
           visibilityTime: 3000,
@@ -92,104 +89,91 @@ const ApplicationDetails: React.FC = () => {
     }
   }
 
-// Manejar aprobación
-const handleApprove = async () => {
-  Alert.alert(
-    'Confirmar aprobación',
-    `¿Estás seguro de que deseas aprobar el proyecto "${application?.title}"?\n\nEsto lo convertirá en un proyecto activo y aparecerá en "Mis Proyectos".`,
-    [
-      {
-        text: 'Cancelar',
-        style: 'cancel',
-      },
-      {
-        text: 'Aprobar',
-        style: 'default',
-        onPress: async () => {
-          if (!uuid) {
-            console.error(' No hay UUID')
-            // Justo antes del return
-            console.log(' Application projectTypes:', application?.projectTypes)
-            console.log(' Application faculties:', application?.faculties)
-            console.log(' Application problemTypes:', application?.problemTypes)
-            console.log(' Application deadline:', application?.deadline)
-            return
-          }
-
-          setIsApproving(true)
-
-          try {
-            console.log(' Aprobando proyecto con UUID:', uuid)
-            console.log(' Application data:', application)
-            
-            // ✅ Extraer IDs y filtrar nulls
-            const projectTypeIds = application.projectTypes
-              ?.map((pt: any) => pt?.project_type_id || pt?.id)
-              .filter((id: any) => id != null) || []
-            
-            const facultyIds = application.faculties
-              ?.map((f: any) => f?.faculty_id || f?.id)
-              .filter((id: any) => id != null) || []
-            
-            const problemTypeIds = application.problemTypes
-              ?.map((pt: any) => pt?.problem_type_id || pt?.id)
-              .filter((id: any) => id != null) || []
-
-            // ✅ Formatear fecha a YYYY-MM-DD
-            const estimatedDate = application.deadline 
-              ? new Date(application.deadline).toISOString().split('T')[0]
-              : undefined
-
-            console.log(' Extracted IDs:', {
-              projectTypeIds,
-              facultyIds,
-              problemTypeIds,
-              estimatedDate,
-            })
-
-            const projectData = {
-              title: application.title,
-              shortDescription: application.shortDescription,
-              description: application.detailedDescription,
-              estimatedDate,
-              projectType: projectTypeIds,
-              faculty: facultyIds,
-              problemType: problemTypeIds,
+  // Manejar aprobación
+  const handleApprove = async () => {
+    Alert.alert(
+      'Confirmar aprobación',
+      `¿Estás seguro de que deseas aprobar el proyecto "${application?.title}"?\n\nEsto lo convertirá en un proyecto activo y aparecerá en "Mis Proyectos".`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Aprobar',
+          style: 'default',
+          onPress: async () => {
+            if (!uuid || !application) {
+              console.error('❌ No hay UUID o application')
+              return
             }
 
-            console.log('📦 Project data to send:', projectData)
-            
-            await approveApplication(uuid, projectData)
+            setIsApproving(true)
 
-            Toast.show({
-              type: 'success',
-              text1: ' Proyecto aprobado',
-              text2: 'El proyecto ha sido aprobado exitosamente',
-              position: 'bottom',
-              visibilityTime: 3000,
-            })
+            try {
+              console.log('🚀 Aprobando proyecto con UUID:', uuid)
+              
+              //  Extraer IDs de los objetos
+              const projectTypeIds = application.projectTypes
+                ?.map((pt: any) => pt.project_type_id)
+                .filter((id: any) => id != null) || []
+              
+              const facultyIds = application.faculties
+                ?.map((f: any) => f.faculty_id)
+                .filter((id: any) => id != null) || []
+              
+              const problemTypeIds = application.problemTypes
+                ?.map((pt: any) => pt.problem_type_id)
+                .filter((id: any) => id != null) || []
 
-            setTimeout(() => {
-              navigation.navigate('MyProjects')
-            }, 1500)
-          } catch (error: any) {
-            console.error(' Error aprobando proyecto:', error)
+              //  Formatear fecha a YYYY-MM-DD
+              const deadline = application.deadline 
+                ? application.deadline.split('T')[0]
+                : undefined
 
-            Toast.show({
-              type: 'error',
-              text1: 'Error al aprobar',
-              text2: getDisplayMessage(error),
-              position: 'bottom',
-              visibilityTime: 4000,
-            })
-          } finally {
-            setIsApproving(false)
-          }
+              const projectData = {
+                title: application.title,
+                shortDescription: application.shortDescription,
+                description: application.detailedDescription,
+                deadline,
+                projectType: projectTypeIds,
+                faculty: facultyIds,
+                problemType: problemTypeIds,
+              }
+
+              console.log('📦 Project data to send:', projectData)
+              
+              await approveApplication(uuid, projectData)
+
+              Toast.show({
+                type: 'success',
+                text1: '✓ Proyecto aprobado',
+                text2: 'El proyecto ha sido aprobado exitosamente',
+                position: 'bottom',
+                visibilityTime: 3000,
+              })
+
+              setTimeout(() => {
+                navigation.navigate('MyProjects')
+              }, 1500)
+            } catch (error: any) {
+              console.error('❌ Error aprobando proyecto:', error)
+
+              Toast.show({
+                type: 'error',
+                text1: 'Error al aprobar',
+                text2: getDisplayMessage(error),
+                position: 'bottom',
+                visibilityTime: 4000,
+              })
+            } finally {
+              setIsApproving(false)
+            }
+          },
         },
-      },
-    ]
-  )
-}
+      ]
+    )
+  }
 
   // Loading state
   if (isLoading) {
@@ -244,25 +228,21 @@ const handleApprove = async () => {
       label: 'Tipo de proyecto',
       value:
         application.projectTypes?.length > 0
-          ? application.projectTypes
-              .map((pt: any) => (typeof pt === 'object' ? pt.name : pt))
-              .join(', ')
+          ? application.projectTypes.map((pt: any) => pt.name).join(', ')
           : 'No especificado',
     },
     {
       label: 'Facultades',
       value:
         application.faculties?.length > 0
-          ? application.faculties.map((f: any) => (typeof f === 'object' ? f.name : f)).join(', ')
+          ? application.faculties.map((f: any) => f.name).join(', ')
           : 'No especificada',
     },
     {
       label: 'Tipo de problemática',
       value:
         application.problemTypes?.length > 0
-          ? application.problemTypes
-              .map((pt: any) => (typeof pt === 'object' ? pt.name : pt))
-              .join(', ')
+          ? application.problemTypes.map((pt: any) => pt.name).join(', ')
           : 'No especificado',
     },
     {
@@ -275,14 +255,9 @@ const handleApprove = async () => {
     },
     {
       label: 'Estado',
-      value:
-        application.status === 'pending'
-          ? 'Pendiente'
-          : application.status === 'approved'
-          ? 'Aprobado'
-          : application.status === 'rejected'
-          ? 'Rechazado'
-          : application.status,
+      value: typeof application.status === 'string' 
+        ? application.status 
+        : application.status.name,
     },
   ]
 
@@ -292,6 +267,13 @@ const handleApprove = async () => {
         <Text style={styles.title}>
           Detalles del <Text style={styles.titleAccent}>proyecto</Text>
         </Text>
+        
+        {/* Badge de estado */}
+        {application.status && (
+          <View style={{ marginTop: 8, alignItems: 'center' }}>
+            <ProjectStatusBadge status={application.status} />
+          </View>
+        )}
       </View>
 
       <View style={styles.content}>
@@ -374,18 +356,18 @@ const handleApprove = async () => {
           </TouchableOpacity>
 
           {/* Botón Ponerse en Contacto */}
-        {(application.author?.email || application.author?.phoneNumber) && (
-        <TouchableOpacity
-            style={[
-            styles.contactButton,
-            (isApproving || isDownloadingAll) && styles.contactButtonDisabled,
-            ]}
-            onPress={handleContact}
-            disabled={isApproving || isDownloadingAll}
-        >
-            <Text style={styles.contactButtonText}>Ponerse en contacto</Text>
-        </TouchableOpacity>
-        )}
+          {(application.author?.email || application.author?.phoneNumber) && (
+            <TouchableOpacity
+              style={[
+                styles.contactButton,
+                (isApproving || isDownloadingAll) && styles.contactButtonDisabled,
+              ]}
+              onPress={handleContact}
+              disabled={isApproving || isDownloadingAll}
+            >
+              <Text style={styles.contactButtonText}>Ponerse en contacto</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </ScrollView>
