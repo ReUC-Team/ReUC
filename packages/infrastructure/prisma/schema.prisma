@@ -143,15 +143,16 @@ model Outsider {
  * https://www.prisma.io/docs/orm/prisma-client/queries/full-text-search
  */
 model Application {
-  uuid_application String   @id @default(uuid())
-  uuidAuthor       String   @map("uuid_author")
-  statusId         Int      @map("status_id")
+  uuid_application String    @id @default(uuid())
+  uuidAuthor       String    @map("uuid_author")
+  statusId         Int       @map("status_id")
   title            String
-  shortDescription String   @map("short_description")
+  shortDescription String    @map("short_description")
   description      String
   deadline         DateTime
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  deletedAt        DateTime? @map("deleted_at")
 
   author            User               @relation(fields: [uuidAuthor], references: [uuid_user])
   applicationStatus Application_Status @relation(fields: [statusId], references: [application_status_id])
@@ -164,6 +165,7 @@ model Application {
   @@index([uuidAuthor])
   @@index([createdAt])
   @@index([deadline])
+  @@index([deletedAt])
   @@map("Applications")
 }
 

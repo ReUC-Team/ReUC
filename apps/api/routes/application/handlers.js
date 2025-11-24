@@ -140,3 +140,22 @@ export async function updateApplicationHandler(req, res) {
     data: { application: applicationData },
   });
 }
+
+/**
+ * Handles the delete of an application.
+ */
+export async function deleteApplicationHandler(req, res) {
+  const user = req.user;
+  const { uuid } = req.params;
+
+  await application.delete({
+    uuidApplication: uuid,
+    uuidAuthor: user.uuid_user,
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: {},
+    message: "Application deleted successfully",
+  });
+}
