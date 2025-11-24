@@ -1,5 +1,6 @@
 import { create } from "./create.js";
 import { update } from "./update.js";
+import { deleteApplication } from "./deleteApplication.js";
 import { getCreationFormData } from "./getCreationFormData.js";
 import { getExploreApplications } from "./getExploreApplications.js";
 import { getExploreFilters } from "./getExploreFilters.js";
@@ -13,6 +14,7 @@ import { myApplications } from "./myApplications.js";
 const applications = {
   create,
   update,
+  delete: deleteApplication,
   getCreationFormData,
   getExploreApplications,
   getExploreFilters,

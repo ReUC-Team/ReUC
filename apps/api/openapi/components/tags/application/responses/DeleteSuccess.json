@@ -1,0 +1,16 @@
+{
+  "description": "Successful deletion of the application.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "description": "Empty object upon successful deletion.",
+          "example": {}
+        }
+      }
+    }
+  ]
+}
