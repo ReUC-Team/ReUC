@@ -94,7 +94,7 @@ export const getSidebarProjectRoutes = (role: string): ProjectRoute[] => {
 }
 
 /**
- * ✅ NUEVA: Obtiene las rutas que deben mostrarse en la búsqueda según el rol
+ *   Obtiene las rutas que deben mostrarse en la búsqueda según el rol
  * (Solo rutas con showInSidebar: true para que no salgan rutas de detalles)
  */
 export const getSearchRoutesByRole = (role: string): ProjectRoute[] => {

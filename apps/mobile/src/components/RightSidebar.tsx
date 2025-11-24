@@ -74,7 +74,7 @@ const accessibilityItems: AccessibilityItem[] = [
     iconType: 'ionicons',
     label: 'Fuente Dislexia',
     setting: 'fontChange',
-    hasToggle: true, // ✅ Ahora tiene toggle
+    hasToggle: true, 
   },
 ]
 
@@ -91,20 +91,20 @@ export default function RightSidebar({
   const navigation = useNavigation<any>()
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
-  const { themeMode, setThemeMode, fontMode, setFontMode } = useTheme() // ✅ Agregamos fontMode
+  const { themeMode, setThemeMode, fontMode, setFontMode } = useTheme() 
   const { handleLogout, isLoading: isLoggingOut } = useLogout()
 
   const [accessibilitySettings, setAccessibilitySettings] = useState({
     darkMode: themeMode === 'dark',
     highContrast: themeMode === 'highContrast',
-    dyslexicFont: fontMode === 'dyslexic', // ✅ Nuevo
+    dyslexicFont: fontMode === 'dyslexic', 
   })
 
   useEffect(() => {
     setAccessibilitySettings({
       darkMode: themeMode === 'dark',
       highContrast: themeMode === 'highContrast',
-      dyslexicFont: fontMode === 'dyslexic', // ✅ Sincronizar con context
+      dyslexicFont: fontMode === 'dyslexic', 
     })
   }, [themeMode, fontMode])
 
@@ -138,7 +138,7 @@ export default function RightSidebar({
       setThemeMode(themeMode === 'highContrast' ? 'light' : 'highContrast')
     }
     if (setting === 'fontChange') {
-      // ✅ Cambiar fuente
+      
       setFontMode(fontMode === 'dyslexic' ? 'default' : 'dyslexic')
     }
   }

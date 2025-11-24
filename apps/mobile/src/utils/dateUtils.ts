@@ -41,7 +41,7 @@ export const formatDateSpanish = (date: Date | null): string => {
       year: 'numeric', 
       month: 'long', 
       day: 'numeric',
-      timeZone: 'UTC' // ✅ Importante: usar UTC para fechas ISO
+      timeZone: 'UTC' 
     })
   } catch (error) {
     console.error('Error formatting date:', error)
