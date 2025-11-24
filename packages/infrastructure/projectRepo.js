@@ -667,7 +667,7 @@ export const projectRepo = {
   async updateDeadline(uuidProject, newDeadline) {
     try {
       return db.project.update({
-        where: { uuid_project: uuidProject, application: { deletedAt: true } },
+        where: { uuid_project: uuidProject, application: { deletedAt: null } },
         data: {
           application: {
             update: {

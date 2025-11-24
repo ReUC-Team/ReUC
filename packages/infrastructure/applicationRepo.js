@@ -409,7 +409,7 @@ export const applicationRepo = {
   async getByUuid(uuid) {
     try {
       return await db.application.findFirst({
-        where: { uuid_application: uuid, deletedAt: true },
+        where: { uuid_application: uuid, deletedAt: null },
         select: {
           uuid_application: true,
           uuidAuthor: true,
