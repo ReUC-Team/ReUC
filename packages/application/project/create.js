@@ -85,7 +85,7 @@ export async function create({ uuidRequestingUser, body }) {
     // 3.1. Handle Conflicts (from createProjectDomain)
     if (err instanceof DomainError.ConflictError)
       throw new ApplicationError.ConflictError(
-        "The registration could not be completed due to a conflict with an existing resource.",
+        "The operation could not be completed due to a conflict with an existing resource.",
         { cause: err }
       );
 

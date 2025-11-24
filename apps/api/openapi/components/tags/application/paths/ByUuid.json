@@ -37,7 +37,7 @@
     "summary": "(Web) Update an application",
     "description": "Updates the details and classifications of an existing application.\n - Requires **\"professor\"** role.",
     "tags": ["Application"],
-    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
     "requestBody": {
       "required": true,
       "content": {
@@ -59,6 +59,28 @@
       "401": { "$ref": "../../../responses/Error401.json" },
       "403": { "$ref": "../../../responses/Error403.json" },
       "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  },
+  "delete": {
+    "summary": "(Web) Delete an application",
+    "description": "Soft deletes an application if it has not yet been approved as a project.\n - Requires **\"outsider\"** or **\"professor\"** role.",
+    "tags": ["Application"],
+    "security": [{ "BearerAuth": [], "CsrfAuth": [] }],
+    "responses": {
+      "200": {
+        "description": "Successfully deleted the application.",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "../responses/DeleteSuccess.json" }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "409": { "$ref": "../../../responses/Error409.json" },
       "500": { "$ref": "../../../responses/Error500.json" }
     }
   }

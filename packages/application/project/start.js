@@ -12,7 +12,6 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @throws {ApplicationError.ValidationError} If the input data is invalid.
  * @throws {ApplicationError.NotFoundError} If any resource is not found during transaction.
  * @throws {ApplicationError.AuthorizationError}
- * @throws {ApplicationError.ConflictError} if the application is already approved
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
 export async function start(uuidProject, uuidRequestingUser) {
