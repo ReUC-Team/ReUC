@@ -627,3 +627,24 @@ export async function updateProjectDeadline(uuid_project, newDeadline) {
 
   return response.data;
 }
+
+/**
+ * Elimina una Application (soft delete)
+ * DELETE /application/:uuid
+ */
+export async function deleteApplication(uuid_application) {
+  const csrfToken = await getCSRFToken();
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/application/${uuid_application}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "csrf-token": csrfToken,
+      },
+    }
+  );
+
+  return response.data;
+}

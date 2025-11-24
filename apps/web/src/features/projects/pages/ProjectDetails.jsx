@@ -8,6 +8,7 @@ import useProjectDetails from '../hooks/useProjectDetails';
 import useProjectActions from '@/features/projects/hooks/useProjectActions';
 import useProjectValidation from '@/features/projects/hooks/useProjectValidation';
 import useTeamMetadata from '@/features/teams/hooks/useTeamMetadata';
+import useCurrentUser from '@/features/auth/hooks/useCurrentUser';
 import ProjectStatusBadge from '../components/ProjectStatusBadge';
 import StartProjectModal from '../components/StartProjectModal';
 import RollbackProjectModal from '../components/RollbackProjectModal';
@@ -21,6 +22,7 @@ export default function ProjectDetails() {
   const { project, isLoading, error, refetch } = useProjectDetails(uuid);
   const { constraints } = useTeamMetadata(uuid);
   const validation = useProjectValidation(project, constraints);
+  const { role } = useCurrentUser();
   const {
     isStarting,
     isRollingBack,
@@ -36,12 +38,13 @@ export default function ProjectDetails() {
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
 
-  // Permisos
-  const isCreator = true;
-  const canStart = project?.status?.slug === 'project_approved' && isCreator;
+  // Permisos basados en rol
+  const isProfessor = role?.name === 'professor' || role?.slug === 'professor';
+  const canStart = project?.status?.slug === 'project_approved' && isProfessor;
   const isProjectStarted = project?.status?.slug === 'project_in_progress' || project?.status?.slug === 'completed';
-  const canRollback = isCreator && (project?.status?.slug === 'project_in_progress' || project?.status?.slug === 'completed');
-  const canUpdateDeadline = isCreator && !isRollingBack && !isStarting;
+  const canRollback = isProfessor && (project?.status?.slug === 'project_in_progress' || project?.status?.slug === 'completed');
+  const canUpdateDeadline = isProfessor && !isRollingBack && !isStarting;
+  const canManageTeam = isProfessor;
 
   // Descargar todos los archivos adjuntos
   const handleDownloadAll = async () => {
@@ -355,15 +358,15 @@ export default function ProjectDetails() {
             {project?.status?.slug === 'project_approved' && (
               <button
                 onClick={() => {
-                  if (isCreator && validation.canStart && !isStarting) {
+                  if (isProfessor && validation.canStart && !isStarting) {
                     setShowStartModal(true);
                   }
                 }}
-                disabled={!isCreator || !validation.canStart || isStarting}
+                disabled={!isProfessor || !validation.canStart || isStarting}
                 className="px-6 py-3 bg-lime-700 text-white rounded-lg hover:bg-lime-800 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
                 title={
-                  !isCreator
-                    ? 'Solo el creador puede iniciar el proyecto'
+                  !isProfessor
+                    ? 'Solo los profesores pueden iniciar el proyecto'
                     : !validation.canStart
                     ? 'El equipo no cumple los requisitos'
                     : isStarting

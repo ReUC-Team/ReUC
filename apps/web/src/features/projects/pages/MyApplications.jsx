@@ -5,10 +5,9 @@ import useMyApplications from '../hooks/useMyApplications';
 
 export default function MyApplications() {
   const [search, setSearch] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  const { applications, pagination, isLoading, error } = useMyApplications(currentPage);
+  const { applications, pagination, isLoading, error, handlePageChange } = useMyApplications();
 
   // Filtrar por búsqueda local
   const filteredApplications = applications.filter((app) => {
@@ -21,11 +20,6 @@ export default function MyApplications() {
 
   const handleApplicationClick = (uuid) => {
     navigate(`/my-applications/${uuid}`);
-  };
-
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Loading state
@@ -127,20 +121,20 @@ export default function MyApplications() {
           {pagination.totalPages > 1 && (
             <div className="flex items-center gap-4 mb-10">
               <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={pagination.page === 1}
                 className="px-4 py-2 bg-lime-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-lime-700 transition"
               >
                 Anterior
               </button>
 
               <span className="text-gray-700 font-medium">
-                Página {currentPage} de {pagination.totalPages}
+                Página {pagination.page} de {pagination.totalPages}
               </span>
 
               <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage >= pagination.totalPages}
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={pagination.page >= pagination.totalPages}
                 className="px-4 py-2 bg-lime-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-lime-700 transition"
               >
                 Siguiente
