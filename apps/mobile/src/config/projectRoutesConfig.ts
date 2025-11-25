@@ -68,45 +68,52 @@ export const PROJECT_ROUTES: ProjectRoute[] = [
     roles: ['outsider', 'student', 'professor', 'admin'],
     showInSidebar: false,
   },
-  {
-    screen: 'FavoriteProjects',
-    label: 'Mis favoritos',
-    icon: 'star-outline',
-    roles: ['outsider', 'student', 'professor', 'admin'],
-    showInSidebar: true,
-  },
 ]
+
+/**
+ * Helper para normalizar el role a string
+ * Acepta tanto string como objeto {slug, name}
+ */
+const normalizeRole = (role: string | { slug: string; name: string } | undefined): string => {
+  if (!role) return 'outsider'
+  if (typeof role === 'string') return role
+  return role.slug || 'outsider'
+}
 
 /**
  * Obtiene las rutas de proyectos permitidas según el rol
  */
-export const getProjectRoutesByRole = (role: string): ProjectRoute[] => {
-  return PROJECT_ROUTES.filter((route) => route.roles.includes(role as any))
+export const getProjectRoutesByRole = (role: string | { slug: string; name: string } | undefined): ProjectRoute[] => {
+  const normalizedRole = normalizeRole(role)
+  return PROJECT_ROUTES.filter((route) => route.roles.includes(normalizedRole as any))
 }
 
 /**
  * Obtiene las rutas que deben mostrarse en el sidebar según el rol
  */
-export const getSidebarProjectRoutes = (role: string): ProjectRoute[] => {
+export const getSidebarProjectRoutes = (role: string | { slug: string; name: string } | undefined): ProjectRoute[] => {
+  const normalizedRole = normalizeRole(role)
   return PROJECT_ROUTES.filter(
-    (route) => route.roles.includes(role as any) && route.showInSidebar
+    (route) => route.roles.includes(normalizedRole as any) && route.showInSidebar
   )
 }
 
 /**
- *   Obtiene las rutas que deben mostrarse en la búsqueda según el rol
+ * Obtiene las rutas que deben mostrarse en la búsqueda según el rol
  * (Solo rutas con showInSidebar: true para que no salgan rutas de detalles)
  */
-export const getSearchRoutesByRole = (role: string): ProjectRoute[] => {
+export const getSearchRoutesByRole = (role: string | { slug: string; name: string } | undefined): ProjectRoute[] => {
+  const normalizedRole = normalizeRole(role)
   return PROJECT_ROUTES.filter(
-    (route) => route.roles.includes(role as any) && route.showInSidebar
+    (route) => route.roles.includes(normalizedRole as any) && route.showInSidebar
   )
 }
 
 /**
  * Verifica si un usuario tiene acceso a una ruta específica
  */
-export const hasAccessToRoute = (role: string, screen: string): boolean => {
+export const hasAccessToRoute = (role: string | { slug: string; name: string } | undefined, screen: string): boolean => {
+  const normalizedRole = normalizeRole(role)
   const route = PROJECT_ROUTES.find((r) => r.screen === screen)
-  return route ? route.roles.includes(role as any) : false
+  return route ? route.roles.includes(normalizedRole as any) : false
 }

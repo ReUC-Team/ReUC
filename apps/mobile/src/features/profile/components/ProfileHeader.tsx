@@ -49,12 +49,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <Text style={styles.editButtonText}>Editar Perfil</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+{/*         <TouchableOpacity 
           style={[styles.button, styles.contactButton]} 
           onPress={onContactPress}
         >
           <Text style={styles.contactButtonText}>Contactar</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );

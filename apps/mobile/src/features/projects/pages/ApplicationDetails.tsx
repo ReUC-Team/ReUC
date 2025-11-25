@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles'
 import { createApplicationDetailsStyles } from '../../../styles/screens/ApplicationDetails.styles'
 import useApplicationDetails from '../hooks/useApplicationDetails'
+import useEditApplication from '../hooks/useEditApplication'
 import { approveApplication, downloadAllAttachments } from '../services/projectsService'
 import { getDisplayMessage } from '../../../utils/errorHandler'
 import { formatDateStringSpanish } from '../../../utils/dateUtils'
@@ -24,6 +25,7 @@ import ProjectSummary from '../components/ProjectSummary'
 import ProjectInfoCard from '../components/ProjectInfoCard'
 import AttachmentCard from '../components/AttachmentCard'
 import ProjectStatusBadge from '../components/ProjectStatusBadge'
+import EditApplicationModal from '../components/EditApplicationModal'
 
 const ApplicationDetails: React.FC = () => {
   const styles = useThemedStyles(createApplicationDetailsStyles)
@@ -33,8 +35,11 @@ const ApplicationDetails: React.FC = () => {
   const { uuid } = route.params || {}
 
   const { application, isLoading, error } = useApplicationDetails(uuid)
+  const { isLoading: isEditing, handleSaveOnly, handleSaveAndApprove } = useEditApplication(uuid)
+  
   const [isApproving, setIsApproving] = useState(false)
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
 
   // Formatear fechas usando la utilidad
   const formatDate = (dateString?: string) => {
@@ -89,7 +94,29 @@ const ApplicationDetails: React.FC = () => {
     }
   }
 
-  // Manejar aprobación
+  // Manejar guardado sin aprobar
+  const handleSaveOnlyWrapper = async (data: any) => {
+    const success = await handleSaveOnly(data)
+    if (success) {
+      setShowEditModal(false)
+      setTimeout(() => {
+        navigation.navigate('ApplicationDetails', { uuid })
+      }, 1500)
+    }
+  }
+
+  // Manejar guardado y aprobación
+  const handleSaveAndApproveWrapper = async (data: any) => {
+    const projectUuid = await handleSaveAndApprove(data)
+    if (projectUuid) {
+      setShowEditModal(false)
+      setTimeout(() => {
+        navigation.navigate('ProjectDetails', { uuid: projectUuid })
+      }, 1500)
+    }
+  }
+
+  // Manejar aprobación directa (sin editar)
   const handleApprove = async () => {
     Alert.alert(
       'Confirmar aprobación',
@@ -113,7 +140,7 @@ const ApplicationDetails: React.FC = () => {
             try {
               console.log('🚀 Aprobando proyecto con UUID:', uuid)
               
-              //  Extraer IDs de los objetos
+              // Extraer IDs de los objetos
               const projectTypeIds = application.projectTypes
                 ?.map((pt: any) => pt.project_type_id)
                 .filter((id: any) => id != null) || []
@@ -126,7 +153,7 @@ const ApplicationDetails: React.FC = () => {
                 ?.map((pt: any) => pt.problem_type_id)
                 .filter((id: any) => id != null) || []
 
-              //  Formatear fecha a YYYY-MM-DD
+              // Formatear fecha a YYYY-MM-DD
               const deadline = application.deadline 
                 ? application.deadline.split('T')[0]
                 : undefined
@@ -308,28 +335,6 @@ const ApplicationDetails: React.FC = () => {
             ))}
           </>
         )}
-
-        {/* Botones de acción */}
-        <View style={styles.actionsContainer}>
-          {/* Botón Aceptar Proyecto */}
-          <TouchableOpacity
-            style={[styles.approveButton, isApproving && styles.approveButtonDisabled]}
-            onPress={handleApprove}
-            disabled={isApproving}
-          >
-            {isApproving ? (
-              <>
-                <ActivityIndicator size="small" color={palette.onPrimary} />
-                <Text style={styles.approveButtonText}>Aprobando...</Text>
-              </>
-            ) : (
-              <>
-                <Ionicons name="checkmark-circle" size={20} color={palette.onPrimary} />
-                <Text style={styles.approveButtonText}>Aceptar proyecto</Text>
-              </>
-            )}
-          </TouchableOpacity>
-
           {/* Botón Descargar Todos */}
           <TouchableOpacity
             style={[
@@ -354,22 +359,69 @@ const ApplicationDetails: React.FC = () => {
               </>
             )}
           </TouchableOpacity>
+          
+        {/* Botones de acción */}
+        
+          {/* Botón Editar Proyecto */}
+          <TouchableOpacity
+            style={[
+              styles.editButton,
+              (isApproving || isDownloadingAll || isEditing) && styles.editButtonDisabled,
+            ]}
+            onPress={() => setShowEditModal(true)}
+            disabled={isApproving || isDownloadingAll || isEditing}
+          >
+            <Ionicons name="create-outline" size={20} color={palette.onPrimary} />
+            <Text style={styles.editButtonText}>Editar proyecto</Text>
+          </TouchableOpacity>
+
+          {/* Botón Aceptar Proyecto */}
+          <TouchableOpacity
+            style={[styles.approveButton, (isApproving || isEditing) && styles.approveButtonDisabled]}
+            onPress={handleApprove}
+            disabled={isApproving || isEditing}
+          >
+            {isApproving ? (
+              <>
+                <ActivityIndicator size="small" color={palette.onPrimary} />
+                <Text style={styles.approveButtonText}>Aprobando...</Text>
+              </>
+            ) : (
+              <>
+                <Ionicons name="checkmark-circle" size={20} color={palette.onPrimary} />
+                <Text style={styles.approveButtonText}>Aceptar proyecto</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
 
           {/* Botón Ponerse en Contacto */}
           {(application.author?.email || application.author?.phoneNumber) && (
             <TouchableOpacity
               style={[
                 styles.contactButton,
-                (isApproving || isDownloadingAll) && styles.contactButtonDisabled,
+                (isApproving || isDownloadingAll || isEditing) && styles.contactButtonDisabled,
               ]}
               onPress={handleContact}
-              disabled={isApproving || isDownloadingAll}
+              disabled={isApproving || isDownloadingAll || isEditing}
             >
               <Text style={styles.contactButtonText}>Ponerse en contacto</Text>
             </TouchableOpacity>
           )}
         </View>
-      </View>
+     
+
+      {/* Modal de Editar */}
+      <EditApplicationModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        application={application}
+        onSaveSuccess={() => {}}
+        onApproveSuccess={(projectUuid) => {}}
+        isLoading={isEditing}
+        onSaveOnly={handleSaveOnlyWrapper}
+        onSaveAndApprove={handleSaveAndApproveWrapper}
+      />
     </ScrollView>
   )
 }

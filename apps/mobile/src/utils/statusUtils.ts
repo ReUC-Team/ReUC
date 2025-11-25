@@ -52,7 +52,7 @@ export const STATUS_CONFIG: Record<string, {
     iconColor: '#84CC16',
   },
   project_in_progress: {
-    bg: '#84CC16',     
+    bg: '#1f79c3ff',     
     text: '#FFFFFF',    
     iconColor: '#FFFFFF', 
   },

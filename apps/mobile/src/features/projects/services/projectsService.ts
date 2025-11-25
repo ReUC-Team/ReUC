@@ -179,6 +179,16 @@ export const updateApplication = async (uuid: string, data: any) => {
 }
 
 /**
+ * Elimina una aplicación (soft delete)
+ */
+export const deleteApplication = async (uuid: string) => {
+  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/application/${uuid}`, {
+    method: 'DELETE',
+  })
+  return response.data
+}
+
+/**
  * ============================================================================
  * PROJECT ENDPOINTS
  * ============================================================================
@@ -274,9 +284,13 @@ export const getProjectDetails = async (uuid: string): Promise<ProjectDetails> =
 }
 
 export const startProject = async (uuid: string) => {
+  console.log(' INICIANDO PROYECTO:', uuid)
+  
   const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/project/${uuid}/start`, {
     method: 'POST',
   })
+  
+  console.log(' RESPUESTA:', JSON.stringify(response, null, 2))
   return response.data
 }
 

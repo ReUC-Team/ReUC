@@ -17,8 +17,8 @@ interface ProjectCardProps {
   isFavorite?: boolean
   onFavoriteToggle?: (isFavorite: boolean, uuid?: string) => void
   onDetailsClick?: (uuid?: string) => void
-  showTeamButton?: boolean  // NUEVO
-  onTeamClick?: (uuid?: string) => void  // NUEVO
+  showTeamButton?: boolean 
+  onTeamClick?: (uuid?: string) => void 
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -30,8 +30,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   isFavorite = false,
   onFavoriteToggle,
   onDetailsClick,
-  showTeamButton = false,  // NUEVO
-  onTeamClick,  // NUEVO
+  showTeamButton = false,  
+  onTeamClick,  
 }) => {
   const styles = useThemedStyles(createProjectCardStyles)
   const [favorite, setFavorite] = useState(isFavorite)
@@ -67,9 +67,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         )}
         
         {/* Botón de favorito */}
-        <TouchableOpacity style={styles.favoriteButton} onPress={handleFavoriteClick}>
+{/*         <TouchableOpacity style={styles.favoriteButton} onPress={handleFavoriteClick}>
           <Ionicons name={favorite ? 'star' : 'star-outline'} size={24} color={favorite ? '#FCD34D' : '#9CA3AF'} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       <View style={styles.content}>
@@ -80,7 +80,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           {description}
         </Text>
         
-        {/* MODIFICADO: Botones condicionales */}
+        {/* : Botones condicionales */}
         {showTeamButton ? (
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.buttonPrimary} onPress={handleViewDetails}>

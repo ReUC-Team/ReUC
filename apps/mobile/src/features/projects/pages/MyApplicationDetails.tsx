@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles'
 import { createApplicationDetailsStyles } from '../../../styles/screens/ApplicationDetails.styles'
 import useApplicationDetails from '../hooks/useApplicationDetails'
+import useApplicationActions from '../hooks/useApplicationActions'
 import { downloadAllAttachments } from '../services/projectsService'
 import { formatDateStringSpanish } from '../../../utils/dateUtils'
 import Toast from 'react-native-toast-message'
@@ -23,6 +24,7 @@ import ProjectSummary from '../components/ProjectSummary'
 import ProjectInfoCard from '../components/ProjectInfoCard'
 import AttachmentCard from '../components/AttachmentCard'
 import ProjectStatusBadge from '../components/ProjectStatusBadge'
+import DeleteApplicationModal from '../components/DeleteApplicationModal'
 
 const MyApplicationDetails: React.FC = () => {
   const styles = useThemedStyles(createApplicationDetailsStyles)
@@ -32,33 +34,28 @@ const MyApplicationDetails: React.FC = () => {
   const { uuid } = route.params || {}
 
   const { application, isLoading, error } = useApplicationDetails(uuid)
+  const { isDeleting, handleDelete } = useApplicationActions(uuid)
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  
   const formatDate = (dateString?: string) => {
-    
-    
     if (!dateString) {
-      console.log(' No date string provided')
       return 'No especificada'
     }
     
     try {
       const formatted = formatDateStringSpanish(dateString)
       
-      
       if (!formatted || formatted === 'Invalid Date' || formatted === 'Invalid date') {
-        console.log(' Invalid formatted date')
         return 'No especificada'
       }
       return formatted
     } catch (error) {
-      console.error(' Error formatting date:', error)
+      console.error('Error formatting date:', error)
       return 'No especificada'
     }
   }
 
-  //  Helper para extraer nombres de arrays
   const extractNames = (items: any[] | null | undefined, fallback: string = 'No especificado'): string => {
     if (!items || !Array.isArray(items) || items.length === 0) {
       return fallback
@@ -81,7 +78,6 @@ const MyApplicationDetails: React.FC = () => {
     }
   }
 
-  // Manejar descarga de todos los archivos
   const handleDownloadAll = async () => {
     if (!application?.attachments || application.attachments.length === 0) {
       Alert.alert('Sin archivos', 'No hay archivos para descargar')
@@ -101,7 +97,7 @@ const MyApplicationDetails: React.FC = () => {
       } else {
         Toast.show({
           type: 'success',
-          text1: '✓ Archivos descargados',
+          text1: 'Archivos descargados',
           text2: `Se descargaron ${result.successful} archivos exitosamente`,
           position: 'bottom',
           visibilityTime: 3000,
@@ -114,7 +110,6 @@ const MyApplicationDetails: React.FC = () => {
     }
   }
 
-  // Manejar contacto con soporte
   const handleContactSupport = () => {
     const supportEmail = 'soporte@reuc.com'
     Linking.openURL(
@@ -122,7 +117,16 @@ const MyApplicationDetails: React.FC = () => {
     )
   }
 
-  // Loading state
+  const handleDeleteApplication = async () => {
+    const success = await handleDelete()
+    if (success) {
+      setShowDeleteModal(false)
+      setTimeout(() => {
+        navigation.navigate('MyApplications')
+      }, 1500)
+    }
+  }
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -132,7 +136,6 @@ const MyApplicationDetails: React.FC = () => {
     )
   }
 
-  // Error state
   if (error || !application) {
     return (
       <ScrollView style={styles.container}>
@@ -152,7 +155,8 @@ const MyApplicationDetails: React.FC = () => {
     )
   }
 
-  //  Información del proyecto con labels correctos
+  const canDelete = application?.status?.slug === 'in_review'
+
   const projectInfo = [
     {
       label: 'Tipo de proyecto',
@@ -167,7 +171,7 @@ const MyApplicationDetails: React.FC = () => {
       value: extractNames(application.problemTypes),
     },
     {
-      label: 'Fecha límite',  
+      label: 'Fecha límite',
       value: formatDate(application.deadline),
     },
     {
@@ -178,13 +182,11 @@ const MyApplicationDetails: React.FC = () => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>
           Detalles de <Text style={styles.titleAccent}>solicitud</Text>
         </Text>
 
-        {/* Badge de estado */}
         {application.status && (
           <View style={{ marginTop: 8, alignItems: 'center' }}>
             <ProjectStatusBadge status={application.status} />
@@ -193,21 +195,17 @@ const MyApplicationDetails: React.FC = () => {
       </View>
 
       <View style={styles.content}>
-        {/* Banner */}
         {application.bannerUrl && (
           <ProjectImage source={{ uri: application.bannerUrl }} alt={application.title} />
         )}
 
-        {/* Resumen */}
         <ProjectSummary title={application.title} description={application.detailedDescription} />
 
-        {/* Información del proyecto */}
         <Text style={styles.sectionTitle}>
           Información del <Text style={styles.titleAccent}>proyecto</Text>
         </Text>
         <ProjectInfoCard items={projectInfo} />
 
-        {/* Archivos adjuntos */}
         {application.attachments?.length > 0 && (
           <>
             <Text style={styles.attachmentsTitle}>
@@ -219,9 +217,7 @@ const MyApplicationDetails: React.FC = () => {
           </>
         )}
 
-        {/* Botones de acción */}
         <View style={styles.actionsContainer}>
-          {/* Botón Descargar Todos */}
           <TouchableOpacity
             style={[
               styles.downloadAllButton,
@@ -246,16 +242,38 @@ const MyApplicationDetails: React.FC = () => {
             )}
           </TouchableOpacity>
 
-          {/* Botón Contactar Soporte */}
-          <TouchableOpacity
-            style={[styles.contactButton, isDownloadingAll && styles.contactButtonDisabled]}
-            onPress={handleContactSupport}
-            disabled={isDownloadingAll}
-          >
-            <Text style={styles.contactButtonText}>Contactar soporte</Text>
-          </TouchableOpacity>
+          {canDelete && (
+            <TouchableOpacity
+              style={[
+                styles.deleteButton,
+                isDownloadingAll && styles.deleteButtonDisabled,
+              ]}
+              onPress={() => setShowDeleteModal(true)}
+              disabled={isDownloadingAll}
+            >
+              <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
+              <Text style={styles.deleteButtonText}>Eliminar solicitud</Text>
+            </TouchableOpacity>
+          )}
+
+          {!canDelete && (
+            <View style={styles.infoBox}>
+              <Ionicons name="information-circle" size={20} color={palette.primary} />
+              <Text style={styles.infoText}>
+                Solo puedes eliminar solicitudes que estén en revisión
+              </Text>
+            </View>
+          )}
         </View>
       </View>
+
+      <DeleteApplicationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        application={application}
+        onConfirm={handleDeleteApplication}
+        isLoading={isDeleting}
+      />
     </ScrollView>
   )
 }
