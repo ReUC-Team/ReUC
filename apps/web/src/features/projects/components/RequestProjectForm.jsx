@@ -274,12 +274,12 @@ export default function RequestProjectForm({
                   }}
                 >
                   <input
-                    type="checkbox"
+                    type="radio"
                     name="projectType"
                     value={project_type_id}
                     checked={form.projectType.includes(String(project_type_id))}
                     onChange={handleChange}
-                    className="w-5 h-5 text-lime-600 rounded border-gray-300 focus:ring-lime-500"
+                    className="w-5 h-5 text-lime-600 border-gray-300 focus:ring-lime-500"
                     style={{ accentColor: '#65a30d' }}
                   />
                   <span className="text-sm font-medium text-gray-700">{name}</span>
@@ -403,7 +403,7 @@ export default function RequestProjectForm({
                     <svg className="w-4 h-4 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span><strong>Inicio:</strong> {formatDateStringSpanish(deadlineConstraints.min)}</span>
+                    <span><strong>Minimo:</strong> {formatDateStringSpanish(deadlineConstraints.min)}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <svg className="w-4 h-4 text-lime-600" fill="currentColor" viewBox="0 0 20 20">

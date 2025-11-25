@@ -8,7 +8,7 @@ import DeleteApplicationModal from '../components/DeleteApplicationModal';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import useApplicationActions from '../hooks/useApplicationActions';
 import { downloadAllAttachments } from '../projectsService';
-import { formatDateStringSpanish } from '@/utils/dateUtils';
+import { formatDateStringSpanish, formatISODateSpanish } from '@/utils/dateUtils';
 import useCurrentUser from '@/features/auth/hooks/useCurrentUser';
 
 export default function MyApplicationDetails() {
@@ -198,7 +198,7 @@ export default function MyApplicationDetails() {
         : 'No especificado' 
     },
     { 
-      label: 'Fecha límite', 
+      label: 'Fecha de vigencia', 
       value: dueDate 
         ? formatDateStringSpanish(dueDate.split('T')[0])
         : 'No especificada'
@@ -206,7 +206,7 @@ export default function MyApplicationDetails() {
     { 
       label: 'Fecha de creación', 
       value: createdAt 
-        ? formatDateStringSpanish(createdAt.split('T')[0])
+        ? formatISODateSpanish(createdAt)
         : 'No especificada'
     },
   ];

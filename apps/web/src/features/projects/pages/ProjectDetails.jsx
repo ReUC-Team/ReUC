@@ -14,7 +14,7 @@ import StartProjectModal from '../components/StartProjectModal';
 import RollbackProjectModal from '../components/RollbackProjectModal';
 import UpdateDeadlineModal from '../components/UpdateDeadlineModal';
 import { downloadAllAttachments } from '../projectsService';
-import { formatDateStringSpanish } from '@/utils/dateUtils';
+import { formatDateStringSpanish, formatISODateSpanish } from '@/utils/dateUtils';
 
 export default function ProjectDetails() {
   const { uuid } = useParams();
@@ -222,7 +222,7 @@ export default function ProjectDetails() {
     { label: 'Facultades', value: faculties.length > 0 ? faculties.map(f => f.name).join(', ') : 'No especificada' },
     { label: 'Tipo de problemática', value: problemTypes.length > 0 ? problemTypes.map(pt => pt.name).join(', ') : 'No especificado' },
     { label: 'Fecha límite', value: estimatedDate ? formatDateStringSpanish(estimatedDate.split('T')[0]) : 'No especificada' },
-    { label: 'Fecha de creación', value: createdAt ? formatDateStringSpanish(createdAt.split('T')[0]) : 'No especificada' },
+    { label: 'Fecha de creación', value: createdAt ? formatISODateSpanish(createdAt) : 'No especificada' },
     { label: 'Estado', value: status?.name || 'Aprobado' },
   ];
 

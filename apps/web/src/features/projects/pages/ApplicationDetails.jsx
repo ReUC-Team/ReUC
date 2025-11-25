@@ -9,7 +9,7 @@ import EditApplicationModal from '../components/EditApplicationModal';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments, approveApplication } from '../projectsService';
 import { Alerts } from '@/shared/alerts';
-import { formatDateStringSpanish } from '@/utils/dateUtils';
+import { formatDateStringSpanish, formatISODateSpanish } from '@/utils/dateUtils';
 
 export default function ApplicationDetails() {
   const { uuid } = useParams();
@@ -299,16 +299,18 @@ export default function ApplicationDetails() {
     { 
       label: 'Fecha de creación', 
       value: createdAt 
-        ? formatDateStringSpanish(createdAt.split('T')[0])
+        ? formatISODateSpanish(createdAt)
         : 'No especificada'
     },
     { 
       label: 'Estado', 
-      value: status === 'pending' ? 'Pendiente' : 
-             status === 'approved' ? 'Aprobado' : 
-             status === 'rejected' ? 'Rechazado' : 
-             status === 'in_progress' ? 'En Progreso' : 
-             status === 'completed' ? 'Completado' : status
+      value: typeof status === 'object' && status !== null
+        ? (status.name || status.slug || 'Desconocido')
+        : (status === 'pending' ? 'Pendiente' : 
+           status === 'approved' ? 'Aprobado' : 
+           status === 'rejected' ? 'Rechazado' : 
+           status === 'in_progress' ? 'En Progreso' : 
+           status === 'completed' ? 'Completado' : status)
     },
   ];
 
@@ -384,66 +386,10 @@ export default function ApplicationDetails() {
         {/* Columna derecha: Información y acciones */}
         <div className="w-7/12">
           {/* Información de la Solicitud */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-              Información de la Solicitud
-            </h2>
-            <div className="space-y-4">
-              {/* Estado actual */}
-              {application?.status && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Estado:</p>
-                  <ProjectStatusBadge status={application.status} size="md" />
-                </div>
-              )}
-
-              {/* Resto de campos existentes */}
-              {projectTypes?.length > 0 && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Tipo de proyecto:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {projectTypes.map(pt => pt.name).join(', ')}
-                  </p>
-                </div>
-              )}
-
-              {faculties?.length > 0 && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Facultades:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {faculties.map(f => f.name).join(', ')}
-                  </p>
-                </div>
-              )}
-
-              {problemTypes?.length > 0 && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Tipo de problemática:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {problemTypes.map(pt => pt.name).join(', ')}
-                  </p>
-                </div>
-              )}
-
-              {dueDate && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Fecha límite:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {formatDateStringSpanish(dueDate.split('T')[0])}
-                  </p>
-                </div>
-              )}
-
-              {createdAt && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Fecha de creación:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {formatDateStringSpanish(createdAt.split('T')[0])}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <h2 className="text-3xl font-bold mb-3">
+            Información de la <span className="text-lime-700">solicitud</span>
+          </h2>
+          <ProjectInfoCard items={projectInfo} />
 
           {/* Información del solicitante */}
           <h2 className="text-3xl font-bold mb-3">
@@ -529,7 +475,7 @@ export default function ApplicationDetails() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Descargar todos ({attachments.length})
+                  Descargar todos
                 </>
               )}
             </button>
