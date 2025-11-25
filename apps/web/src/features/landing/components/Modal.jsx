@@ -9,7 +9,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+      document.body.style.overflow = 'hidden';
     }
     
     return () => {
@@ -30,7 +30,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-lime-600 text-white px-6 py-4 flex justify-between items-center rounded-t-xl">
+        <div className="sticky top-0 bg-lime-600 dark:bg-gray-700 text-white px-6 py-4 flex justify-between items-center rounded-t-xl">
           <h2 className="text-xl sm:text-2xl font-bold">{title}</h2>
           <button
             onClick={onClose}
@@ -44,12 +44,12 @@ const Modal = ({ isOpen, onClose, title, children }) => {
         </div>
 
         {/* Content */}
-        <div className="px-6 py-8">
+        <div className="px-6 py-8 dark:bg-gray-600">
           {children}
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t rounded-b-xl">
+        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t rounded-b-xl">
           <button
             onClick={onClose}
             className="w-full sm:w-auto px-6 py-3 bg-lime-600 text-white hover:bg-lime-700 font-semibold rounded-lg transition-colors"

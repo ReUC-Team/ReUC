@@ -15,6 +15,7 @@ import RollbackProjectModal from '../components/RollbackProjectModal';
 import UpdateDeadlineModal from '../components/UpdateDeadlineModal';
 import { downloadAllAttachments } from '../projectsService';
 import { formatDateStringSpanish, formatISODateSpanish } from '@/utils/dateUtils';
+import ProjectResourcesSection from '../components/ProjectResourcesSection';
 
 export default function ProjectDetails() {
   const { uuid } = useParams();
@@ -22,7 +23,7 @@ export default function ProjectDetails() {
   const { project, isLoading, error, refetch } = useProjectDetails(uuid);
   const { constraints } = useTeamMetadata(uuid);
   const validation = useProjectValidation(project, constraints);
-  const { role } = useCurrentUser();
+  const { role, user } = useCurrentUser();
   const {
     isStarting,
     isRollingBack,
@@ -45,6 +46,16 @@ export default function ProjectDetails() {
   const canRollback = isProfessor && (project?.status?.slug === 'project_in_progress' || project?.status?.slug === 'completed');
   const canUpdateDeadline = isProfessor && !isRollingBack && !isStarting;
   const canManageTeam = isProfessor;
+
+  // Verificar si el usuario actual es miembro del equipo del proyecto
+  const isTeamMember = project?.teamMembers?.some(member => {
+    // user puede ser un string (UUID) o un objeto con uuid_user/uuid
+    const userUuid = typeof user === 'string' ? user : (user?.uuid_user || user?.uuid);
+    return member.uuid_user === userUuid;
+  }) || false;
+
+  // Los profesores y miembros del equipo pueden gestionar recursos
+  const canManageResources = isProfessor || isTeamMember;
 
   // Descargar todos los archivos adjuntos
   const handleDownloadAll = async () => {
@@ -313,6 +324,15 @@ export default function ProjectDetails() {
             )}
             </div>
           )}
+
+
+          {/* Recursos del Proyecto */}
+          <ProjectResourcesSection 
+            projectUuid={uuid}
+            project={project} 
+            canManage={canManageResources}
+            onResourceChange={refetch}
+          />
         </div>
 
         {/* Columna derecha: Información y acciones */}

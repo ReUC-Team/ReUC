@@ -485,6 +485,20 @@ export async function getProjectDetails(uuid) {
     approvedAt: details.approvedAt,
     estimatedDate: details.deadline,
     estimatedEffortHours: details.estimatedEffortHours || null,
+    
+    // Resources (archivos subidos por el equipo)
+    resources: (proj.resources || []).map(res => ({
+      uuid_file: res.uuid_file,
+      uuid: res.uuid_file, // Alias para compatibilidad
+      downloadUrl: res.downloadUrl?.startsWith('http')
+        ? res.downloadUrl
+        : `${API_URL}${res.downloadUrl}`,
+      name: res.name,
+      size: res.size,
+      type: res.type,
+      uuidAuthor: res.uuidAuthor,
+      createdAt: res.createdAt || details.createdAt,
+    })),
   };
 }
 
@@ -637,6 +651,73 @@ export async function deleteApplication(uuid_application) {
 
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/application/${uuid_application}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "csrf-token": csrfToken,
+      },
+    }
+  );
+
+  return response.data;
+}
+
+/**
+ * Sube un recurso (archivo) al proyecto
+ * POST /project/:uuid/resources/file
+ */
+export async function uploadProjectResource(uuid_project, file) {
+  const csrfToken = await getCSRFToken();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/${uuid_project}/resources/file`,
+    {
+      method: "POST",
+      headers: {
+        "csrf-token": csrfToken,
+      },
+      body: formData,
+    }
+  );
+
+  return response.data;
+}
+
+/**
+ * Actualiza (reemplaza) un recurso del proyecto
+ * PUT /project/:uuid/resources/file/:uuidResource
+ */
+export async function updateProjectResource(uuid_project, uuid_resource, file) {
+  const csrfToken = await getCSRFToken();
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/${uuid_project}/resources/file/${uuid_resource}`,
+    {
+      method: "PUT",
+      headers: {
+        "csrf-token": csrfToken,
+      },
+      body: formData,
+    }
+  );
+
+  return response.data;
+}
+
+/**
+ * Elimina un recurso del proyecto (soft delete)
+ * DELETE /project/:uuid/resources/file/:uuidResource
+ */
+export async function deleteProjectResource(uuid_project, uuid_resource) {
+  const csrfToken = await getCSRFToken();
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/${uuid_project}/resources/file/${uuid_resource}`,
     {
       method: "DELETE",
       headers: {
