@@ -57,7 +57,9 @@ model User {
 
   application     Application[]
   teamMembers     Team_Member[]
-  projectsCreated Project[]     @relation("ProjectCreator")
+  projectsCreated Project[]       @relation("ProjectCreator")
+  External_Link   External_Link[]
+  File_Link       File_Link[]
 
   @@index([email])
   @@map("Users")
@@ -423,16 +425,36 @@ model File {
 }
 
 model File_Link {
-  file_link_id Int      @id @default(autoincrement())
-  uuidFile     String   @map("uuid_file")
-  modelTarget  String   @map("model_target")
-  uuidTarget   String   @map("uuid_target")
-  purpose      String
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  file_link_id  Int       @id @default(autoincrement())
+  uuidFile      String    @map("uuid_file")
+  uuidCreatedBy String?   @map("uuid_created_by")
+  modelTarget   String    @map("model_target")
+  uuidTarget    String    @map("uuid_target")
+  purpose       String
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @updatedAt @map("deleted_at")
 
-  file File @relation(fields: [uuidFile], references: [uuid_file])
+  file   File  @relation(fields: [uuidFile], references: [uuid_file])
+  author User? @relation(fields: [uuidCreatedBy], references: [uuid_user])
 
   @@unique([modelTarget, uuidTarget, uuidFile, purpose])
   @@map("File_Links")
+}
+
+model External_Link {
+  uuid_link     String   @id @default(uuid())
+  url           String
+  displayName   String?  @map("display_name")
+  uuidCreatedBy String   @map("uuid_created_by")
+  modelTarget   String   @map("model_target")
+  uuidTarget    String   @map("uuid_target")
+  purpose       String
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  author User @relation(fields: [uuidCreatedBy], references: [uuid_user])
+
+  @@index([modelTarget, uuidTarget, purpose])
+  @@map("External_Links")
 }

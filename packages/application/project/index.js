@@ -9,6 +9,9 @@ import { deleteTeamMember } from "./deleteTeamMember.js";
 import { start } from "./start.js";
 import { rollback } from "./rollback.js";
 import { updateDeadline } from "./updateDeadline.js";
+import { uploadFile } from "./uploadFile.js";
+import { editFile } from "./editFile.js";
+import { deleteFile } from "./deleteFile.js";
 
 /**
  * The 'project' entity in the application layer, grouping all project
@@ -26,6 +29,9 @@ const project = {
   updateTeamMember,
   deleteTeamMember,
   updateDeadline,
+  uploadFile,
+  editFile,
+  deleteFile,
 };
 
 export default project;

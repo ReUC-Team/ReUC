@@ -193,3 +193,59 @@ export async function updateDeadlineProjectHandler(req, res) {
     data: { project: projectData },
   });
 }
+
+/**
+ * Handles the upload of a file for a project.
+ */
+export async function uploadProjectResourceFileHandler(req, res) {
+  const { uuid: uuidProject } = req.params;
+
+  const { resource } = await project.uploadFile({
+    uuidProject,
+    uuidRequestingUser: req.user.uuid_user,
+    file: req.file || undefined,
+  });
+
+  return res.status(201).json({
+    success: true,
+    data: { resource },
+  });
+}
+
+/**
+ * Handles the edit of a project file.
+ */
+export async function editProjectResourceFileHandler(req, res) {
+  const { uuid: uuidProject, uuidResource } = req.params;
+
+  const { resource } = await project.editFile({
+    uuidProject,
+    uuidRequestingUser: req.user.uuid_user,
+    uuidResource,
+    file: req.file || undefined,
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: { resource },
+  });
+}
+
+/**
+ * Handles the delete of a project file.
+ */
+export async function deleteProjectResourceFileHandler(req, res) {
+  const { uuid: uuidProject, uuidResource } = req.params;
+
+  await project.deleteFile({
+    uuidProject,
+    uuidRequestingUser: req.user.uuid_user,
+    uuidResource,
+  });
+
+  return res.status(200).json({
+    success: true,
+    data: {},
+    message: "Project resource deleted successfully.",
+  });
+}
