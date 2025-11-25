@@ -69,7 +69,7 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       color: palette.primary,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
-    // Estilos del badge de estado
+  
     statusBadge: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -167,4 +167,65 @@ export const createApplicationDetailsStyles = (palette: ColorPalette, fontMode: 
       textAlign: 'center',
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
+
+    deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#DC2626',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: 8,
+    gap: spacing.xs,
+  },
+  deleteButtonDisabled: {
+    opacity: 0.5,
+  },
+  deleteButtonText: {
+    fontSize: typography.base,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+},
+
+editButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: palette.onGBtn,
+  paddingVertical: spacing.md,
+  paddingHorizontal: spacing.lg,
+  borderRadius: 8,
+  gap: spacing.xs,
+  marginTop: spacing.lg,
+  marginBottom: spacing.xs,
+},
+editButtonDisabled: {
+  opacity: 0.5,
+},
+editButtonText: {
+  fontSize: typography.base,
+  fontWeight: '600',
+  color: palette.onPrimary,
+  fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+},
+
+infoBox: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  backgroundColor: palette.grayExtraLight,
+  padding: spacing.md,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: palette.grayLight,
+  gap: spacing.xs,
+  marginTop: spacing.sm,
+},
+infoText: {
+  flex: 1,
+  fontSize: typography.sm,
+  color: palette.textSecondary,
+  fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Regular' : 'System',
+},
+
   })

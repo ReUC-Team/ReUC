@@ -15,12 +15,16 @@ import { Ionicons } from '@expo/vector-icons'
 import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles'
 import { createApplicationDetailsStyles } from '../../../styles/screens/ApplicationDetails.styles'
 import useApplicationDetails from '../hooks/useApplicationDetails'
+import useApplicationActions from '../hooks/useApplicationActions'
 import { downloadAllAttachments } from '../services/projectsService'
+import { formatDateStringSpanish } from '../../../utils/dateUtils'
 import Toast from 'react-native-toast-message'
 import ProjectImage from '../components/ProjectImage'
 import ProjectSummary from '../components/ProjectSummary'
 import ProjectInfoCard from '../components/ProjectInfoCard'
 import AttachmentCard from '../components/AttachmentCard'
+import ProjectStatusBadge from '../components/ProjectStatusBadge'
+import DeleteApplicationModal from '../components/DeleteApplicationModal'
 
 const MyApplicationDetails: React.FC = () => {
   const styles = useThemedStyles(createApplicationDetailsStyles)
@@ -30,19 +34,50 @@ const MyApplicationDetails: React.FC = () => {
   const { uuid } = route.params || {}
 
   const { application, isLoading, error } = useApplicationDetails(uuid)
+  const { isDeleting, handleDelete } = useApplicationActions(uuid)
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  // Formatear fechas
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'No especificada'
-    return new Date(dateString).toLocaleDateString('es-MX', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
+    if (!dateString) {
+      return 'No especificada'
+    }
+    
+    try {
+      const formatted = formatDateStringSpanish(dateString)
+      
+      if (!formatted || formatted === 'Invalid Date' || formatted === 'Invalid date') {
+        return 'No especificada'
+      }
+      return formatted
+    } catch (error) {
+      console.error('Error formatting date:', error)
+      return 'No especificada'
+    }
   }
 
-  // Manejar descarga de todos los archivos
+  const extractNames = (items: any[] | null | undefined, fallback: string = 'No especificado'): string => {
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return fallback
+    }
+    
+    try {
+      const names = items
+        .filter(item => item != null)
+        .map(item => {
+          if (typeof item === 'string') return item
+          if (typeof item === 'object' && item.name) return item.name
+          return String(item)
+        })
+        .filter(name => name && name !== 'undefined' && name !== 'null')
+      
+      return names.length > 0 ? names.join(', ') : fallback
+    } catch (err) {
+      console.error('Error extracting names:', err)
+      return fallback
+    }
+  }
+
   const handleDownloadAll = async () => {
     if (!application?.attachments || application.attachments.length === 0) {
       Alert.alert('Sin archivos', 'No hay archivos para descargar')
@@ -62,7 +97,7 @@ const MyApplicationDetails: React.FC = () => {
       } else {
         Toast.show({
           type: 'success',
-          text1: '✓ Archivos descargados',
+          text1: 'Archivos descargados',
           text2: `Se descargaron ${result.successful} archivos exitosamente`,
           position: 'bottom',
           visibilityTime: 3000,
@@ -75,15 +110,23 @@ const MyApplicationDetails: React.FC = () => {
     }
   }
 
-  // Manejar contacto con soporte
   const handleContactSupport = () => {
-    const supportEmail = 'soporte@reuc.com' 
+    const supportEmail = 'soporte@reuc.com'
     Linking.openURL(
       `mailto:${supportEmail}?subject=Consulta sobre solicitud: ${application?.title}`
     )
   }
 
-  // Loading state
+  const handleDeleteApplication = async () => {
+    const success = await handleDelete()
+    if (success) {
+      setShowDeleteModal(false)
+      setTimeout(() => {
+        navigation.navigate('MyApplications')
+      }, 1500)
+    }
+  }
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -93,7 +136,6 @@ const MyApplicationDetails: React.FC = () => {
     )
   }
 
-  // Error state
   if (error || !application) {
     return (
       <ScrollView style={styles.container}>
@@ -113,87 +155,30 @@ const MyApplicationDetails: React.FC = () => {
     )
   }
 
-  // Información del proyecto
+  const canDelete = application?.status?.slug === 'in_review'
+
   const projectInfo = [
     {
       label: 'Tipo de proyecto',
-      value:
-        application.projectTypes?.length > 0
-          ? application.projectTypes
-              .map((pt: any) => (typeof pt === 'object' ? pt.name : pt))
-              .join(', ')
-          : 'No especificado',
+      value: extractNames(application.projectTypes),
     },
     {
       label: 'Facultades',
-      value:
-        application.faculties?.length > 0
-          ? application.faculties.map((f: any) => (typeof f === 'object' ? f.name : f)).join(', ')
-          : 'No especificada',
+      value: extractNames(application.faculties, 'No especificada'),
     },
     {
       label: 'Tipo de problemática',
-      value:
-        application.problemTypes?.length > 0
-          ? application.problemTypes
-              .map((pt: any) => (typeof pt === 'object' ? pt.name : pt))
-              .join(', ')
-          : 'No especificado',
+      value: extractNames(application.problemTypes),
     },
     {
-      label: 'Fecha estimada',
+      label: 'Fecha límite',
       value: formatDate(application.deadline),
     },
     {
       label: 'Fecha de creación',
       value: formatDate(application.createdAt),
     },
-    {
-      label: 'Estado',
-      value:
-        application.status === 'pending'
-          ? 'Pendiente'
-          : application.status === 'approved'
-          ? 'Aprobado'
-          : application.status === 'rejected'
-          ? 'Rechazado'
-          : application.status,
-    },
   ]
-
-  // Determinar el color e ícono del badge según el estado
-  const getStatusBadgeStyles = () => {
-    if (application.status === 'pending') {
-      return {
-        backgroundColor: `${palette.warning || '#FFA500'}20`,
-        iconName: 'time-outline' as const,
-        iconColor: palette.warning || '#FFA500',
-        text: 'Pendiente de revisión',
-      }
-    } else if (application.status === 'approved') {
-      return {
-        backgroundColor: `${palette.success || '#4CAF50'}20`,
-        iconName: 'checkmark-circle' as const,
-        iconColor: palette.success || '#4CAF50',
-        text: 'Aprobado',
-      }
-    } else if (application.status === 'rejected') {
-      return {
-        backgroundColor: `${palette.error || '#F44336'}20`,
-        iconName: 'close-circle' as const,
-        iconColor: palette.error || '#F44336',
-        text: 'Rechazado',
-      }
-    }
-    return {
-      backgroundColor: `${palette.gray || '#9E9E9E'}20`,
-      iconName: 'help-circle-outline' as const,
-      iconColor: palette.gray || '#9E9E9E',
-      text: application.status,
-    }
-  }
-
-  const statusBadge = getStatusBadgeStyles()
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -202,29 +187,25 @@ const MyApplicationDetails: React.FC = () => {
           Detalles de <Text style={styles.titleAccent}>solicitud</Text>
         </Text>
 
-        {/* Badge de estado */}
-        <View style={[styles.statusBadge, { backgroundColor: statusBadge.backgroundColor }]}>
-          <Ionicons name={statusBadge.iconName} size={16} color={statusBadge.iconColor} />
-          <Text style={styles.statusBadgeText}>{statusBadge.text}</Text>
-        </View>
+        {application.status && (
+          <View style={{ marginTop: 8, alignItems: 'center' }}>
+            <ProjectStatusBadge status={application.status} />
+          </View>
+        )}
       </View>
 
       <View style={styles.content}>
-        {/* Banner */}
         {application.bannerUrl && (
           <ProjectImage source={{ uri: application.bannerUrl }} alt={application.title} />
         )}
 
-        {/* Resumen */}
         <ProjectSummary title={application.title} description={application.detailedDescription} />
 
-        {/* Información del proyecto */}
         <Text style={styles.sectionTitle}>
           Información del <Text style={styles.titleAccent}>proyecto</Text>
         </Text>
         <ProjectInfoCard items={projectInfo} />
 
-        {/* Archivos adjuntos */}
         {application.attachments?.length > 0 && (
           <>
             <Text style={styles.attachmentsTitle}>
@@ -236,9 +217,7 @@ const MyApplicationDetails: React.FC = () => {
           </>
         )}
 
-        {/* Botones de acción */}
         <View style={styles.actionsContainer}>
-          {/* Botón Descargar Todos */}
           <TouchableOpacity
             style={[
               styles.downloadAllButton,
@@ -263,16 +242,38 @@ const MyApplicationDetails: React.FC = () => {
             )}
           </TouchableOpacity>
 
-          {/* Botón Contactar Soporte */}
-          <TouchableOpacity
-            style={[styles.contactButton, isDownloadingAll && styles.contactButtonDisabled]}
-            onPress={handleContactSupport}
-            disabled={isDownloadingAll}
-          >
-            <Text style={styles.contactButtonText}>Contactar soporte</Text>
-          </TouchableOpacity>
+          {canDelete && (
+            <TouchableOpacity
+              style={[
+                styles.deleteButton,
+                isDownloadingAll && styles.deleteButtonDisabled,
+              ]}
+              onPress={() => setShowDeleteModal(true)}
+              disabled={isDownloadingAll}
+            >
+              <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
+              <Text style={styles.deleteButtonText}>Eliminar solicitud</Text>
+            </TouchableOpacity>
+          )}
+
+          {!canDelete && (
+            <View style={styles.infoBox}>
+              <Ionicons name="information-circle" size={20} color={palette.primary} />
+              <Text style={styles.infoText}>
+                Solo puedes eliminar solicitudes que estén en revisión
+              </Text>
+            </View>
+          )}
         </View>
       </View>
+
+      <DeleteApplicationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        application={application}
+        onConfirm={handleDeleteApplication}
+        isLoading={isDeleting}
+      />
     </ScrollView>
   )
 }

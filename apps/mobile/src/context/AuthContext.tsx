@@ -5,10 +5,17 @@ import { getSession } from '../features/auth/pages/authServiceNative'
 import { tokenStorage } from '../features/auth/utils/tokenStorage'
 import { AuthenticationError } from '../utils/errorHandler'
 
+interface Role {
+  slug: string
+  name: string
+}
+
 interface User {
   uuid: string
   email: string
-  role: 'student' | 'professor' | 'outsider' | 'admin'
+  role: Role
+  firstName?: string
+  lastName?: string
   roleDetails?: any
 }
 
@@ -49,12 +56,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return
       }
 
-      console.log('✅ Token found, loading user session...')
+      console.log(' Token found, loading user session...')
 
       // Usar getSession del authService (ya tiene todos los headers correctos)
       const userData = await getSession()
-      
-      console.log('✅ User session loaded:', userData)
+      console.log(' RAW USER DATA from getSession:', JSON.stringify(userData, null, 2))
+      console.log(' USER ROLE:', userData.role)
+      console.log(' USER ROLE TYPE:', typeof userData.role)
+      console.log(' User session loaded:', userData)
       setUser(userData)
     } catch (error: any) {
       console.error('❌ Error loading user:', error)
@@ -70,20 +79,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   const login = (userData: User) => {
-    console.log('✅ Setting user in AuthContext:', userData)
+    console.log(' Setting user in AuthContext:', userData)
     setUser(userData)
   }
 
   const logout = async () => {
-    console.log('✅ Logging out...')
+    console.log(' Logging out...')
     await tokenStorage.clearTokens()
     setUser(null)
   }
 
   const refreshUser = async () => {
-    console.log('✅ Refreshing user session...')
+    console.log(' Refreshing user session...')
     await loadUser()
   }
+
+  // Role helpers con validación de slug
+  const getRoleSlug = (): string => {
+    if (!user?.role) return ''
+    
+    // Si role es un objeto con slug
+    if (typeof user.role === 'object' && 'slug' in user.role) {
+      return user.role.slug
+    }
+    
+    // Si role es un string directamente
+    if (typeof user.role === 'string') {
+      return user.role
+    }
+    
+    return ''
+  }
+
+  const roleSlug = getRoleSlug()
 
   const value: AuthContextType = {
     user,
@@ -93,11 +121,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     logout,
     refreshUser,
     
-    // Role helpers
-    isStudent: user?.role === 'student',
-    isProfessor: user?.role === 'professor',
-    isOutsider: user?.role === 'outsider',
-    isAdmin: user?.role === 'admin',
+    // Role helpers usando el slug
+    isStudent: roleSlug === 'student',
+    isProfessor: roleSlug === 'professor',
+    isOutsider: roleSlug === 'outsider',
+    isAdmin: roleSlug === 'admin',
   }
 
   return (

@@ -25,6 +25,9 @@ import MyApplications from '../features/projects/pages/MyApplications'
 import MyApplicationDetails from '../features/projects/pages/MyApplicationDetails'
 import ApplicationDetails from '../features/projects/pages/ApplicationDetails'
 
+// Importar TeamPage
+import TeamPage from '../features/teams/pages/TeamPage'
+
 import { useAuth } from '../context/AuthContext'
 
 const Stack = createNativeStackNavigator()
@@ -158,6 +161,15 @@ const DashboardStack = () => (
       {() => (
         <DashboardLayout>
           <ProjectDetails />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* NUEVO: Página de equipo del proyecto */}
+    <Stack.Screen name="TeamPage">
+      {() => (
+        <DashboardLayout>
+          <TeamPage />
         </DashboardLayout>
       )}
     </Stack.Screen>

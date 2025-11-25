@@ -67,32 +67,34 @@ const ProfileScreen = () => {
   const location = profile?.location || 'México'
 
   return (
-    <View style={styles.container}>
-      {/* Header con scroll independiente */}
-      <ScrollView showsVerticalScrollIndicator={false} stickyHeaderIndices={[1]}>
-        <ProfileHeader
-          firstName={firstName}
-          middleName={middleName}
-          lastName={lastName}
-          name={fullName}
-          location={location}
-          onEditPress={handleEditPress}
-          onContactPress={handleContactPress}
-        />
+<View style={styles.container}>
 
-        {/* Tabs fijos */}
-        <ProfileTabs onTabChange={handleTabChange} />
+  {/* Header y Tabs siempre visibles */}
+  <ProfileHeader
+    firstName={firstName}
+    middleName={middleName}
+    lastName={lastName}
+    name={fullName}
+    location={location}
+    onEditPress={handleEditPress}
+    onContactPress={handleContactPress}
+  />
 
-        {/* Contenido de tabs */}
-        <View>
-          {activeTab === 'overview' && <OverviewTab profile={profile} />}
-          {activeTab === 'projects' && <MyProjectsTab />}
-        </View>
-      </ScrollView>
+  <ProfileTabs onTabChange={handleTabChange} />
 
-      {/* Modal de edición */}
-      <EditProfileModal visible={modalVisible} onClose={handleModalClose} profile={profile} />
-    </View>
+  {/* Contenido del tab */}
+  {activeTab === 'overview' && (
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <OverviewTab profile={profile} />
+    </ScrollView>
+  )}
+
+  {activeTab === 'projects' && (
+    <MyProjectsTab />
+  )}
+
+  <EditProfileModal visible={modalVisible} onClose={handleModalClose} profile={profile} />
+</View>
   )
 }
 

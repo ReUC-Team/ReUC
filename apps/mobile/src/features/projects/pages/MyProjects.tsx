@@ -31,6 +31,12 @@ const MyProjects: React.FC = () => {
     navigation.navigate('ProjectDetails', { uuid })
   }
 
+  //  Handler para navegar al equipo
+  const handleTeamClick = (uuid: string) => {
+    console.log('👥 Navigating to team with UUID:', uuid)
+    navigation.navigate('TeamPage', { uuid })
+  }
+
   if (isLoading && projects.length === 0) {
     return (
       <View style={styles.container}>
@@ -108,7 +114,10 @@ const MyProjects: React.FC = () => {
                     ? { uri: item.bannerUrl }
                     : require('../../../../../web/src/assets/project.webp')
                 }
+                status={item.status}
                 onDetailsClick={() => handleProjectClick(item.uuid_project)}
+                showTeamButton={true}  
+                onTeamClick={() => handleTeamClick(item.uuid_project)} 
               />
             )}
             contentContainerStyle={styles.listContent}
