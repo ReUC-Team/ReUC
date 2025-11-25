@@ -4,16 +4,22 @@ import ProjectImage from '../components/ProjectImage';
 import ProjectSummary from '../components/ProjectSummary';
 import ProjectInfoCard from '../components/ProjectInfoCard';
 import AttachmentCard from '../components/AttachmentCard';
+import DeleteApplicationModal from '../components/DeleteApplicationModal';
 import useApplicationDetails from '../hooks/useApplicationDetails';
+import useApplicationActions from '../hooks/useApplicationActions';
 import { downloadAllAttachments } from '../projectsService';
 import { formatDateStringSpanish } from '@/utils/dateUtils';
+import useCurrentUser from '@/features/auth/hooks/useCurrentUser';
 
 export default function MyApplicationDetails() {
   const { uuid } = useParams();
   const navigate = useNavigate();
   const { application, isLoading, error } = useApplicationDetails(uuid);
+  const { user } = useCurrentUser();
+  const { handleDelete, isDeleting } = useApplicationActions(uuid);
   const [isDownloadingAll, setIsDownloadingAll] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Descargar todos los archivos adjuntos
   const handleDownloadAll = async () => {
@@ -38,6 +44,15 @@ export default function MyApplicationDetails() {
       setDownloadError(errorMessage);
     } finally {
       setIsDownloadingAll(false);
+    }
+  };
+
+  // Eliminar solicitud
+  const confirmDelete = async () => {
+    const success = await handleDelete();
+    if (success) {
+      setShowDeleteModal(false);
+      navigate('/my-applications');
     }
   }; 
 
@@ -112,6 +127,7 @@ export default function MyApplicationDetails() {
     detailedDescription,
     bannerUrl,
     faculties = [],
+    author,
     outsider,
     projectTypes = [],
     problemTypes = [],
@@ -120,7 +136,7 @@ export default function MyApplicationDetails() {
     dueDate,
     attachments = [],
     project,
-  } = application;
+  } = application || {};
 
   // Configuración de estados visuales
   const statusConfig = {
@@ -156,6 +172,10 @@ export default function MyApplicationDetails() {
   // Obtener el slug del estado correctamente
   const statusSlug = typeof status === 'object' && status !== null ? status.slug : status;
   const currentStatus = statusConfig[statusSlug] || statusConfig.pending;
+
+  // Permisos de eliminación
+  const isAuthor = user === author?.uuid_user;
+  const canDelete = isAuthor && (statusSlug !== 'approved' && statusSlug !== 'project_approved');
 
   // Información del proyecto
   const projectInfo = [
@@ -295,7 +315,7 @@ export default function MyApplicationDetails() {
             <button 
               onClick={handleDownloadAll}
               disabled={isDownloadingAll || attachments.length === 0}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700 font-semibold transition disabled:bg-gray-500 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               title={attachments.length === 0 ? 'No hay archivos para descargar' : 'Descargar todos los documentos'}
             >
               {isDownloadingAll ? (
@@ -311,7 +331,7 @@ export default function MyApplicationDetails() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Descargar todos ({attachments.length})
+                  Descargar todos
                 </>
               )}
             </button>
@@ -362,9 +382,32 @@ export default function MyApplicationDetails() {
                 </div>
               </div>
             )}
+
+            {/* Botón Eliminar Solicitud */}
+            {canDelete && (
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                disabled={isDeleting}
+                className="w-full px-4 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Eliminar Solicitud
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Modal de eliminación */}
+      <DeleteApplicationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        application={application}
+        onConfirm={confirmDelete}
+        isLoading={isDeleting}
+      />
     </section>
   );
 }

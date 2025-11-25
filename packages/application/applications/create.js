@@ -27,7 +27,6 @@ import * as DomainError from "@reuc/domain/errors/index.js";
  * @param {Buffer} [params.attachments[].buffer] - The image buffer.
  *
  * @throws {ApplicationError.ValidationError} If the input data is invalid.
- * @throws {ApplicationError.ConflictError} If a conflict occurs (e.g., invalid foreign key).
  * @throws {ApplicationError.ApplicationError} For other unexpected errors.
  */
 export async function create({

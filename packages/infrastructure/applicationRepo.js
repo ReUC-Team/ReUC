@@ -121,7 +121,7 @@ export const applicationRepo = {
       const updatePayload = _buildApplicationUpdateData(applicationUpdates);
 
       return await db.application.update({
-        where: { uuid_application: uuid },
+        where: { uuid_application: uuid, deletedAt: null },
         data: updatePayload,
         select: {
           uuid_application: true,
@@ -254,8 +254,8 @@ export const applicationRepo = {
    */
   async getDetailedApplication(uuid) {
     try {
-      const applicationData = await db.application.findUnique({
-        where: { uuid_application: uuid },
+      const applicationData = await db.application.findFirst({
+        where: { uuid_application: uuid, deletedAt: null },
         select: {
           // --- User & Organization ---
           author: {
@@ -345,7 +345,7 @@ export const applicationRepo = {
    */
   async getAllByAuthor({ uuidAuthor, page = 1, perPage = 50 }) {
     try {
-      const where = { uuidAuthor };
+      const where = { uuidAuthor, deletedAt: null };
       const sort = { createdAt: "asc" };
       const skip = (page - 1) * perPage;
       const take = perPage;
@@ -377,7 +377,7 @@ export const applicationRepo = {
             totalPages,
             filteredItems: totalItems,
           },
-          query: where,
+          query: { uuidAuthor },
           sort,
         },
       };
@@ -408,11 +408,12 @@ export const applicationRepo = {
    */
   async getByUuid(uuid) {
     try {
-      return await db.application.findUnique({
-        where: { uuid_application: uuid },
+      return await db.application.findFirst({
+        where: { uuid_application: uuid, deletedAt: null },
         select: {
           uuid_application: true,
           uuidAuthor: true,
+          project: { select: { uuid_project: true } },
         },
       });
     } catch (err) {
@@ -428,6 +429,53 @@ export const applicationRepo = {
       );
       throw new InfrastructureError.InfrastructureError(
         "Unexpected Infrastructure error confirm existing application",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Soft deletes an application by setting the deletedAt timestamp.
+   * @param {string} uuid - The UUID of the application.
+   *
+   * @throws {InfrastructureError.NotFoundError} If the application does not exist.
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async softDelete(uuid) {
+    try {
+      return await db.application.update({
+        where: { uuid_application: uuid },
+        data: {
+          deletedAt: new Date(),
+        },
+        select: {
+          uuid_application: true,
+          deletedAt: true,
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2025") {
+          const message = err.meta?.cause || "Record to delete not found.";
+
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuid} application found to delete.`,
+            { details: { message } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected database error while deleting application: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      console.error(
+        `Infrastructure error (applicationRepo.delete) with UUID ${uuid}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while deleting application.",
         { cause: err }
       );
     }
@@ -747,7 +795,7 @@ async function _cleanupOrphanedFiles(allSavedFileMetas) {
  * @param {string} facultyName - The optional name of the faculty to filter by.
  */
 async function _buildGetLimitedWhereClause(facultyName) {
-  const where = { project: { is: null } };
+  const where = { project: { is: null }, deletedAt: null };
 
   if (facultyName) {
     const facultyFound = await facultyRepo.findByName(facultyName);

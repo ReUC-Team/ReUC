@@ -11,6 +11,7 @@ import {
   getDetailedApplicationHandler,
   getMyApplicationsHandler,
   updateApplicationHandler,
+  deleteApplicationHandler,
 } from "./handlers.js";
 
 export const applicationRouter = express.Router();
@@ -105,4 +106,10 @@ applicationRouter.put(
   csrfProtection,
   requireRole("professor"),
   asyncHandler(updateApplicationHandler)
+);
+applicationRouter.delete(
+  "/:uuid",
+  csrfProtection,
+  requireRole(["outsider", "professor"]),
+  asyncHandler(deleteApplicationHandler)
 );

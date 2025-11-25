@@ -33,13 +33,13 @@ export async function rollback(uuidProject, uuidRequestingUser) {
     // 3. Error Mapping
     if (err instanceof DomainError.NotFoundError)
       throw new ApplicationError.NotFoundError(
-        "The project to rollback was not found.",
+        "The requested resource was not found.",
         { cause: err }
       );
 
     if (err instanceof DomainError.AuthorizationError)
       throw new ApplicationError.AuthorizationError(
-        "User not authorizate to perform this action."
+        "User not authorized to perform this action."
       );
 
     // Pass through existing ApplicationErrors

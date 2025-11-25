@@ -107,12 +107,18 @@ export const projectRepo = {
    */
   async getAll({ page = 1, perPage = 50 }) {
     try {
+      const where = {
+        application: {
+          deletedAt: null,
+        },
+      };
       const sort = { createdAt: "asc" };
       const skip = (page - 1) * perPage;
       const take = perPage;
 
       const [projectsRaw, totalItems] = await db.$transaction([
         db.project.findMany({
+          where,
           select: {
             uuid_project: true,
             uuidApplication: true,
@@ -129,7 +135,7 @@ export const projectRepo = {
           skip,
           take,
         }),
-        db.project.count(),
+        db.project.count({ where }),
       ]);
 
       const totalPages = Math.ceil(totalItems / perPage);
@@ -178,9 +184,14 @@ export const projectRepo = {
   async getAllByUser({ uuidUser, page = 1, perPage = 50 }) {
     try {
       const where = {
-        OR: [
-          { application: { uuidAuthor: uuidUser } },
-          { teamMembers: { some: { uuidUser } } },
+        AND: [
+          { application: { deletedAt: null } },
+          {
+            OR: [
+              { application: { uuidAuthor: uuidUser } },
+              { teamMembers: { some: { uuidUser } } },
+            ],
+          },
         ],
       };
       const sort = { createdAt: "asc" };
@@ -253,8 +264,8 @@ export const projectRepo = {
    */
   async getConstraintsForProject(uuidProject) {
     try {
-      return await db.project.findUnique({
-        where: { uuid_project: uuidProject },
+      return await db.project.findFirst({
+        where: { uuid_project: uuidProject, application: { deletedAt: null } },
         select: {
           application: {
             select: {
@@ -306,8 +317,8 @@ export const projectRepo = {
    */
   async getDetailedProject(uuid) {
     try {
-      const projectData = await db.project.findUnique({
-        where: { uuid_project: uuid },
+      const projectData = await db.project.findFirst({
+        where: { uuid_project: uuid, application: { deletedAt: null } },
         select: {
           // --- 1. Inherited Data (Source of Truth: Application) ---
           application: {
@@ -442,7 +453,7 @@ export const projectRepo = {
   async updateStatus(uuidProject, targetStatusSlug) {
     try {
       return db.project.update({
-        where: { uuid_project: uuidProject },
+        where: { uuid_project: uuidProject, application: { deletedAt: null } },
         data: {
           projectStatus: {
             connect: { slug: targetStatusSlug },
@@ -499,8 +510,8 @@ export const projectRepo = {
    */
   async getForValidation(uuidProject) {
     try {
-      return await db.project.findUnique({
-        where: { uuid_project: uuidProject },
+      return await db.project.findFirst({
+        where: { uuid_project: uuidProject, application: { deletedAt: null } },
         select: {
           // --- 1. Get Team Members to validate composition ---
           uuid_project: true,
@@ -571,8 +582,11 @@ export const projectRepo = {
     try {
       return await db.$transaction(async (tx) => {
         // 1. Find the Project to get the Application UUID
-        const project = await tx.project.findUnique({
-          where: { uuid_project: uuidProject },
+        const project = await tx.project.findFirst({
+          where: {
+            uuid_project: uuidProject,
+            application: { deletedAt: null },
+          },
           select: { uuidApplication: true },
         });
 
@@ -653,7 +667,7 @@ export const projectRepo = {
   async updateDeadline(uuidProject, newDeadline) {
     try {
       return db.project.update({
-        where: { uuid_project: uuidProject },
+        where: { uuid_project: uuidProject, application: { deletedAt: null } },
         data: {
           application: {
             update: {

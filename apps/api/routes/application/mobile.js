@@ -8,6 +8,7 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import {
   createApplicationHandler,
   updateApplicationHandler,
+  deleteApplicationHandler,
 } from "./handlers.js";
 import { fileUploadMiddleware } from "./index.js";
 
@@ -25,4 +26,9 @@ mobileApplicationRouter.put(
   "/:uuid",
   requireRole("professor"),
   asyncHandler(updateApplicationHandler)
+);
+mobileApplicationRouter.delete(
+  "/:uuid",
+  requireRole(["outsider", "professor"]),
+  asyncHandler(deleteApplicationHandler)
 );
