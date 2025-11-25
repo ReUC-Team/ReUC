@@ -93,6 +93,7 @@ export const fileRepo = {
       modelTarget,
       uuidTarget,
       purpose,
+      deletedAt: null,
     };
 
     if (uuidFile) {
@@ -149,6 +150,7 @@ export const fileRepo = {
           modelTarget,
           purpose,
           uuidTarget: { in: targetUuids },
+          deletedAt: null,
         },
         select: { uuidTarget: true, modelTarget: true, purpose: true },
       });
@@ -183,11 +185,16 @@ export const fileRepo = {
   async getLinksAndMetadataByTarget(targetUuid) {
     try {
       return await db.file_Link.findMany({
-        where: { uuidTarget: targetUuid },
+        where: { uuidTarget: targetUuid, deletedAt: null },
         select: {
           modelTarget: true,
           purpose: true,
           uuidTarget: true,
+          author: {
+            select: {
+              uuid_user: true,
+            },
+          },
           file: {
             select: {
               uuid_file: true,
