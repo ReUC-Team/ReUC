@@ -35,17 +35,17 @@ const faqs = [
 
 const FAQSection = () => {
   return (
-    <section className="bg-gray-100 dark:bg-slate-800 py-16 px-6 text-gray-800 dark:text-gray-200">
-      <div className=" mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <section className="bg-gray-100 dark:bg-slate-800 py-12 sm:py-16 px-4 sm:px-6 text-gray-800 dark:text-gray-200">
+      <div className="mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 items-center">
         {/* Ilustración */}
         <div className="md:pr-8 flex flex-col items-center">
-          <h2 className="text-4xl font-extrabold mb-6">
+          <h2 className="text-3xl sm:text-4xl font-extrabold mb-4 sm:mb-6">
             Preguntas Frecuentes (<span className="text-lime-700">FAQ</span>)
           </h2>
           <img
             src={faqIllustration}
             alt="Persona mirando a través de un telescopio con engranajes"
-            className="w-auto h-auto rounded-lg max-w-sm mx-auto md:max-w-full"
+            className="w-auto h-auto rounded-lg max-w-xs sm:max-w-sm md:max-w-full mx-auto"
           />
         </div>
 
@@ -53,7 +53,7 @@ const FAQSection = () => {
         <div className="space-y-8">
           {faqs.map((faq, index) => (
             <div key={index}>
-              <h3 className="text-2xl font-bold mb-2">
+              <h3 className="text-xl sm:text-2xl font-bold mb-2">
                 <span className="text-lime-700 font-bold">{faq.question}</span>
               </h3>
               <p className="text-lg leading-relaxed text-gray-700 dark:text-gray-300 font-semibold">

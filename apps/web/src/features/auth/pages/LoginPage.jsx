@@ -13,13 +13,13 @@ const LoginPage = () => {
   const { form, isLoading, fieldErrors, handleChange, handleSubmit } = useLogin();
 
   return (
-    <section className='flex items-center justify-between h-full w-full ml-20'>
-      <div className="flex flex-col items-start justify-start gap-10 w-6/12 h-full mt-10">
-        <div className="flex flex-col gap-4 justify-between w-8/12 text-start">
-          <h2 className="text-5xl font-bold">
-            Bienvenido a <span className='text-5xl font-extrabold text-lime-600'>ReUC</span>
+    <section className='flex flex-col lg:flex-row items-center justify-between h-full w-full px-4 sm:px-6 lg:px-8 py-8 lg:py-0'>
+      <div className="flex flex-col items-start justify-start gap-6 sm:gap-8 lg:gap-10 w-full lg:w-6/12 h-full mt-6 sm:mt-8 lg:mt-10">
+        <div className="flex flex-col gap-3 sm:gap-4 justify-between w-full sm:w-10/12 md:w-8/12 text-start">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
+            Bienvenido a <span className='text-3xl sm:text-4xl lg:text-5xl font-extrabold text-lime-600'>ReUC</span>
           </h2>
-          <p className="text-gray-800 font-semibold text-2xl w-8/12">
+          <p className="text-gray-800 font-semibold text-lg sm:text-xl lg:text-2xl w-full sm:w-10/12 md:w-8/12">
             Accede a tu cuenta para continuar explorando el repositorio
           </p>
         </div>
@@ -56,21 +56,21 @@ const LoginPage = () => {
           <hr className='text-lime-600 my-3' />
         </AuthForm>
 
-        <div className='flex items-center gap-5'>
+        <div className='flex flex-col sm:flex-row items-center gap-4 sm:gap-5'>
           <div className='flex flex-col items-center'>
-            <h3 className="text-4xl font-extrabold text-lime-600">ReUC APP</h3>
-            <p className='text-2xl font-bold mb-7'>Disponible en:</p>
-            <div className='flex flex-col items-center gap-3'>
-              <img src={appStoreImage} alt="App Store" />
-              <img src={googlePlayImage} alt="Google Play" />
+            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-lime-600">ReUC APP</h3>
+            <p className='text-lg sm:text-xl lg:text-2xl font-bold mb-5 sm:mb-7'>Disponible en:</p>
+            <div className='flex flex-col items-center gap-2 sm:gap-3'>
+              <img src={appStoreImage} alt="App Store" className="w-32 sm:w-auto" />
+              <img src={googlePlayImage} alt="Google Play" className="w-32 sm:w-auto" />
             </div>
           </div>
-          <img src={reucAppImage} alt="ReUC App" />
+          <img src={reucAppImage} alt="ReUC App" className="hidden sm:block w-32 md:w-auto" />
         </div>
       </div>
 
-      <div className='flex items-start justify-start w-7/12'>
-        <img className='rounded-3xl w-10/12' src={loginImage} alt="Login" />
+      <div className='hidden lg:flex items-start justify-start w-full lg:w-7/12'>
+        <img className='rounded-3xl w-full lg:w-10/12' src={loginImage} alt="Login" />
       </div>
     </section>
   );

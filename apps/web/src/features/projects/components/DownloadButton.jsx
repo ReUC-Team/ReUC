@@ -78,13 +78,13 @@ const DownloadButton = ({ file }) => {
       </button>
       
       {file.size && (
-        <span className="ml-3 text-sm text-gray-600">
+        <span className="ml-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
           ({formatFileSize(file.size)})
         </span>
       )}
       
       {error && (
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+        <p className="mt-2 text-xs sm:text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
     </div>
   );

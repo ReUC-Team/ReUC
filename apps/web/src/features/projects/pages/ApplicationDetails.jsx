@@ -9,7 +9,7 @@ import EditApplicationModal from '../components/EditApplicationModal';
 import useApplicationDetails from '../hooks/useApplicationDetails';
 import { downloadAllAttachments, approveApplication } from '../projectsService';
 import { Alerts } from '@/shared/alerts';
-import { formatDateStringSpanish } from '@/utils/dateUtils';
+import { formatDateStringSpanish, formatISODateSpanish } from '@/utils/dateUtils';
 
 export default function ApplicationDetails() {
   const { uuid } = useParams();
@@ -146,28 +146,28 @@ export default function ApplicationDetails() {
   // Loading state
   if (isLoading) {
     return (
-      <section className="w-full px-10 py-12">
-        <div className="h-10 w-64 bg-gray-200 rounded animate-pulse mb-10"></div>
+      <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
+        <div className="h-10 w-64 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-10"></div>
         
-        <div className='flex h-screen mt-10'>
-          <div className="w-6/12">
-            <div className="w-full h-96 bg-gray-200 rounded-xl animate-pulse mb-6"></div>
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
+        <div className='flex flex-col lg:flex-row h-screen mt-10 gap-6'>
+          <div className="w-full lg:w-5/12">
+            <div className="w-full h-96 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse mb-6"></div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-slate-700">
+              <div className="h-6 w-48 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-4"></div>
               <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                <div className="h-4 w-5/6 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
               </div>
             </div>
           </div>
 
-          <div className="w-7/12 ml-6">
-            <div className="h-8 w-80 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div className="w-full lg:w-7/12">
+            <div className="h-8 w-80 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-3"></div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 border border-gray-200 dark:border-slate-700">
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div key={i} className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
                 ))}
               </div>
             </div>
@@ -180,10 +180,10 @@ export default function ApplicationDetails() {
   // Error state
   if (error || !application) {
     return (
-      <section className="w-full px-10 py-12">
+      <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -191,12 +191,12 @@ export default function ApplicationDetails() {
           Volver
         </button>
 
-        <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 sm:p-8 text-center">
           <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-2xl font-bold text-red-800 mb-2">Proyecto no encontrado</h2>
-          <p className="text-red-600 mb-6">{error || 'No se pudo cargar la información del proyecto'}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-red-800 dark:text-red-400 mb-2">Proyecto no encontrado</h2>
+          <p className="text-sm sm:text-base text-red-600 dark:text-red-400 mb-6">{error || 'No se pudo cargar la información del proyecto'}</p>
           <button
             onClick={() => navigate('/explore-projects')}
             className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition"
@@ -299,23 +299,25 @@ export default function ApplicationDetails() {
     { 
       label: 'Fecha de creación', 
       value: createdAt 
-        ? formatDateStringSpanish(createdAt.split('T')[0])
+        ? formatISODateSpanish(createdAt)
         : 'No especificada'
     },
     { 
       label: 'Estado', 
-      value: status === 'pending' ? 'Pendiente' : 
-             status === 'approved' ? 'Aprobado' : 
-             status === 'rejected' ? 'Rechazado' : 
-             status === 'in_progress' ? 'En Progreso' : 
-             status === 'completed' ? 'Completado' : status
+      value: typeof status === 'object' && status !== null
+        ? (status.name || status.slug || 'Desconocido')
+        : (status === 'pending' ? 'Pendiente' : 
+           status === 'approved' ? 'Aprobado' : 
+           status === 'rejected' ? 'Rechazado' : 
+           status === 'in_progress' ? 'En Progreso' : 
+           status === 'completed' ? 'Completado' : status)
     },
   ];
 
   const isAlreadyApproved = application?.status === 'approved';
   
   return (
-    <section className="w-full px-10 py-12">
+    <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
       {/* Header con estado y redirección */}
       <div className="flex items-center justify-between mb-6">
         <button
@@ -349,13 +351,13 @@ export default function ApplicationDetails() {
         </div>
       </div>
 
-      <h1 className="text-4xl font-bold">
-        Detalles del <span className="text-lime-700">proyecto</span>
+      <h1 className="text-3xl sm:text-4xl font-bold dark:text-gray-100">
+        Detalles del <span className="text-lime-700 dark:text-lime-500">proyecto</span>
       </h1>
 
-      <div className='flex mt-10 gap-6'>
+      <div className='flex flex-col lg:flex-row mt-6 sm:mt-10 gap-6'>
         {/* Columna izquierda: Imagen, descripción y archivos adjuntos */}
-        <div className="w-5/12">
+        <div className="w-full lg:w-5/12">
           <ProjectImage 
             src={bannerUrl} 
             alt={title} 
@@ -368,11 +370,11 @@ export default function ApplicationDetails() {
 
           {attachments.length > 0 && (
             <div className="mt-6">
-              <h2 className="text-3xl font-bold mb-3">
-                Documentos <span className="text-lime-700">adjuntos</span>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3 dark:text-gray-100">
+              Documentos <span className="text-lime-700 dark:text-lime-500">adjuntos</span>
               </h2>
               
-              <div className="space-y-3 mr-10">
+              <div className="space-y-3 lg:mr-10">
                 {attachments.map((file, index) => (
                   <AttachmentCard key={index} file={file} />
                 ))}
@@ -382,87 +384,31 @@ export default function ApplicationDetails() {
         </div>
 
         {/* Columna derecha: Información y acciones */}
-        <div className="w-7/12">
+        <div className="w-full lg:w-7/12">
           {/* Información de la Solicitud */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
-              Información de la Solicitud
-            </h2>
-            <div className="space-y-4">
-              {/* Estado actual */}
-              {application?.status && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Estado:</p>
-                  <ProjectStatusBadge status={application.status} size="md" />
-                </div>
-              )}
-
-              {/* Resto de campos existentes */}
-              {projectTypes?.length > 0 && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Tipo de proyecto:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {projectTypes.map(pt => pt.name).join(', ')}
-                  </p>
-                </div>
-              )}
-
-              {faculties?.length > 0 && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Facultades:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {faculties.map(f => f.name).join(', ')}
-                  </p>
-                </div>
-              )}
-
-              {problemTypes?.length > 0 && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Tipo de problemática:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {problemTypes.map(pt => pt.name).join(', ')}
-                  </p>
-                </div>
-              )}
-
-              {dueDate && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Fecha límite:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {formatDateStringSpanish(dueDate.split('T')[0])}
-                  </p>
-                </div>
-              )}
-
-              {createdAt && (
-                <div>
-                  <p className="text-gray-600 dark:text-gray-400 font-semibold mb-2">Fecha de creación:</p>
-                  <p className="text-gray-800 dark:text-gray-200">
-                    {formatDateStringSpanish(createdAt.split('T')[0])}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 dark:text-gray-100">
+            Información de la <span className="text-lime-700 dark:text-lime-500">solicitud</span>
+          </h2>
+          <ProjectInfoCard items={projectInfo} />
 
           {/* Información del solicitante */}
-          <h2 className="text-3xl font-bold mb-3">
-            Información del <span className="text-lime-700">solicitante</span>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 dark:text-gray-100">
+            Información del <span className="text-lime-700 dark:text-lime-500">solicitante</span>
           </h2>
           <ProjectInfoCard items={applicantInfo} />
 
           {/* Botones de acción */}
-          <div className="flex flex-col gap-3 pt-4 w-11/12">
+          <div className="flex flex-col gap-3 pt-4 w-full lg:w-11/12">
             {/* Primera fila: Editar + Aceptar */}
-            <div className='flex gap-5'>
+            <div className='flex flex-col sm:flex-row gap-3 sm:gap-5'>
               {/* Botón Editar proyecto */}
               <button 
                 onClick={handleEditClick}
                 disabled={isApproving || isAlreadyApproved}
-                className={`px-4 py-2 rounded-lg font-semibold w-6/12 transition flex items-center justify-center gap-2 ${
+                className={`px-4 py-2 rounded-lg font-semibold w-full sm:w-6/12 transition flex items-center justify-center gap-2 ${
                   isAlreadyApproved
-                    ? 'bg-gray-300 cursor-not-allowed text-gray-500'
-                    : 'border-2 border-lime-600 text-lime-700 hover:bg-lime-50'
+                    ? 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed text-gray-500 dark:text-gray-400'
+                    : 'border-2 border-lime-600 text-lime-700 dark:text-lime-500 hover:bg-lime-50 dark:hover:bg-lime-900/20'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                 title={isAlreadyApproved ? 'No se puede editar un proyecto aprobado' : 'Editar metadata y aprobar proyecto'}
               >
@@ -476,9 +422,9 @@ export default function ApplicationDetails() {
               <button 
                 onClick={handleApprove}
                 disabled={isApproving || isAlreadyApproved}
-                className={`px-4 py-2 rounded-lg font-semibold w-6/12 transition flex items-center justify-center gap-2 ${
+                className={`px-4 py-2 rounded-lg font-semibold w-full sm:w-6/12 transition flex items-center justify-center gap-2 ${
                   isAlreadyApproved
-                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    ? 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed text-white'
                     : 'bg-lime-600 text-white hover:bg-lime-700'
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                 title={isAlreadyApproved ? 'Este proyecto ya fue aprobado' : 'Aprobar proyecto sin modificaciones'}
@@ -529,21 +475,21 @@ export default function ApplicationDetails() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Descargar todos ({attachments.length})
+                  Descargar todos
                 </>
               )}
             </button>
 
             {/* Mensaje de error si ocurrió */}
             {downloadError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-600 dark:text-red-400">
                 {downloadError}
               </div>
             )}
 
             {/* Mensaje informativo si ya está aprobado */}
             {isAlreadyApproved && (
-              <div className="p-3 bg-lime-50 border border-lime-200 rounded-lg text-sm text-lime-700 flex items-start gap-2">
+              <div className="p-3 bg-lime-50 dark:bg-lime-900/20 border border-lime-200 dark:border-lime-700 rounded-lg text-sm text-lime-700 dark:text-lime-400 flex items-start gap-2">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>

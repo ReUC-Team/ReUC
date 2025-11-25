@@ -25,7 +25,7 @@ const ProjectCard = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-md p-2 w-full relative hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
+    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-md p-2 w-full relative hover:shadow-xl transition-shadow duration-300 flex flex-col h-full border border-gray-200 dark:border-slate-700">
       {/* Contenedor de imagen con overlay y badge */}
       <div className="relative w-full h-52 mb-4 group">
         <img
@@ -47,8 +47,8 @@ const ProjectCard = ({
       </div>
       
       <div className='p-3 flex flex-col flex-grow'>
-        <h3 className="font-bold text-xl mb-2 line-clamp-2">{title}</h3>
-        <p className="text-md text-gray-700 mb-6 line-clamp-3 flex-grow">{description}</p>
+        <h3 className="font-bold text-lg sm:text-xl mb-2 line-clamp-2 dark:text-gray-100">{title}</h3>
+        <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 mb-6 line-clamp-3 flex-grow">{description}</p>
         
         <div className={`flex gap-3 mt-auto ${showTeamButton ? 'flex-row' : ''}`}>
           <button

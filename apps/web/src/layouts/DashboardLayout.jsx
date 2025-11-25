@@ -5,11 +5,11 @@ import Timeline from '@/components/Timeline'
 
 const DashboardLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-900">
       <Header />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-6 overflow-x-hidden relative top-25">
+        <main className="flex-1 p-4 sm:p-6 overflow-x-hidden relative top-25 bg-white dark:bg-slate-900">
           <Outlet />
         </main>
         {/* <Timeline /> */}
