@@ -164,3 +164,73 @@ export interface PaginatedResponse<T> {
     totalItems: number
   }
 }
+
+/**
+ * Rol del equipo
+ */
+export interface TeamRole {
+  id: number
+  name: string
+}
+
+/**
+ * Miembro del equipo con detalles completos
+ */
+export interface TeamMemberDetailed {
+  uuidUser: string
+  firstName: string
+  middleName?: string
+  lastName: string
+  email: string
+  universityId?: string
+  roleName: string
+  roleId: number
+}
+
+/**
+ * Miembro pendiente (antes de guardar)
+ */
+export interface PendingTeamMember {
+  id: number // ID temporal
+  uuidUser: string
+  roleId: number
+  user: {
+    firstName: string
+    middleName?: string
+    lastName: string
+    email: string
+    universityId?: string
+  }
+}
+
+/**
+ * Restricción de rol
+ */
+export interface TeamRoleConstraint {
+  min: number
+  max: number | null
+}
+
+/**
+ * Metadata del equipo
+ */
+export interface TeamMetadata {
+  allowedRoles: Array<{
+    teamRoleId: number
+    name: string
+    minCount: number
+    maxCount: number | null
+  }>
+}
+
+/**
+ * Usuario de búsqueda
+ */
+export interface SearchUser {
+  uuidUser: string
+  firstName: string
+  middleName?: string
+  lastName: string
+  email: string
+  universityId?: string
+}

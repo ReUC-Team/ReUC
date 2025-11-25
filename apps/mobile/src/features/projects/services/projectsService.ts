@@ -324,3 +324,86 @@ export const downloadFile = async (url: string, filename: string) => {
   console.log('Download requested:', filename, url)
   return url
 }
+
+/**
+ * ============================================================================
+ * TEAM MANAGEMENT ENDPOINTS
+ * ============================================================================
+ */
+
+/**
+ * Obtiene la metadata del equipo (roles disponibles y límites)
+ */
+export const getTeamMetadata = async (projectUuid: string) => {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/project/${projectUuid}/team/metadata`
+  )
+  return response.data
+}
+
+/**
+ * Busca usuarios (profesores y estudiantes) para agregar al equipo
+ */
+export const searchMembers = async (query: string, limit: number = 10) => {
+  if (!query || query.trim().length < 3) {
+    return []
+  }
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/profile/search?q=${encodeURIComponent(query)}&limit=${limit}`
+  )
+
+  return response.data?.records || []
+}
+
+/**
+ * Crea el equipo del proyecto
+ */
+export const createTeam = async (projectUuid: string, members: Array<{ uuidUser: string; roleId: number }>) => {
+  const payload = { members }
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/mobile/project/${projectUuid}/team/create`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }
+  )
+
+  return response.data
+}
+
+/**
+ * Actualiza el rol de un miembro del equipo
+ */
+export const updateTeamMemberRole = async (
+  projectUuid: string,
+  memberUuid: string,
+  newRoleId: number
+) => {
+  const payload = { roleId: newRoleId }
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/mobile/project/${projectUuid}/team/members/${memberUuid}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }
+  )
+
+  return response.data
+}
+
+/**
+ * Elimina un miembro del equipo
+ */
+export const deleteTeamMember = async (projectUuid: string, memberUuid: string) => {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/mobile/project/${projectUuid}/team/members/${memberUuid}`,
+    {
+      method: 'DELETE',
+    }
+  )
+
+  return response.data
+}

@@ -13,10 +13,12 @@ interface ProjectCardProps {
   title: string
   description: string
   image: ImageSourcePropType | { uri: string }
-  status?: StatusObject | string  // Badge de estado (opcional)
+  status?: StatusObject | string
   isFavorite?: boolean
   onFavoriteToggle?: (isFavorite: boolean, uuid?: string) => void
   onDetailsClick?: (uuid?: string) => void
+  showTeamButton?: boolean  // NUEVO
+  onTeamClick?: (uuid?: string) => void  // NUEVO
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({
@@ -28,6 +30,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   isFavorite = false,
   onFavoriteToggle,
   onDetailsClick,
+  showTeamButton = false,  // NUEVO
+  onTeamClick,  // NUEVO
 }) => {
   const styles = useThemedStyles(createProjectCardStyles)
   const [favorite, setFavorite] = useState(isFavorite)
@@ -40,6 +44,10 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 
   const handleViewDetails = () => {
     onDetailsClick?.(uuid)
+  }
+
+  const handleViewTeam = () => {
+    onTeamClick?.(uuid)
   }
 
   return (
@@ -71,9 +79,23 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
         <Text style={styles.description} numberOfLines={3}>
           {description}
         </Text>
-        <TouchableOpacity style={styles.button} onPress={handleViewDetails}>
-          <Text style={styles.buttonText}>Ver detalles</Text>
-        </TouchableOpacity>
+        
+        {/* MODIFICADO: Botones condicionales */}
+        {showTeamButton ? (
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.buttonPrimary} onPress={handleViewDetails}>
+              <Text style={styles.buttonText}>Detalles</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonSecondary} onPress={handleViewTeam}>
+              <Ionicons name="people" size={16} color="#FFFFFF" />
+              <Text style={styles.buttonText}>Equipo</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TouchableOpacity style={styles.button} onPress={handleViewDetails}>
+            <Text style={styles.buttonText}>Ver detalles</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   )

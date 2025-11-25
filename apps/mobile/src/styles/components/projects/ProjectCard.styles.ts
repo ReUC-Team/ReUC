@@ -85,4 +85,27 @@ export const createProjectCardStyles = (palette: ColorPalette, fontMode: string)
       fontWeight: '600',
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
+    buttonRow: {
+      flexDirection: 'row',
+      gap: spacing.xs,
+    },
+    buttonPrimary: {
+      flex: 1,
+      backgroundColor: palette.primary,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    buttonSecondary: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: palette.onGBtn,
+      paddingVertical: spacing.sm,
+      paddingHorizontal: spacing.md,
+      borderRadius: 8,
+      gap: spacing.xxs,
+    },
   });
