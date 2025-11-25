@@ -22,14 +22,42 @@
                   "type": "string",
                   "format": "uri-relative",
                   "description": "The relative URL path for the project banner (inherited from application).",
-                  "example": "/file/view/123e4567?ticket=xyz",
-                  "nullable": true
+                  "example": "/APPLICATION/BANNER/123e4f...-426614174001?ticket=xyz"
                 },
                 "appAttachments": {
                   "type": "array",
                   "description": "A list of file attachments inherited from the original application.",
                   "items": {
                     "$ref": "../../application/common/ObjectAttachment.json"
+                  }
+                },
+                "resources": {
+                  "type": "array",
+                  "description": "A list of file resources (deliverables) uploaded by the project team.",
+                  "items": {
+                    "allOf": [
+                      {
+                        "$ref": "../../application/common/ObjectAttachment.json"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "downloadUrl": {
+                            "type": "string",
+                            "format": "uri-relative",
+                            "description": "The relative URL path to download the resources.",
+                            "example": "/PROJECT/RESOURCE/123e4f...-426614174001?ticket=xyz"
+                          },
+                          "uuidAuthor": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "The UUID of the team member who uploaded this resource.",
+                            "nullable": true,
+                            "example": "a1b2c3d4-e5f6-7890-1234-56789abcdef0"
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
               }
