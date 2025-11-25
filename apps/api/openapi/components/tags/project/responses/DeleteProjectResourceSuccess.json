@@ -1,0 +1,19 @@
+{
+  "description": "Successful response containing the project resource data.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "description": "Empty object as the project resource has been deleted."
+        },
+        "message": {
+          "type": "string",
+          "example": "Project resource deleted successfully."
+        }
+      }
+    }
+  ]
+}

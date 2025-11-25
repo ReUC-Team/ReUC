@@ -1,0 +1,32 @@
+{
+  "description": "Successful response containing the project resource data.",
+  "allOf": [
+    { "$ref": "../../../responses/data/ResponseSuccess.json" },
+    {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "properties": {
+            "resource": {
+              "type": "object",
+              "properties": {
+                "uuid_file": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "storedPath": { "type": "string" },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2025-11-17T10:00:00Z"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

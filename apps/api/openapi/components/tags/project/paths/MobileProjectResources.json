@@ -1,0 +1,72 @@
+{
+  "parameters": [
+    {
+      "name": "uuid",
+      "in": "path",
+      "required": true,
+      "schema": { "type": "string", "format": "uuid" },
+      "description": "The UUID of the project."
+    },
+    {
+      "name": "uuidResource",
+      "in": "path",
+      "required": true,
+      "schema": { "type": "string", "format": "uuid" },
+      "description": "The UUID of the file resource."
+    }
+  ],
+  "put": {
+    "summary": "(Mobile) Edit Project File",
+    "description": "Replaces the content of an existing project file resource via Mobile App. \n- **Roles**: `student`, `professor`.\n- **Constraint**: User must be a member of the project's team.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "../payload/ProjectResourceCreate.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Resource edited successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/UpdateProjectResourceSuccess.json"
+            }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  },
+  "delete": {
+    "summary": "(Mobile) Delete Project File",
+    "description": "Soft-deletes a project file resource via Mobile App. \n- **Roles**: `student`, `professor`.\n- **Constraint**: User must be a member of the project's team.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "responses": {
+      "200": {
+        "description": "Resource deleted successfully.",
+        "content": {
+          "application/json": {
+            "$ref": "../responses/DeleteProjectResourceSuccess.json"
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

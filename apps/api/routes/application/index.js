@@ -30,7 +30,7 @@ const upload = multer();
  * e.g.:
  * upload.single('fieldName')
  * req.file
- * - Hold the input 'fieldName` as a `MulterObject`. `req.file: Array<MulterObject>`
+ * - Hold the input 'fieldName` as a `MulterObject`. `req.file: MulterObject`
  *
  *
  * - If it is uploaded more than 1 files
