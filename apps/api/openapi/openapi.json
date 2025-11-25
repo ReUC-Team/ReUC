@@ -265,6 +265,18 @@
     },
     "/mobile/project/{uuid}/deadline": {
       "$ref": "./components/tags/project/paths/MobileUpdateDeadlineProject.json"
+    },
+    "/project/{uuid}/resources/file": {
+      "$ref": "./components/tags/project/paths/MobileCreateProjectResource.json"
+    },
+    "/mobile/project/{uuid}/resources/file": {
+      "$ref": "./components/tags/project/paths/WebCreateProjectResource.json"
+    },
+    "/project/{uuid}/resources/file/{uuidResource}": {
+      "$ref": "./components/tags/project/paths/WebProjectResources.json"
+    },
+    "/mobile/project/{uuid}/resources/file/{uuidResource}": {
+      "$ref": "./components/tags/project/paths/MobileProjectResources.json"
     }
   }
 }

@@ -1,5 +1,6 @@
 import express from "express";
 import csurf from "csurf";
+import multer from "multer";
 import { authMiddleware, requireRole } from "../../middleware/auth.js";
 import asyncHandler from "../../utils/asyncHandler.js";
 import {
@@ -14,12 +15,18 @@ import {
   startProjectHandler,
   rollbackProjectHandler,
   updateDeadlineProjectHandler,
+  uploadProjectResourceFileHandler,
+  editProjectResourceFileHandler,
+  deleteProjectResourceFileHandler,
 } from "./handlers.js";
 
 export const projectRouter = express.Router();
 projectRouter.use(authMiddleware);
 
 const csrfProtection = csurf({ cookie: true });
+const upload = multer();
+
+export const fileUploadMiddleware = upload.single("file");
 
 projectRouter.post(
   "/create",
@@ -82,4 +89,24 @@ projectRouter.patch(
   csrfProtection,
   requireRole("professor"),
   asyncHandler(updateDeadlineProjectHandler)
+);
+projectRouter.post(
+  "/:uuid/resources/file",
+  csrfProtection,
+  requireRole(["student", "professor"]),
+  fileUploadMiddleware,
+  asyncHandler(uploadProjectResourceFileHandler)
+);
+projectRouter.put(
+  "/:uuid/resources/file/:uuidResource",
+  csrfProtection,
+  requireRole(["student", "professor"]),
+  fileUploadMiddleware,
+  asyncHandler(editProjectResourceFileHandler)
+);
+projectRouter.delete(
+  "/:uuid/resources/file/:uuidResource",
+  csrfProtection,
+  requireRole(["student", "professor"]),
+  asyncHandler(deleteProjectResourceFileHandler)
 );
