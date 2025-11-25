@@ -1,5 +1,6 @@
 import * as ApplicationError from "../errors/index.js";
 import { validateUuid } from "../shared/validators.js";
+import { mapFileLink } from "../shared/fileUtils.js";
 import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
 import { getDetailedApplication as getAppDomain } from "@reuc/domain/application/getDetailedApplication.js";
 import { getLinksByTarget } from "@reuc/domain/file/getLinksByTarget.js";
@@ -163,25 +164,7 @@ function _normalizeFiles(uuidUser, tokenConfig, fileLinks) {
   // 2. Map all ATTACHMENT links
   const attachments = fileLinks
     .filter((link) => link.purpose === "ATTACHMENT")
-    .map((link) => {
-      const basePath = buildFileUrl(link);
-      if (!basePath) return null;
-
-      const fileIdentifier = basePath.substring(1);
-      const ticket = generateFileTicket({
-        uuidUser: uuidUser,
-        fileIdentifier,
-        audience: "download",
-        tokenConfig,
-      });
-
-      return {
-        downloadUrl: `${basePath}?ticket=${ticket}`,
-        name: link.file.originalName,
-        size: link.file.fileSize,
-        type: link.file.mimetype,
-      };
-    })
+    .map((link) => mapFileLink(link, uuidUser, tokenConfig, "download"))
     .filter(Boolean); // Remove any nulls from failed buildFileUrl calls
 
   return { bannerUrl, attachments };

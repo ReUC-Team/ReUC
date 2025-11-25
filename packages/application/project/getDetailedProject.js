@@ -1,5 +1,6 @@
 import * as ApplicationError from "../errors/index.js";
 import { validateUuid } from "../shared/validators.js";
+import { mapFileLink } from "../shared/fileUtils.js";
 import { generateFileTicket } from "@reuc/domain/user/session/generateFileTicket.js";
 import { getDetailedProject as getProjectDomain } from "@reuc/domain/project/getDetailedProject.js";
 import { getLinksByTarget } from "@reuc/domain/file/getLinksByTarget.js";
@@ -37,17 +38,26 @@ export async function getDetailedProject(
     // Step 1: Fetch Project Data first
     const projectData = await getProjectDomain(projectUuid);
 
-    // Step 2: Fetch Files using the related application UUID
-    const appUuid = projectData.uuidApplication;
-    const fileLinks = await getLinksByTarget(appUuid);
+    // Step 2: Fetch Files concurrently
+    // A. Fetch files linked to the Application (Banner, Initial Attachments)
+    // B. Fetch files linked to the Project (Team Resources)
+    const [appLinks, projectLinks] = await Promise.all([
+      getLinksByTarget(projectData.uuidApplication),
+      getLinksByTarget(projectData.uuid_project),
+    ]);
 
     // Step 3: Normalize and separate the data.
     const author = _normalizeAuthor(projectData.application.author);
     const details = _normalizeDetails(projectData);
-    const { bannerUrl, attachments } = _normalizeFiles(
+    const { bannerUrl, attachments } = _normalizeAppFiles(
       uuidRequestingUser,
       tokenConfig,
-      fileLinks
+      appLinks
+    );
+    const resources = _normalizeProjectResources(
+      uuidRequestingUser,
+      tokenConfig,
+      projectLinks
     );
 
     // Step 4: Stitch the final DTO.
@@ -56,7 +66,7 @@ export async function getDetailedProject(
       details,
       bannerUrl,
       appAttachments: attachments,
-      // TODO: In the future, merge with project.attachments here
+      resources,
     };
   } catch (err) {
     if (err instanceof DomainError.NotFoundError)
@@ -178,7 +188,7 @@ function _normalizeDetails(projectData) {
  * Normalize file links into a banner URL and attachment list.
  * @param {Array<object>} fileLinks - The list of file links from the domain.
  */
-function _normalizeFiles(uuidUser, tokenConfig, fileLinks) {
+function _normalizeAppFiles(uuidUser, tokenConfig, fileLinks) {
   let bannerUrl = null;
 
   // 1. Find the first BANNER link
@@ -201,26 +211,30 @@ function _normalizeFiles(uuidUser, tokenConfig, fileLinks) {
   // 2. Map all ATTACHMENT links
   const attachments = fileLinks
     .filter((link) => link.purpose === "ATTACHMENT")
-    .map((link) => {
-      const basePath = buildFileUrl(link);
-      if (!basePath) return null;
-
-      const fileIdentifier = basePath.substring(1);
-      const ticket = generateFileTicket({
-        uuidUser: uuidUser,
-        fileIdentifier,
-        audience: "download",
-        tokenConfig,
-      });
-
-      return {
-        downloadUrl: `${basePath}?ticket=${ticket}`,
-        name: link.file.originalName,
-        size: link.file.fileSize,
-        type: link.file.mimetype,
-      };
-    })
-    .filter(Boolean); // Remove any nulls from failed buildFileUrl calls
+    .map((link) => mapFileLink(link, uuidUser, tokenConfig, "download"))
+    .filter(Boolean);
 
   return { bannerUrl, attachments };
+}
+
+/**
+ * @private
+ * Normalize project-level resources (Deliverables).
+ * @param {string} uuidUser
+ * @param {object} tokenConfig
+ * @param {Array<object>} fileLinks
+ */
+function _normalizeProjectResources(uuidUser, tokenConfig, fileLinks) {
+  return fileLinks
+    .filter((link) => link.purpose === "RESOURCE")
+    .map((link) => {
+      const fileData = mapFileLink(link, uuidUser, tokenConfig, "download");
+      if (!fileData) return null;
+
+      return {
+        ...fileData,
+        uuidAuthor: link.author?.uuid_user || null, // Attach the author UUID
+      };
+    })
+    .filter(Boolean);
 }
