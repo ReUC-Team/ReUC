@@ -2,11 +2,17 @@
   "type": "object",
   "description": "A single file attachment.",
   "properties": {
+    "uuid_file": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier of the file resource.",
+      "example": "123e4567-e89b-12d3-a456-426614174000"
+    },
     "downloadUrl": {
       "type": "string",
       "format": "uri-relative",
       "description": "The relative URL path to download the attachment.",
-      "example": "/APPLICATION/ATTACHMENT/123e4f...-426614174001"
+      "example": "/APPLICATION/ATTACHMENT/123e4f...-426614174001?ticket=xyz"
     },
     "name": {
       "type": "string",
