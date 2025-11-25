@@ -21,9 +21,8 @@
                 "bannerUrl": {
                   "type": "string",
                   "format": "uri-relative",
-                  "description": "The relative URL path for the application's banner image. Null if no banner is set.",
-                  "example": "/APPLICATION/BANNER/123e4567-e89b-12d3-a456-426614174000",
-                  "nullable": true
+                  "description": "The relative URL path for the application's banner image.",
+                  "example": "/APPLICATION/BANNER/123e4f...-426614174001?ticket=xyz"
                 },
                 "attachments": {
                   "type": "array",
