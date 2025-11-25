@@ -110,26 +110,26 @@ export default function ProjectDetails() {
   // Loading state
   if (isLoading) {
     return (
-      <section className="w-full px-10 py-12">
-        <div className="h-10 w-64 bg-gray-200 rounded animate-pulse mb-10"></div>
-        <div className='flex h-screen mt-10'>
-          <div className="w-6/12">
-            <div className="w-full h-96 bg-gray-200 rounded-xl animate-pulse mb-6"></div>
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
+      <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
+        <div className="h-10 w-64 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-10"></div>
+        <div className='flex flex-col lg:flex-row h-screen mt-10 gap-6'>
+          <div className="w-full lg:w-6/12">
+            <div className="w-full h-96 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse mb-6"></div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-slate-700">
+              <div className="h-6 w-48 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-4"></div>
               <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                <div className="h-4 w-5/6 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
               </div>
             </div>
           </div>
-          <div className="w-7/12 ml-6">
-            <div className="h-8 w-80 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div className="w-full lg:w-7/12">
+            <div className="h-8 w-80 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-3"></div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 border border-gray-200 dark:border-slate-700">
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div key={i} className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
                 ))}
               </div>
             </div>
@@ -142,22 +142,22 @@ export default function ProjectDetails() {
   // Error state
   if (error || !project) {
     return (
-      <section className="w-full px-10 py-12">
+      <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
         <button
           onClick={() => navigate('/my-projects')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Volver a mis proyectos
         </button>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 sm:p-8 text-center">
           <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-2xl font-bold text-red-800 mb-2">Proyecto no encontrado</h2>
-          <p className="text-red-600 mb-6">{error || 'No se pudo cargar la información del proyecto'}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-red-800 dark:text-red-400 mb-2">Proyecto no encontrado</h2>
+          <p className="text-sm sm:text-base text-red-600 dark:text-red-400 mb-6">{error || 'No se pudo cargar la información del proyecto'}</p>
           <button
             onClick={() => navigate('/my-projects')}
             className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition"
@@ -242,12 +242,12 @@ export default function ProjectDetails() {
   // };
 
   return (
-    <section className="w-full px-10 py-12">
+    <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
       {/* Header con badge de estado */}
       <div className="flex items-center justify-between mb-6">
         <button
           onClick={() => navigate('/my-projects')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -261,21 +261,21 @@ export default function ProjectDetails() {
         </div>
       </div>
 
-      <h1 className="text-4xl font-bold mb-6">
-        Detalles del <span className="text-lime-700">proyecto</span>
+      <h1 className="text-3xl sm:text-4xl font-bold mb-6 dark:text-gray-100">
+        Detalles del <span className="text-lime-700 dark:text-lime-500">proyecto</span>
       </h1>
 
-      <div className='flex mt-10 gap-6'>
+      <div className='flex flex-col lg:flex-row mt-6 sm:mt-10 gap-6'>
         {/* Columna izquierda: Imagen, descripción y archivos adjuntos */}
-        <div className="w-5/12">
+        <div className="w-full lg:w-5/12">
           <ProjectImage src={bannerUrl} alt={title} />
           <ProjectSummary title={title} description={description || shortDescription} />
           {attachments.length > 0 && (
             <div className="mt-6">
-              <h2 className="text-3xl font-bold mb-3">
-                Documentos <span className="text-lime-700">adjuntos</span>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 dark:text-gray-100">
+                Documentos <span className="text-lime-700 dark:text-lime-500">adjuntos</span>
               </h2>
-              <div className="space-y-3 mr-10">
+              <div className="space-y-3 lg:mr-10">
                 {attachments.map((file, index) => (
                   <AttachmentCard key={index} file={file} />
                 ))}
@@ -284,7 +284,7 @@ export default function ProjectDetails() {
             <button 
               onClick={handleDownloadAll}
               disabled={isDownloadingAll || attachments.length === 0}
-              className="px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-gray-700 font-semibold transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 w-11/12 mr-10"
+              className="px-4 py-2 bg-lime-700 text-white rounded-lg hover:bg-gray-700 font-semibold transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-4 w-full lg:w-11/12 lg:mr-10"
               title={attachments.length === 0 ? 'No hay archivos para descargar' : 'Descargar todos los documentos'}
             >
               {isDownloadingAll ? (
@@ -307,7 +307,7 @@ export default function ProjectDetails() {
 
             {/* Mensaje de error si ocurrió */}
             {downloadError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-600 dark:text-red-400">
                 {downloadError}
               </div>
             )}
@@ -316,24 +316,24 @@ export default function ProjectDetails() {
         </div>
 
         {/* Columna derecha: Información y acciones */}
-        <div className="w-7/12">
+        <div className="w-full lg:w-7/12">
           {/* Información del autor */}
-          <h2 className="text-3xl font-bold mb-3">
-            Información del <span className="text-lime-700">autor</span>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 dark:text-gray-100">
+            Información del <span className="text-lime-700 dark:text-lime-500">autor</span>
           </h2>
           <ProjectInfoCard items={authorInfo} />
 
           {/* Información del proyecto */}
-          <h2 className="text-3xl font-bold mb-3 mt-8">
-            Información del <span className="text-lime-700">proyecto</span>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 mt-8 dark:text-gray-100">
+            Información del <span className="text-lime-700 dark:text-lime-500">proyecto</span>
           </h2>
           <ProjectInfoCard items={projectInfo} />
 
           {/* Sección de Equipo (si hay miembros) */}
           {/* {teamMembers && teamMembers.length > 0 && (
             <>
-              <h2 className="text-3xl font-bold mb-3 mt-8">
-                Equipo del <span className="text-lime-700">proyecto</span>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 mt-8 dark:text-gray-100">
+                Equipo del <span className="text-lime-700 dark:text-lime-500">proyecto</span>
               </h2>
               <ProjectInfoCard items={teamInfo} />
             </>

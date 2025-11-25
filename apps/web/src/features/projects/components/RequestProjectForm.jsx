@@ -134,22 +134,22 @@ export default function RequestProjectForm({
       className="w-full max-w-5xl mx-auto"
     >
       {/* Información Básica */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sm:p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 dark:bg-lime-900/20 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-700 dark:text-lime-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Información <span className='text-lime-700'>Básica</span></h3>
-            <p className="text-sm text-gray-500">Describe tu proyecto de manera clara y concisa</p>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Información <span className='text-lime-700'>Básica</span></h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Describe tu proyecto de manera clara y concisa</p>
           </div>
         </div>
 
         <div className="space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Título del proyecto <span className="text-red-500">*</span>
             </label>
             <input
@@ -157,13 +157,13 @@ export default function RequestProjectForm({
               value={form.title}
               onChange={handleChange}
               placeholder="Ej: Sistema de gestión de inventario"
-              className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
-                fieldErrors?.title ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+              className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-700 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
+                fieldErrors?.title ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
               }`}
               required
             />
             {fieldErrors?.title && (
-              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+              <p className="mt-2 text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -173,7 +173,7 @@ export default function RequestProjectForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Descripción corta <span className="text-red-500">*</span>
             </label>
             <input
@@ -181,13 +181,13 @@ export default function RequestProjectForm({
               value={form.shortDescription}
               onChange={handleChange}
               placeholder="Resumen en una línea para la tarjeta del proyecto"
-              className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
-                fieldErrors?.shortDescription ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+              className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-700 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
+                fieldErrors?.shortDescription ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
               }`}
               required
             />
             {fieldErrors?.shortDescription && (
-              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+              <p className="mt-2 text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -197,7 +197,7 @@ export default function RequestProjectForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Descripción detallada <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -205,14 +205,14 @@ export default function RequestProjectForm({
               value={form.description}
               onChange={handleChange}
               placeholder="Describe el problema a resolver, objetivos, alcance y cualquier detalle relevante..."
-              className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent resize-none ${
-                fieldErrors?.description ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+              className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-slate-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent resize-none ${
+                fieldErrors?.description ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
               }`}
               rows={6}
               required
             />
             {fieldErrors?.description && (
-              <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+              <p className="mt-2 text-xs sm:text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
@@ -224,16 +224,16 @@ export default function RequestProjectForm({
       </div>
 
       {/* Clasificación del Proyecto */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sm:p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 dark:bg-lime-900/20 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-700 dark:text-lime-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Clasificación</h3>
-            <p className="text-sm text-gray-500">Categoriza tu proyecto <span className="text-lime-600">(opcional)</span></p>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Clasificación</h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Categoriza tu proyecto <span className="text-lime-600">(opcional)</span></p>
           </div>
         </div>
 
@@ -241,13 +241,13 @@ export default function RequestProjectForm({
           {/* Tipo de proyecto */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <label className="text-sm font-semibold text-gray-700">
+              <label className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Tipo de proyecto
               </label>
               <button
                 type="button"
                 onClick={() => setShowInfo((s) => !s)}
-                className="text-gray-400 hover:text-blue-600 transition-colors"
+                className="text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -256,8 +256,8 @@ export default function RequestProjectForm({
             </div>
             
             {showInfo && (
-              <div className="mb-4 p-4 bg-lime-50 border border-lime-200 rounded-xl">
-                <p className="text-sm text-lime-800">
+              <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl">
+                <p className="text-sm text-blue-800 dark:text-blue-300">
                   Selecciona la modalidad académica a la que aplica tu proyecto.
                 </p>
               </div>
@@ -270,7 +270,6 @@ export default function RequestProjectForm({
                   className="relative flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md group"
                   style={{
                     borderColor: form.projectType.includes(String(project_type_id)) ? '#65a30d' : '#e5e7eb',
-                    backgroundColor: form.projectType.includes(String(project_type_id)) ? '#f7fee7' : 'white'
                   }}
                 >
                   <input
@@ -279,12 +278,12 @@ export default function RequestProjectForm({
                     value={project_type_id}
                     checked={form.projectType.includes(String(project_type_id))}
                     onChange={handleChange}
-                    className="w-5 h-5 text-lime-600 border-gray-300 focus:ring-lime-500"
+                    className="w-5 h-5 text-lime-600 border-gray-300 dark:border-slate-600 focus:ring-lime-500"
                     style={{ accentColor: '#65a30d' }}
                   />
-                  <span className="text-sm font-medium text-gray-700">{name}</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{name}</span>
                   {form.projectType.includes(String(project_type_id)) && (
-                    <svg className="w-5 h-5 text-lime-600 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-lime-600 dark:text-lime-400 ml-auto" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -295,7 +294,7 @@ export default function RequestProjectForm({
 
           {/* Facultad */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Facultad sugerida
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -304,8 +303,7 @@ export default function RequestProjectForm({
                   key={faculty_id} 
                   className="relative flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md"
                   style={{
-                    borderColor: form.faculty.includes(String(faculty_id)) ? '#65a30d' : '#e5e7eb',
-                    backgroundColor: form.faculty.includes(String(faculty_id)) ? '#f7fee7' : 'white'
+                    borderColor: form.faculty.includes(String(faculty_id)) ? '#65a30d' : '#e5e7eb'
                   }}
                 >
                   <input
@@ -314,12 +312,12 @@ export default function RequestProjectForm({
                     value={faculty_id}
                     checked={form.faculty.includes(String(faculty_id))}
                     onChange={handleChange}
-                    className="w-5 h-5 text-lime-600 border-gray-300 focus:ring-lime-500"
+                    className="w-5 h-5 text-lime-600 border-gray-300 dark:border-slate-600 focus:ring-lime-500"
                     style={{ accentColor: '#65a30d' }}
                   />
-                  <span className="text-sm font-medium text-gray-700">{name}</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{name}</span>
                   {form.faculty.includes(String(faculty_id)) && (
-                    <svg className="w-5 h-5 text-lime-600 ml-auto" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-lime-600 dark:text-lime-400 ml-auto" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                   )}
@@ -330,7 +328,7 @@ export default function RequestProjectForm({
 
           {/* Tipo de problemática */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
               Tipo de problemática
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -339,8 +337,7 @@ export default function RequestProjectForm({
                   key={problem_type_id}
                   className="relative flex items-center gap-2 p-3 border-2 rounded-xl cursor-pointer transition-all duration-200 hover:shadow-md"
                   style={{
-                    borderColor: form.problemType.includes(String(problem_type_id)) ? '#65a30d' : '#e5e7eb',
-                    backgroundColor: form.problemType.includes(String(problem_type_id)) ? '#f7fee7' : 'white'
+                    borderColor: form.problemType.includes(String(problem_type_id)) ? '#65a30d' : '#e5e7eb'
                   }}
                 >
                   <input
@@ -349,10 +346,10 @@ export default function RequestProjectForm({
                     value={problem_type_id}
                     checked={form.problemType.includes(String(problem_type_id))}
                     onChange={handleChange}
-                    className="w-4 h-4 text-lime-600 rounded border-gray-300 focus:ring-lime-500"
+                    className="w-4 h-4 text-lime-600 rounded border-gray-300 dark:border-slate-600 focus:ring-lime-500"
                     style={{ accentColor: '#65a30d' }}
                   />
-                  <span className="text-sm font-medium text-gray-700">{name}</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{name}</span>
                 </label>
               ))}
             </div>
@@ -364,7 +361,9 @@ export default function RequestProjectForm({
                   value={form.problemTypeOther}
                   onChange={handleChange}
                   placeholder="Describe tu problemática..."
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent"
+                  className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-slate-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
+                    fieldErrors?.problemTypeOther ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20' : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
+                  }`}
                 />
               </div>
             )}
@@ -373,45 +372,45 @@ export default function RequestProjectForm({
       </div>
 
       {/* Vigencia */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sm:p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-lime-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 dark:bg-lime-900/20 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-700 dark:text-lime-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Fecha<span className="text-lime-700"> Límite</span></h3>
-            <p className="text-sm text-gray-500">¿Cuándo necesitas completar el proyecto?</p>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Fecha<span className="text-lime-700"> Límite</span></h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">¿Cuándo necesitas completar el proyecto?</p>
           </div>
         </div>
 
         {deadlineConstraints.projectTypeName ? (
-          <div className="mb-4 p-5 bg-gradient-to-br from-lime-50 to-lime-50 border border-lime-200 rounded-xl">
+          <div className="mb-4 p-5 bg-gradient-to-br from-lime-50 to-lime-50 dark:from-lime-900/20 dark:to-lime-900/20 border border-lime-200 dark:border-lime-700 rounded-xl">
             <div className="flex gap-4">
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-lime-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-lime-600 dark:bg-lime-500 rounded-lg flex items-center justify-center">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-lime-700 mb-2">{deadlineConstraints.projectTypeName}</h4>
-                <div className="space-y-1.5 text-sm text-lime-800">
+                <h4 className="font-bold text-lime-700 dark:text-lime-300 mb-2">{deadlineConstraints.projectTypeName}</h4>
+                <div className="space-y-1.5 text-sm text-lime-800 dark:text-lime-200">
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-lime-600 dark:text-lime-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     <span><strong>Minimo:</strong> {formatDateStringSpanish(deadlineConstraints.min)}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-4 h-4 text-lime-600 dark:text-lime-400" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                     </svg>
                     <span><strong>Límite:</strong> {formatDateStringSpanish(deadlineConstraints.max)}</span>
                   </div>
-                  <div className="mt-2 pt-2 border-t border-lime-200">
+                  <div className="mt-2 pt-2 border-t border-lime-200 dark:border-lime-700">
                     <span className="text-xs font-semibold">Duración: {deadlineConstraints.minMonths} a {deadlineConstraints.maxMonths} meses</span>
                   </div>
                 </div>
@@ -419,11 +418,11 @@ export default function RequestProjectForm({
             </div>
           </div>
         ) : (
-          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-start gap-3">
-            <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mb-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-xl flex items-start gap-3">
+            <svg className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
             </svg>
-            <p className="text-sm text-yellow-800">
+            <p className="text-sm text-yellow-800 dark:text-yellow-300">
               Selecciona un tipo de proyecto para ver el rango de fechas permitidas
             </p>
           </div>
@@ -437,46 +436,46 @@ export default function RequestProjectForm({
           min={deadlineConstraints.min || undefined}
           max={deadlineConstraints.max || undefined}
           disabled={!deadlineConstraints.min}
-          className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
+          className={`w-full border-2 rounded-xl px-4 py-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-slate-700 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-lime-500 focus:border-transparent ${
             fieldErrors?.deadline
-              ? 'border-red-300 bg-red-50'
+              ? 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20'
               : !deadlineConstraints.min
-              ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
-              : 'border-gray-200 hover:border-gray-300'
+              ? 'border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-800 cursor-not-allowed'
+              : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500'
           }`}
           required
         />
 
         {fieldErrors?.deadline && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
-            <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-xl flex items-start gap-2">
+            <svg className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
             </svg>
-            <p className="text-sm text-red-700 font-medium">{fieldErrors.deadline}</p>
+            <p className="text-sm text-red-700 dark:text-red-300 font-medium">{fieldErrors.deadline}</p>
           </div>
         )}
 
         {!fieldErrors?.deadline && form.deadline && deadlineConstraints.min && (
-          <div className="mt-3 p-3 bg-lime-50 border border-lime-200 rounded-xl flex items-center gap-2">
-            <svg className="w-5 h-5 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
+          <div className="mt-3 p-3 bg-lime-50 dark:bg-lime-900/20 border border-lime-200 dark:border-lime-700 rounded-xl flex items-center gap-2">
+            <svg className="w-5 h-5 text-lime-600 dark:text-lime-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
-            <p className="text-sm text-lime-700 font-medium">Fecha válida seleccionada</p>
+            <p className="text-sm text-lime-700 dark:text-lime-300 font-medium">Fecha válida seleccionada</p>
           </div>
         )}
       </div>
 
       {/* Banner */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sm:p-8 mb-6">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
-            <svg className="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-10 h-10 bg-lime-50 dark:bg-lime-900/20 rounded-xl flex items-center justify-center">
+            <svg className="w-6 h-6 text-lime-600 dark:text-lime-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <div>
-            <h3 className="text-xl font-bold text-gray-900">Banner del <span className="font-semibold text-lime-700">Proyecto</span></h3>
-            <p className="text-sm text-gray-500">Imagen principal que representará tu proyecto</p>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Banner del <span className="font-semibold text-lime-700">Proyecto</span></h3>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Imagen principal que representará tu proyecto</p>
           </div>
         </div>
 
@@ -510,7 +509,7 @@ export default function RequestProjectForm({
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               Subir imagen personalizada
             </label>
             <input
@@ -519,15 +518,15 @@ export default function RequestProjectForm({
               onChange={handleCustomBannerChange}
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              className="w-full border-2 border-dashed border-gray-300 rounded-xl px-4 py-8 text-center hover:border-lime-500 transition-colors cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-lime-50 file:text-lime-700 hover:file:bg-lime-100"
+              className="w-full border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl px-4 py-8 text-center hover:border-lime-500 dark:hover:border-lime-500 transition-colors cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-lime-50 dark:file:bg-lime-900/20 file:text-lime-700 dark:file:text-lime-300 hover:file:bg-lime-100 dark:hover:file:bg-lime-800"
             />
             {fieldErrors?.banner && (
-              <p className="mt-2 text-sm text-red-600">{fieldErrors.banner}</p>
+              <p className="mt-2 text-sm text-red-600 dark:text-red-400">{fieldErrors.banner}</p>
             )}
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-gray-700 mb-3">O selecciona un banner predeterminado:</p>
+            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">O selecciona un banner predeterminado:</p>
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
               {defaultBanners.map((banner) => (
                 <div
@@ -536,7 +535,7 @@ export default function RequestProjectForm({
                   className={`relative aspect-video rounded-lg overflow-hidden cursor-pointer transition-all duration-200 border-2 ${
                     form.selectedBannerUuid === banner.uuid
                       ? 'border-lime-500 shadow-lg scale-105'
-                      : 'border-gray-200 hover:border-lime-300 hover:shadow-md'
+                      : 'border-gray-200 dark:border-slate-600 hover:border-lime-300 dark:hover:border-lime-500 hover:shadow-md'
                   }`}
                 >
                   <img
@@ -546,8 +545,8 @@ export default function RequestProjectForm({
                   />
                   {form.selectedBannerUuid === banner.uuid && (
                     <div className="absolute inset-0 bg-lime-500 bg-opacity-20 flex items-center justify-center">
-                      <div className="bg-white rounded-full p-1">
-                        <svg className="w-6 h-6 text-lime-600" fill="currentColor" viewBox="0 0 20 20">
+                      <div className="bg-white dark:bg-slate-700 rounded-full p-1">
+                        <svg className="w-6 h-6 text-lime-600 dark:text-lime-400" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
@@ -561,21 +560,21 @@ export default function RequestProjectForm({
       </div>
 
       {/* Archivos Adjuntos */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 sm:p-8 mb-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-lime-50 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-lime-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 bg-lime-50 dark:bg-lime-900/20 rounded-xl flex items-center justify-center">
+              <svg className="w-6 h-6 text-lime-600 dark:text-lime-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
               </svg>
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900">Archivos <span className="font-semibold text-lime-700">Adjuntos</span></h3>
-              <p className="text-sm text-gray-500">Documentos de apoyo <span className="font-semibold text-lime-600">(máximo 5 archivos)</span></p>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Archivos <span className="font-semibold text-lime-700">Adjuntos</span></h3>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Documentos de apoyo <span className="font-semibold text-lime-600">(máximo 5 archivos)</span></p>
             </div>
           </div>
-          <div className="px-4 py-2 bg-gray-100 rounded-lg">
-            <span className="text-sm font-bold text-gray-700">
+          <div className="px-4 py-2 bg-gray-100 dark:bg-slate-700 rounded-lg">
+            <span className="text-sm font-bold text-gray-700 dark:text-gray-300">
               {form.attachments?.length || 0} / 5
             </span>
           </div>
@@ -586,9 +585,9 @@ export default function RequestProjectForm({
             {form.attachments.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center gap-4 p-4 bg-gray-50 border border-gray-200 rounded-xl hover:shadow-md transition-all duration-200 group"
+                className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl hover:shadow-md transition-all duration-200 group"
               >
-                <div className="flex-shrink-0 w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-gray-200">
+                <div className="flex-shrink-0 w-12 h-12 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center border border-gray-200 dark:border-slate-600">
                   {(() => {
                     const icon = getFileIcon(file);
                     const isImage = file.type.startsWith('image/');
@@ -599,20 +598,20 @@ export default function RequestProjectForm({
                         className={isImage ? 'w-full h-full object-cover rounded-lg' : 'w-8 h-8 object-contain'}
                       />
                     ) : (
-                      <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                     );
                   })()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{getShortFileName(file)}</p>
-                  <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{getShortFileName(file)}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{formatFileSize(file.size)}</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => removeAttachment(index)}
-                  className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                  className="flex-shrink-0 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                 >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -630,14 +629,14 @@ export default function RequestProjectForm({
           type="file"
           multiple
           accept="image/jpeg,image/png,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,text/plain,video/*,audio/*"
-          className="w-full border-2 border-dashed border-gray-300 rounded-xl px-4 py-8 text-center hover:border-lime-500 transition-colors cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-lime-50 file:text-lime-700 hover:file:bg-lime-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full border-2 border-dashed border-gray-300 dark:border-slate-600 rounded-xl px-4 py-8 text-center hover:border-lime-500 dark:hover:border-lime-500 transition-colors cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-lime-50 dark:file:bg-lime-900/20 file:text-lime-700 dark:file:text-lime-300 hover:file:bg-lime-100 dark:hover:file:bg-lime-800 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={form.attachments?.length >= 5}
         />
-        <p className="mt-3 text-xs text-center text-gray-500">
+        <p className="mt-3 text-xs text-center text-gray-500 dark:text-gray-400">
           PDF, Word, Excel, PowerPoint, Imágenes, ZIP, Texto
         </p>
         {fieldErrors?.attachments && (
-          <p className="mt-2 text-sm text-red-600 text-center">{fieldErrors.attachments}</p>
+          <p className="mt-2 text-sm text-red-600 dark:text-red-400 text-center">{fieldErrors.attachments}</p>
         )}
       </div>
 
@@ -650,7 +649,7 @@ export default function RequestProjectForm({
             if (bannerInputRef.current) bannerInputRef.current.value = ''
             if (attachmentsInputRef.current) attachmentsInputRef.current.value = ''
           }}
-          className="px-8 py-3 rounded-xl font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3 rounded-xl font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Limpiar
         </button>

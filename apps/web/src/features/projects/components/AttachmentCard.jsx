@@ -85,10 +85,10 @@ const AttachmentCard = ({ file }) => {
     <div 
       onClick={handleCardClick}
       className={`
-        bg-white rounded-lg shadow-md p-4 
+        bg-white dark:bg-slate-800 rounded-lg shadow-md p-3 sm:p-4 
         transition-all duration-200
         ${isDownloading ? 'opacity-50 cursor-wait' : 'hover:shadow-lg cursor-pointer hover:scale-[1.02]'}
-        border border-gray-200
+        border border-gray-200 dark:border-slate-700
       `}
     >
       <div className="flex items-start justify-between gap-3">
@@ -120,17 +120,17 @@ const AttachmentCard = ({ file }) => {
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 truncate" title={file.name}>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate text-sm sm:text-base" title={file.name}>
               {file.name}
             </h3>
             
-            <div className="flex items-center gap-2 mt-1 text-sm text-gray-600">
+            <div className="flex items-center gap-2 mt-1 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
               {file.size && (
-                <span className="text-gray-500">{formatFileSize(file.size)}</span>
+                <span className="text-gray-500 dark:text-gray-400">{formatFileSize(file.size)}</span>
               )}
               
               {file.type === 'application/pdf' && (
-                <span className="text-lime-600 font-medium">
+                <span className="text-lime-600 dark:text-lime-400 font-medium">
                   • Click para vista previa
                 </span>
               )}
@@ -160,7 +160,7 @@ const AttachmentCard = ({ file }) => {
 
       {/* Mensaje de error */}
       {error && (
-        <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-600">
+        <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded text-xs sm:text-sm text-red-600 dark:text-red-400">
           {error}
         </div>
       )}

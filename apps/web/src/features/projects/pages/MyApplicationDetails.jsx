@@ -59,28 +59,28 @@ export default function MyApplicationDetails() {
   // Loading state
   if (isLoading) {
     return (
-      <section className="w-full px-10 py-12">
-        <div className="h-10 w-64 bg-gray-200 rounded animate-pulse mb-10"></div>
+      <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
+        <div className="h-10 w-64 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-10"></div>
         
-        <div className='flex h-screen mt-10'>
-          <div className="w-6/12">
-            <div className="w-full h-96 bg-gray-200 rounded-xl animate-pulse mb-6"></div>
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4"></div>
+        <div className='flex flex-col lg:flex-row h-screen mt-10 gap-6'>
+          <div className="w-full lg:w-6/12">
+            <div className="w-full h-96 bg-gray-200 dark:bg-slate-700 rounded-xl animate-pulse mb-6"></div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 border border-gray-200 dark:border-slate-700">
+              <div className="h-6 w-48 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-4"></div>
               <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                <div className="h-4 w-5/6 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                <div className="h-4 w-5/6 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
               </div>
             </div>
           </div>
 
-          <div className="w-7/12 ml-6">
-            <div className="h-8 w-80 bg-gray-200 rounded animate-pulse mb-3"></div>
-            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div className="w-full lg:w-7/12">
+            <div className="h-8 w-80 bg-gray-200 dark:bg-slate-700 rounded animate-pulse mb-3"></div>
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md p-6 mb-6 border border-gray-200 dark:border-slate-700">
               <div className="space-y-4">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                  <div key={i} className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse"></div>
                 ))}
               </div>
             </div>
@@ -93,10 +93,10 @@ export default function MyApplicationDetails() {
   // Error state
   if (error || !application) {
     return (
-      <section className="w-full px-10 py-12">
+      <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition"
+          className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-6 transition"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -104,12 +104,12 @@ export default function MyApplicationDetails() {
           Volver
         </button>
 
-        <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-6 sm:p-8 text-center">
           <svg className="w-16 h-16 text-red-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <h2 className="text-2xl font-bold text-red-800 mb-2">Solicitud no encontrada</h2>
-          <p className="text-red-600 mb-6">{error || 'No se pudo cargar la información de la solicitud'}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-red-800 dark:text-red-400 mb-2">Solicitud no encontrada</h2>
+          <p className="text-sm sm:text-base text-red-600 dark:text-red-400 mb-6">{error || 'No se pudo cargar la información de la solicitud'}</p>
           <button
             onClick={() => navigate('/my-applications')}
             className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition"
@@ -221,11 +221,11 @@ export default function MyApplicationDetails() {
   // };
   
   return (
-    <section className="w-full px-10 py-12">
+    <section className="w-full px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
       {/* Botón de regreso */}
       <button
         onClick={() => navigate('/my-applications')}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition"
+        className="flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 mb-4 transition"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -233,9 +233,9 @@ export default function MyApplicationDetails() {
         Volver a mis solicitudes
       </button>
 
-      <div className="flex items-center gap-4 mb-6">
-        <h1 className="text-4xl font-bold">
-          Detalles de mi <span className="text-lime-700">solicitud</span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
+        <h1 className="text-3xl sm:text-4xl font-bold dark:text-gray-100">
+          Detalles de mi <span className="text-lime-700 dark:text-lime-500">solicitud</span>
         </h1>
 
         {/* Badge de estado */}
@@ -245,9 +245,9 @@ export default function MyApplicationDetails() {
         </div>
       </div>
 
-      <div className='flex mt-10 gap-6'>
+      <div className='flex flex-col lg:flex-row mt-6 sm:mt-10 gap-6'>
         {/* Columna izquierda: Imagen, descripción y archivos adjuntos */}
-        <div className="w-5/12">
+        <div className="w-full lg:w-5/12">
           {/* Banner */}
           <ProjectImage 
             src={bannerUrl} 
@@ -263,11 +263,11 @@ export default function MyApplicationDetails() {
           {/* Archivos adjuntos */}
           {attachments.length > 0 && (
             <div className="mt-6">
-              <h2 className="text-3xl font-bold mb-3">
-                Documentos <span className="text-lime-700">adjuntos</span>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-3 dark:text-gray-100">
+                Documentos <span className="text-lime-700 dark:text-lime-500">adjuntos</span>
               </h2>
               
-              <div className="space-y-3 mr-10">
+              <div className="space-y-3 lg:mr-10">
                 {attachments.map((file, index) => (
                   <AttachmentCard key={index} file={file} />
                 ))}
@@ -277,10 +277,10 @@ export default function MyApplicationDetails() {
         </div>
 
         {/* Columna derecha: Información y acciones */}
-        <div className="w-7/12">
+        <div className="w-full lg:w-7/12">
           {/* Información del proyecto */}
-          <h2 className="text-3xl font-bold mb-3">
-            Información del <span className="text-lime-700">proyecto</span>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 dark:text-gray-100">
+            Información del <span className="text-lime-700 dark:text-lime-500">proyecto</span>
           </h2>
           <ProjectInfoCard items={projectInfo} />
 
@@ -310,7 +310,7 @@ export default function MyApplicationDetails() {
           )}
 
           {/* Botones de acción */}
-          <div className="flex flex-col gap-3 pt-6 w-11/12">
+          <div className="flex flex-col gap-3 pt-6 w-full lg:w-11/12">
             {/* Botón Descargar Todos los Archivos */}
             <button 
               onClick={handleDownloadAll}
@@ -338,7 +338,7 @@ export default function MyApplicationDetails() {
 
             {/* Mensaje de error si ocurrió */}
             {downloadError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-600 dark:text-red-400">
                 {downloadError}
               </div>
             )}
@@ -356,7 +356,7 @@ export default function MyApplicationDetails() {
 
             {/* Nota informativa según estado */}
             {statusSlug === 'pending' && (
-              <div className="p-3 bg-yellow-100 border border-yellow-200 rounded-lg text-sm text-yellow-700 flex items-start gap-2">
+              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg text-sm text-yellow-700 dark:text-yellow-300 flex items-start gap-2">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
@@ -370,7 +370,7 @@ export default function MyApplicationDetails() {
             )}
 
             {statusSlug === 'rejected' && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-start gap-2">
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-700 dark:text-red-400 flex items-start gap-2">
                 <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>

@@ -16,7 +16,7 @@ const AuthInput = ({ label, name, error, onChange, ...props }) => {
     <div className="flex flex-col">
       <label 
         htmlFor={name}
-        className="text-lg font-bold mb-1 ml-2 text-gray-700"
+        className="text-base sm:text-lg font-bold mb-1 ml-2 text-gray-700"
       >
         {label}
       </label>

@@ -122,7 +122,7 @@ export default function TeamPage() {
   }
 
   return (
-    <section className="flex flex-col items-center w-full min-h-screen px-10 pt-10 pb-20">
+    <section className="flex flex-col items-center w-full min-h-screen px-4 sm:px-6 lg:px-10 pt-6 sm:pt-10 pb-12 sm:pb-20">
       <div className="w-full max-w-5xl mb-8">
         {/* Header con estado y botón de iniciar */}
         <div className="flex items-center justify-between mb-6">
@@ -159,16 +159,16 @@ export default function TeamPage() {
           </div>
         </div>
 
-        <h1 className="text-5xl font-bold">
-          Equipo del <span className="text-lime-600">Proyecto</span>
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold dark:text-gray-100">
+          Equipo del <span className="text-lime-600 dark:text-lime-500">Proyecto</span>
         </h1>
         
         {!canEdit && (
-          <div className="mt-4 p-3 bg-lime-50 dark:bg-blue-900/20 border border-lime-200 dark:border-blue-800 rounded-lg flex items-center gap-2">
+          <div className="mt-4 p-3 bg-lime-50 dark:bg-blue-900/20 border border-lime-200 dark:border-blue-700 rounded-lg flex items-center gap-2">
             <svg className="w-5 h-5 text-lime-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-sm text-lime-700 dark:text-lime-300">
+            <p className="text-xs sm:text-sm text-lime-700 dark:text-blue-300">
               Estás viendo el equipo en modo solo lectura
             </p>
           </div>
