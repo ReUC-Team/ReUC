@@ -29,6 +29,7 @@ interface RequestProjectFormProps {
   handlePickAttachments: () => void
   handleRemoveAttachment: (index: number) => void
   handleSubmit: () => void
+  deadlineConstraints: any
 }
 
 const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
@@ -41,13 +42,13 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
   handlePickAttachments,
   handleRemoveAttachment,
   handleSubmit,
+  deadlineConstraints,
 }) => {
   const styles = useThemedStyles(createRequestProjectFormStyles)
   const palette = useThemedPalette()
   const [showHelp, setShowHelp] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
 
-  // Cargar metadata (facultades, tipos de proyecto, etc.)
   const {
     faculties,
     projectTypes,
@@ -61,7 +62,6 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
     setShowDatePicker(Platform.OS === 'ios')
     
     if (selectedDate) {
-      // Formatear fecha como YYYY-MM-DD para el backend
       const year = selectedDate.getFullYear()
       const month = String(selectedDate.getMonth() + 1).padStart(2, '0')
       const day = String(selectedDate.getDate()).padStart(2, '0')
@@ -73,7 +73,7 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
 
   // Formatear fecha para mostrar
   const getDisplayDate = () => {
-    if (!form.deadline) return 'Seleccionar fecha'
+    if (!form.deadline) return 'dd/mm/aaaa'
     
     const date = new Date(form.deadline)
     return date.toLocaleDateString('es-MX', {
@@ -98,7 +98,7 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
   // Convertir datos a formato para MultiSelectDropdown
   const facultyOptions = faculties.map((f) => ({
     id: f.faculty_id,
-    label: f.abbreviation || f.name,
+    label: f.name,
   }))
 
   const projectTypeOptions = projectTypes.map((pt) => ({
@@ -122,7 +122,7 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
           <Ionicons
             name="information-circle-outline"
             size={28}
-            color="#4E4E4E"
+            color={palette.text}
           />
         </TouchableOpacity>
       </View>
@@ -130,53 +130,69 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
       {/* Help box */}
       {showHelp && (
         <View style={styles.helpBox}>
-          <Text style={styles.helpTitle}>
-            Recomendaciones para llenar el formulario:
-          </Text>
-          <Text style={styles.helpText}>
-            • Título: Sé claro y conciso{'\n'}
-            • Descripción corta: Resume en 1-2 líneas{'\n'}
-            • Descripción detallada: Explica el problema a resolver{'\n'}
-            • Banner: Selecciona una imagen representativa{'\n'}
-            • Adjuntos: Puedes agregar hasta 5 archivos
-          </Text>
+          <View style={styles.helpIcon}>
+            <Ionicons name="bulb-outline" size={20} color="#92400E" />
+          </View>
+          <View style={styles.helpContent}>
+            <Text style={styles.helpTitle}>
+              Recomendaciones para llenar el formulario:
+            </Text>
+            <Text style={styles.helpText}>
+              • Título: Sé claro y conciso{'\n'}
+              • Descripción corta: Resume en 1-2 líneas{'\n'}
+              • Descripción detallada: Explica el problema a resolver{'\n'}
+              • Banner: Selecciona una imagen representativa{'\n'}
+              • Adjuntos: Puedes agregar hasta 5 archivos
+            </Text>
+          </View>
         </View>
       )}
 
       <View style={styles.form}>
-        {/* TÍTULO DEL PROYECTO */}
+        {/* SECCIÓN: INFORMACIÓN DEL PROYECTO */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Información del proyecto</Text>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIcon}>
+              <Ionicons name="document-text-outline" size={20} color={palette.primary} />
+            </View>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Información Básica</Text>
+              <Text style={styles.sectionSubtitle}>Describe tu proyecto de manera clara y concisa</Text>
+            </View>
+          </View>
 
+          {/* Título */}
           <View style={styles.field}>
-            <Text style={styles.label}>Título del proyecto *</Text>
+            <Text style={styles.label}>
+              Título del proyecto <Text style={styles.requiredIndicator}>*</Text>
+            </Text>
             <TextInput
               style={[
                 styles.input,
-                fieldErrors.title && { borderColor: palette.error },
+                fieldErrors.title && { borderColor: '#DC2626', borderWidth: 2 },
               ]}
-              placeholder="Título atractivo y claro"
+              placeholder="Ej: Sistema de gestión de inventario"
               placeholderTextColor={palette.textSecondary}
               value={form.title}
               onChangeText={(text) => handleChange('title', text)}
               editable={!isLoading}
             />
             {fieldErrors.title && (
-              <Text style={{ color: palette.error, fontSize: 12, marginTop: 4 }}>
-                {fieldErrors.title}
-              </Text>
+              <Text style={styles.errorText}>{fieldErrors.title}</Text>
             )}
           </View>
 
-          {/* DESCRIPCIÓN CORTA */}
+          {/* Descripción corta */}
           <View style={styles.field}>
-            <Text style={styles.label}>Descripción corta *</Text>
+            <Text style={styles.label}>
+              Descripción corta <Text style={styles.requiredIndicator}>*</Text>
+            </Text>
             <TextInput
               style={[
                 styles.input,
-                fieldErrors.shortDescription && { borderColor: palette.error },
+                fieldErrors.shortDescription && { borderColor: '#DC2626', borderWidth: 2 },
               ]}
-              placeholder="Resumen breve (aparecerá en la tarjeta)"
+              placeholder="Resumen en una línea para la tarjeta del proyecto"
               placeholderTextColor={palette.textSecondary}
               value={form.shortDescription}
               onChangeText={(text) => handleChange('shortDescription', text)}
@@ -184,22 +200,22 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
               maxLength={150}
             />
             {fieldErrors.shortDescription && (
-              <Text style={{ color: palette.error, fontSize: 12, marginTop: 4 }}>
-                {fieldErrors.shortDescription}
-              </Text>
+              <Text style={styles.errorText}>{fieldErrors.shortDescription}</Text>
             )}
           </View>
 
-          {/* DESCRIPCIÓN DETALLADA */}
+          {/* Descripción detallada */}
           <View style={styles.field}>
-            <Text style={styles.label}>Descripción detallada *</Text>
+            <Text style={styles.label}>
+              Descripción detallada <Text style={styles.requiredIndicator}>*</Text>
+            </Text>
             <TextInput
               style={[
                 styles.input,
                 styles.textArea,
-                fieldErrors.description && { borderColor: palette.error },
+                fieldErrors.description && { borderColor: '#DC2626', borderWidth: 2 },
               ]}
-              placeholder="Describe el proyecto que necesitas resolver"
+              placeholder="Describe el problema a resolver, objetivos, alcance y cualquier detalle relevante..."
               placeholderTextColor={palette.textSecondary}
               multiline
               numberOfLines={5}
@@ -209,15 +225,24 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
               editable={!isLoading}
             />
             {fieldErrors.description && (
-              <Text style={{ color: palette.error, fontSize: 12, marginTop: 4 }}>
-                {fieldErrors.description}
-              </Text>
+              <Text style={styles.errorText}>{fieldErrors.description}</Text>
             )}
           </View>
         </View>
 
-        {/* TIPO DE PROYECTO */}
+        {/* SECCIÓN: CLASIFICACIÓN */}
         <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIcon}>
+              <Ionicons name="pricetag-outline" size={20} color={palette.primary} />
+            </View>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Clasificación</Text>
+              <Text style={styles.sectionSubtitle}>Categoriza tu proyecto (opcional)</Text>
+            </View>
+          </View>
+
+          {/* Tipo de proyecto */}
           <MultiSelectDropdown
             label="Tipo de proyecto"
             options={projectTypeOptions}
@@ -226,10 +251,8 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
             placeholder="Selecciona uno o más tipos"
             optional
           />
-        </View>
 
-        {/* FACULTAD SUGERIDA */}
-        <View style={styles.section}>
+          {/* Facultad sugerida */}
           <MultiSelectDropdown
             label="Facultad sugerida"
             options={facultyOptions}
@@ -238,10 +261,8 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
             placeholder="Selecciona una o más facultades"
             optional
           />
-        </View>
 
-        {/* TIPO DE PROBLEMÁTICA */}
-        <View style={styles.section}>
+          {/* Tipo de problemática */}
           <MultiSelectDropdown
             label="Tipo de problemática"
             options={problemTypeOptions}
@@ -270,14 +291,37 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
           )}
         </View>
 
-        {/* VIGENCIA */}
+        {/* SECCIÓN: FECHA LÍMITE */}
         <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIcon}>
+              <Ionicons name="calendar-outline" size={20} color={palette.primary} />
+            </View>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Fecha Límite</Text>
+              <Text style={styles.sectionSubtitle}>¿Cuándo necesitas completar el proyecto?</Text>
+            </View>
+          </View>
+
           <View style={styles.field}>
-            <Text style={styles.label}>Vigencia *</Text>
+            <Text style={styles.label}>
+              Vigencia <Text style={styles.requiredIndicator}>*</Text>
+            </Text>
+            
+            {/* Mostrar restricciones si hay un tipo de proyecto seleccionado */}
+            {deadlineConstraints && deadlineConstraints.min && (
+              <View style={styles.infoBox}>
+                <Ionicons name="information-circle-outline" size={20} color="#92400E" />
+                <Text style={styles.infoText}>
+                  Selecciona un tipo de proyecto para ver el rango de fechas permitidas
+                </Text>
+              </View>
+            )}
+            
             <TouchableOpacity
               style={[
                 styles.input,
-                fieldErrors.deadline && { borderColor: palette.error },
+                fieldErrors.deadline && { borderColor: '#DC2626', borderWidth: 2 },
                 { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
               ]}
               onPress={() => setShowDatePicker(true)}
@@ -297,9 +341,7 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
               />
             </TouchableOpacity>
             {fieldErrors.deadline && (
-              <Text style={{ color: palette.error, fontSize: 12, marginTop: 4 }}>
-                {fieldErrors.deadline}
-              </Text>
+              <Text style={styles.errorText}>{fieldErrors.deadline}</Text>
             )}
           </View>
 
@@ -314,10 +356,20 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
           )}
         </View>
 
-        {/* BANNER */}
+        {/* SECCIÓN: BANNER */}
         <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIcon}>
+              <Ionicons name="image-outline" size={20} color={palette.primary} />
+            </View>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Banner del Proyecto</Text>
+              <Text style={styles.sectionSubtitle}>Imagen principal que representará tu proyecto</Text>
+            </View>
+          </View>
+
           <BannerSelector
-            label="Banner del proyecto *"
+            label=""
             defaultBanners={defaultBanners}
             selectedBannerUuid={form.selectedBannerUuid}
             customBannerName={form.customBannerName}
@@ -327,8 +379,18 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
           />
         </View>
 
-        {/* ARCHIVOS ADJUNTOS */}
+        {/* SECCIÓN: ARCHIVOS ADJUNTOS */}
         <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionIcon}>
+              <Ionicons name="attach-outline" size={20} color={palette.primary} />
+            </View>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>Archivos Adjuntos</Text>
+              <Text style={styles.sectionSubtitle}>Documentos de apoyo (opcional, máximo 5 archivos)</Text>
+            </View>
+          </View>
+
           <AttachmentsList
             attachments={form.attachments}
             onRemove={handleRemoveAttachment}
@@ -336,34 +398,34 @@ const RequestProjectForm: React.FC<RequestProjectFormProps> = ({
             maxFiles={5}
           />
         </View>
+      </View>
 
-        {/* BOTONES */}
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={() => {
-              // Limpiar formulario
-            }}
-            disabled={isLoading}
-          >
-            <Text style={styles.clearButtonText}>Limpiar</Text>
-          </TouchableOpacity>
+      {/* BOTONES */}
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={styles.clearButton}
+          onPress={() => {
+            // Limpiar formulario
+          }}
+          disabled={isLoading}
+        >
+          <Text style={styles.clearButtonText}>Limpiar</Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              isLoading && { opacity: 0.5 },
-            ]}
-            onPress={handleSubmit}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={palette.onPrimary} />
-            ) : (
-              <Text style={styles.submitButtonText}>Enviar solicitud</Text>
-            )}
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity
+          style={[
+            styles.submitButton,
+            isLoading && { opacity: 0.6 },
+          ]}
+          onPress={handleSubmit}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={palette.onPrimary} />
+          ) : (
+            <Text style={styles.submitButtonText}>Enviar Solicitud</Text>
+          )}
+        </TouchableOpacity>
       </View>
     </ScrollView>
   )

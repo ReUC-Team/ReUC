@@ -15,9 +15,19 @@ import type {
  * ============================================================================
  */
 
-export const getFormMetadata = async () => {
+export const getCreateMetadata = async () => {
   const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/application/metadata/create`)
-  return response.data
+  
+  const metadata = response.data.metadata
+  
+  if (metadata.defaultBanners) {
+    metadata.defaultBanners = metadata.defaultBanners.map((banner: any) => ({
+      ...banner,
+      url: `${API_URL}${banner.url}`
+    }))
+  }
+  
+  return metadata
 }
 
 export const getExploreApplicationsMetadata = async () => {
