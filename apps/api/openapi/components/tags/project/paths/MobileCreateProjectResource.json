@@ -1,0 +1,44 @@
+{
+  "post": {
+    "summary": "(Mobile) Upload Project File",
+    "description": "Uploads a new file resource to a specific project via Mobile App. \n- **Roles**: `student`, `professor`.\n- **Constraint**: User must be a member of the project's team.",
+    "tags": ["Project"],
+    "security": [{ "BearerAuth": [], "ApiKeyAuth": [] }],
+    "parameters": [
+      {
+        "name": "uuid",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" },
+        "description": "The UUID of the project."
+      }
+    ],
+    "requestBody": {
+      "required": true,
+      "content": {
+        "multipart/form-data": {
+          "schema": {
+            "$ref": "../payload/ProjectResourceCreate.json"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Resource uploaded successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../responses/CreateProjectResourceSuccess.json"
+            }
+          }
+        }
+      },
+      "400": { "$ref": "../../../responses/Error400.json" },
+      "401": { "$ref": "../../../responses/Error401.json" },
+      "403": { "$ref": "../../../responses/Error403.json" },
+      "404": { "$ref": "../../../responses/Error404.json" },
+      "500": { "$ref": "../../../responses/Error500.json" }
+    }
+  }
+}

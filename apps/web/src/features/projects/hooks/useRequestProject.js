@@ -96,35 +96,42 @@ export default function useRequestProject() {
       });
     }
 
-    // Manejo de radio button para faculty
-    if (type === "radio" && name === "faculty") {
-      setForm(prevForm => ({
-        ...prevForm,
-        faculty: [String(value)]
-      }));
-      return;
-    }
-
-    // Manejo de checkboxes (projectType, problemType)
-    if (type === "checkbox") {
-      if (name === "projectType" || name === "problemType") {
-        setForm(prevForm => {
-          const currentArray = prevForm[name] || [];
-          
-          if (checked) {
-            return {
-              ...prevForm,
-              [name]: [...currentArray, value]
-            };
-          } else {
-            return {
-              ...prevForm,
-              [name]: currentArray.filter(item => item !== value)
-            };
-          }
-        });
+    // Manejo de radio buttons (faculty y projectType)
+    if (type === "radio") {
+      if (name === "faculty") {
+        setForm(prevForm => ({
+          ...prevForm,
+          faculty: [String(value)]
+        }));
         return;
       }
+      if (name === "projectType") {
+        setForm(prevForm => ({
+          ...prevForm,
+          projectType: [String(value)]
+        }));
+        return;
+      }
+    }
+
+    // Manejo de checkboxes (solo problemType ahora)
+    if (type === "checkbox" && name === "problemType") {
+      setForm(prevForm => {
+        const currentArray = prevForm[name] || [];
+        
+        if (checked) {
+          return {
+            ...prevForm,
+            [name]: [...currentArray, value]
+          };
+        } else {
+          return {
+            ...prevForm,
+            [name]: currentArray.filter(item => item !== value)
+          };
+        }
+      });
+      return;
     }
 
     // Manejo de archivos de banner

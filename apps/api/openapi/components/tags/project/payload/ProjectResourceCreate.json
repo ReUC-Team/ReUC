@@ -1,0 +1,12 @@
+{
+  "type": "object",
+  "description": "Payload for uploading or editing a project resource file.",
+  "properties": {
+    "file": {
+      "type": "string",
+      "format": "binary",
+      "description": "The file resource to upload. \n - **Max Size**: 10MB.\n - **Allowed Types**: Images (JPEG, PNG, WEBP), Documents (PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, TXT, ZIP)."
+    }
+  },
+  "required": ["file"]
+}

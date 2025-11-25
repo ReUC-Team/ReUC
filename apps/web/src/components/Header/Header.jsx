@@ -30,12 +30,12 @@ export default function Header() {
 
   return (
     <>
-    <header className="w-full fixed top-0 flex items-center justify-between px-6 py-3 shadow-md bg-white z-50">
+    <header className="w-full fixed top-0 flex items-center justify-between px-4 sm:px-6 py-3 shadow-md bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 z-50">
       <Link to="/dashboard">
         <img
           src={LogoUDC}
           alt="Logo UCOL"
-          className="w-52 object-contain"
+          className="w-40 sm:w-48 lg:w-52 object-contain"
           />
       </Link>
 

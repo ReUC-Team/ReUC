@@ -25,7 +25,6 @@ export class FileService {
    * @param {string|null} [options.uuidTarget=null] - The UUID of the target entity.
    * @param {object} [options.processorOptions={}] - Options for the file processor.
    *
-   * @returns {Promise<object>} A promise that resolves to the file metadata object.
    * @throws {RuleNotFoundError} If the model/purpose combination has no defined rule.
    * @throws {ProcessingError} If the file processing fails.
    * @throws {AdapterError} If the underlying storage adapter fails to save the file.

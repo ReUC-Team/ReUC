@@ -56,8 +56,17 @@ export const MODEL_FILE_RULES = {
       kind: "mixed",
       context: "download",
       cardinality: "many",
-      maxSizeMB: MAX_FILE_SIZES_MB.attachment_files, // Using new limit
-      allowedMime: ALLOWED_MIME_TYPES.attachment_files, // Using new list
+      maxSizeMB: MAX_FILE_SIZES_MB.attachment_files,
+      allowedMime: ALLOWED_MIME_TYPES.attachment_files,
+    },
+  },
+  PROJECT: {
+    RESOURCE: {
+      kind: "mixed",
+      context: "download",
+      cardinality: "many",
+      maxSizeMB: MAX_FILE_SIZES_MB.attachment_files,
+      allowedMime: ALLOWED_MIME_TYPES.attachment_files,
     },
   },
   // TODO: Reference for later inplemetation

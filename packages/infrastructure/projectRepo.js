@@ -1,5 +1,7 @@
-import { db, isPrismaError } from "./db/client.js";
+import { db, isPrismaError, getFileService } from "./db/client.js";
 import * as InfrastructureError from "./errors/index.js";
+
+const fileService = getFileService();
 
 export const projectRepo = {
   /**
@@ -518,6 +520,7 @@ export const projectRepo = {
           uuidCreator: true,
           teamMembers: {
             select: {
+              uuidUser: true,
               role: {
                 select: {
                   team_role_id: true,
@@ -708,4 +711,336 @@ export const projectRepo = {
       );
     }
   },
+  /**
+   * Uploads a physical file and creates the database records (File + Link).
+   * @param {string} uuidProject - The UUID of the project to update.
+   * @param {string} uuidUser - The UUID of the user to update.
+   * @param {object} resourcePayload - The prepared payload from Domain.
+   *
+   * @throws {InfrastructureError.FileOperationError}
+   * @throws {InfrastructureError.ForeignKeyConstraintError}
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async saveFileResource(uuidProject, uuidUser, resourcePayload) {
+    // 1. Perform the physical upload first
+    const uploadedFileMeta = await _uploadFileToStorage(resourcePayload);
+
+    try {
+      const {
+        modelTarget,
+        purpose,
+        storedPath,
+        storedName,
+        originalName,
+        mimetype,
+        fileSize,
+        fileKind,
+      } = uploadedFileMeta;
+
+      return await db.file.create({
+        data: {
+          storedPath,
+          storedName,
+          originalName,
+          mimetype,
+          fileSize,
+          fileKind,
+          File_Link: {
+            create: {
+              modelTarget: modelTarget,
+              uuidTarget: uuidProject,
+              purpose: purpose,
+              author: { connect: { uuid_user: uuidUser } },
+            },
+          },
+        },
+        select: {
+          uuid_file: true,
+          storedPath: true,
+          createdAt: true,
+        },
+      });
+    } catch (err) {
+      // 3. Compensation Logic (Rollback)
+      await _cleanupOrphanedFile(uploadedFileMeta.storedPath);
+
+      // 4. Translate and Re-throw Error
+      if (isPrismaError(err)) {
+        if (err.code === "P2003") {
+          const field = err.meta.constraint;
+
+          throw new InfrastructureError.ForeignKeyConstraintError(
+            `A resource with this ${field} failed to upload a resource for a project.`,
+            { details: { field, rule: "foreign_key_violation" } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected Database error while uploading a resource for a project: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      if (err instanceof InfrastructureError.InfrastructureError) throw err;
+
+      const context = JSON.stringify({
+        uuidProject,
+        uuidUser,
+        resourcePayload,
+      });
+      console.error(
+        `Infrastructure error (projectRepo.saveFileResource) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while uploading a resource for a project",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Updates a project file resource.
+   * This leaves the old physical file as an orphan on the disk (as designed).
+   * @param {string} uuidResource - The UUID of the resource to edit.
+   * @param {string} uuidProject - The UUID of the project to update.
+   * @param {string} uuidUser - The UUID of the user to update.
+   * @param {object} resourcePayload
+   *
+   * @throws {InfrastructureError.FileOperationError}
+   * @throws {InfrastructureError.NotFoundError}
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async updateFileResource(
+    uuidResource,
+    uuidProject,
+    uuidUser,
+    resourcePayload
+  ) {
+    // 1. Perform the physical upload first
+    const uploadedFileMeta = await _uploadFileToStorage(resourcePayload);
+
+    try {
+      const {
+        modelTarget,
+        purpose,
+        storedPath,
+        storedName,
+        originalName,
+        mimetype,
+        fileSize,
+        fileKind,
+      } = uploadedFileMeta;
+
+      return await db.file.update({
+        where: { uuid_file: uuidResource },
+        data: {
+          storedPath,
+          storedName,
+          originalName,
+          mimetype,
+          fileSize,
+          fileKind,
+          File_Link: {
+            update: {
+              where: {
+                modelTarget_uuidTarget_uuidFile_purpose: {
+                  uuidFile: uuidResource,
+                  uuidTarget: uuidProject,
+                  modelTarget,
+                  purpose,
+                },
+              },
+              data: {
+                author: { connect: { uuid_user: uuidUser } },
+              },
+            },
+          },
+        },
+        select: {
+          uuid_file: true,
+          storedPath: true,
+          updatedAt: true,
+        },
+      });
+    } catch (err) {
+      // 3. Compensation Logic (Rollback)
+      await _cleanupOrphanedFile(uploadedFileMeta.storedPath);
+
+      // 4. Translate and Re-throw Error
+      if (isPrismaError(err)) {
+        if (err.code === "P2025") {
+          const message = err.meta.cause;
+
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuidResource} file resource found to update.`,
+            { details: { message } }
+          );
+        }
+
+        if (err.code === "P2003") {
+          const field = err.meta.constraint;
+
+          throw new InfrastructureError.ForeignKeyConstraintError(
+            `A resource with this ${field} failed to update a resource.`,
+            { details: { field, rule: "foreign_key_violation" } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected Database error while updating a resource: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      if (err instanceof InfrastructureError.InfrastructureError) throw err;
+
+      const context = JSON.stringify({
+        uuidResource,
+        uuidProject,
+        uuidUser,
+        resourcePayload,
+      });
+      console.error(
+        `Infrastructure error (projectRepo.updateFileResource) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while updating a resource.",
+        { cause: err }
+      );
+    }
+  },
+  /**
+   * Soft deletes a project file resource.
+   * @param {string} uuidResource - The UUID of the resource to delete.
+   * @param {string} uuidProject - The UUID of the project to update.
+   * @param {string} uuidUser - The UUID of the user to update.
+   *
+   * @throws {InfrastructureError.NotFoundError}
+   * @throws {InfrastructureError.DatabaseError} For other unexpected prisma know errors.
+   * @throws {InfrastructureError.InfrastructureError} For other unexpected errors.
+   */
+  async deleteFileResource(uuidResource, uuidProject, uuidUser) {
+    try {
+      return await db.file.update({
+        where: { uuid_file: uuidResource },
+        data: {
+          File_Link: {
+            update: {
+              where: {
+                modelTarget_uuidTarget_uuidFile_purpose: {
+                  uuidFile: uuidResource,
+                  uuidTarget: uuidProject,
+                  modelTarget: "PROJECT",
+                  purpose: "RESOURCE",
+                },
+              },
+              data: {
+                deletedAt: new Date(),
+              },
+            },
+          },
+        },
+        select: {
+          uuid_file: true,
+          storedPath: true,
+          File_Link: { select: { deletedAt: true } },
+        },
+      });
+    } catch (err) {
+      if (isPrismaError(err)) {
+        if (err.code === "P2025") {
+          const message = err.meta.cause;
+
+          throw new InfrastructureError.NotFoundError(
+            `No ${uuidResource} file resource found to delete.`,
+            { details: { message } }
+          );
+        }
+
+        if (err.code === "P2003") {
+          const field = err.meta.constraint;
+
+          throw new InfrastructureError.ForeignKeyConstraintError(
+            `A resource with this ${field} failed to delete a resource.`,
+            { details: { field, rule: "foreign_key_violation" } }
+          );
+        }
+
+        throw new InfrastructureError.DatabaseError(
+          `Unexpected Database error while deleting a resource: ${err.message}`,
+          { cause: err }
+        );
+      }
+
+      if (err instanceof InfrastructureError.InfrastructureError) throw err;
+
+      const context = JSON.stringify({
+        uuidResource,
+        uuidProject,
+        uuidUser,
+      });
+      console.error(
+        `Infrastructure error (projectRepo.deleteFileResource) with CONTEXT ${context}:`,
+        err
+      );
+      throw new InfrastructureError.InfrastructureError(
+        "Unexpected Infrastructure error while deleting a resource.",
+        { cause: err }
+      );
+    }
+  },
 };
+
+/**
+ * Handles the interaction with the FileStorage service.
+ * @private
+ */
+async function _uploadFileToStorage(resourcePayload) {
+  if (!resourcePayload?.filePayload)
+    throw new InfrastructureError.FileOperationError(
+      "Missing file payload for upload.",
+      { details: { field: "file", rule: "missing_or_empty" } }
+    );
+
+  const { filePayload, fileDescriptor } = resourcePayload;
+
+  try {
+    return await fileService.saveFile(filePayload.buffer, {
+      originalName: fileDescriptor.name,
+      mimetype: filePayload.mimetype,
+      targetModel: fileDescriptor.modelTarget,
+      purpose: fileDescriptor.purpose,
+    });
+  } catch (err) {
+    if (err instanceof FileStorageError.FileStorageError)
+      throw new InfrastructureError.FileOperationError(
+        "Unexpected Storage error while uploading file resource for a project.",
+        { cause: err, details: err.details }
+      );
+
+    throw new InfrastructureError.InfrastructureError(
+      "Unexpected Infrastructure error while uploading file resource for a project.",
+      { cause: err }
+    );
+  }
+}
+
+/**
+ * Deletes a file from storage if the DB transaction failed.
+ * @private
+ */
+async function _cleanupOrphanedFile(storedPath) {
+  if (!storedPath) return;
+
+  try {
+    await fileService.deleteFile(storedPath);
+  } catch (err) {
+    console.error(
+      "Infrastructure Critical Error: Failed to delete orphaned files after DB transaction failed:",
+      err
+    );
+  }
+}

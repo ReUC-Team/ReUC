@@ -9,7 +9,7 @@ const SubmitBtn = ({ text, isLoading = false }) => (
     <button
       type="submit"
       disabled={isLoading}
-      className="w-full flex justify-center items-center gap-2 cursor-pointer"
+      className="w-full flex justify-center items-center gap-2 cursor-pointer text-sm sm:text-base"
     >
       {isLoading ? (
         <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

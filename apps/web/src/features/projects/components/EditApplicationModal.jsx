@@ -84,17 +84,17 @@ export default function EditApplicationModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between rounded-t-2xl">
-          <h2 className="text-3xl font-bold">
-            Editar <span className="text-lime-700">proyecto</span>
+        <div className="sticky top-0 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between rounded-t-2xl z-10">
+          <h2 className="text-2xl sm:text-3xl font-bold dark:text-gray-100">
+            Editar <span className="text-lime-700 dark:text-lime-500">proyecto</span>
           </h2>
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="text-gray-400 hover:text-gray-600 transition disabled:opacity-50"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition disabled:opacity-50"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -103,21 +103,21 @@ export default function EditApplicationModal({
         </div>
 
         {/* Body */}
-        <form className="px-8 py-6 space-y-6">
+        <form className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-6">
           
           {/* Tipo de Proyecto */}
           <div>
-            <label className="block text-lg font-semibold mb-3">
-              Tipo de proyecto <span className="text-lime-700">*</span>
+            <label className="block text-base sm:text-lg font-semibold mb-3 dark:text-gray-200">
+              Tipo de proyecto <span className="text-lime-700 dark:text-lime-500">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {projectTypes.map((type) => (
                 <label
                   key={type.project_type_id}
-                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition ${
+                  className={`flex items-center gap-3 p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition ${
                     form.projectType.includes(type.project_type_id)
-                      ? 'border-lime-600 bg-lime-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-lime-600 bg-lime-50 dark:bg-lime-900/20'
+                      : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 bg-white dark:bg-slate-700'
                   }`}
                 >
                   <input
@@ -130,13 +130,13 @@ export default function EditApplicationModal({
                     style={{ accentColor: '#65a30d' }}
                   />
                   <div className="flex-1">
-                    <span className="text-sm font-medium block">{type.name}</span>
+                    <span className="text-sm font-medium block dark:text-gray-200">{type.name}</span>
                     {type.name !== 'Proyectos de investigación' ? (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                       {type.minEstimatedMonths} meses
                     </span>
                     ) : (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                       De {type.minEstimatedMonths} a {type.maxEstimatedMonths} meses
                     </span>
                     )}
@@ -145,23 +145,23 @@ export default function EditApplicationModal({
               ))}
             </div>
             {fieldErrors.projectType && (
-              <p className="text-red-500 text-sm mt-2">{fieldErrors.projectType}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-2">{fieldErrors.projectType}</p>
             )}
           </div>
 
           {/* Facultad */}
           <div>
-            <label className="block text-lg font-semibold mb-3">
-              Facultad <span className="text-lime-700">*</span>
+            <label className="block text-base sm:text-lg font-semibold mb-3 dark:text-gray-200">
+              Facultad <span className="text-lime-700 dark:text-lime-500">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {faculties.map((faculty) => (
                 <label
                   key={faculty.faculty_id}
-                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition ${
+                  className={`flex items-center gap-3 p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition ${
                     form.faculty.includes(faculty.faculty_id)
-                      ? 'border-lime-600 bg-lime-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-lime-600 bg-lime-50 dark:bg-lime-900/20'
+                      : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 bg-white dark:bg-slate-700'
                   }`}
                 >
                   <input
@@ -173,29 +173,29 @@ export default function EditApplicationModal({
                     className="w-5 h-5 text-lime-600 focus:ring-lime-500 border-gray-300"
                     style={{ accentColor: '#65a30d' }}
                   />
-                  <span className="text-sm font-medium">{faculty.name}</span>
+                  <span className="text-sm font-medium dark:text-gray-200">{faculty.name}</span>
                 </label>
               ))}
             </div>
             {fieldErrors.faculty && (
-              <p className="text-red-500 text-sm mt-2">{fieldErrors.faculty}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-2">{fieldErrors.faculty}</p>
             )}
           </div>
 
           {/* Tipo de Problemática */}
           <div>
-            <label className="block text-lg font-semibold mb-3">
-              Tipo de problemática <span className="text-lime-700">*</span>
+            <label className="block text-base sm:text-lg font-semibold mb-3 dark:text-gray-200">
+              Tipo de problemática <span className="text-lime-700 dark:text-lime-500">*</span>
             </label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {extendedProblemTypes.map((type) => (
                 <label
                   key={type.problem_type_id}
-                  className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition ${
+                  className={`flex items-center gap-3 p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition ${
                     form.problemType.includes(type.problem_type_id) ||
                     form.problemType.includes("otro")
-                      ? 'border-lime-600 bg-lime-50'
-                      : 'border-gray-200 hover:border-gray-300'
+                      ? 'border-lime-600 bg-lime-50 dark:bg-lime-900/20'
+                      : 'border-gray-200 dark:border-slate-600 hover:border-gray-300 dark:hover:border-slate-500 bg-white dark:bg-slate-700'
                   }`}
                 >
                   <input
@@ -208,20 +208,20 @@ export default function EditApplicationModal({
                     className="w-5 h-5 text-lime-600 rounded focus:ring-lime-500 border-gray-300"
                     style={{ accentColor: '#65a30d' }}
                   />
-                  <span className="text-sm font-medium">{type.name}</span>
+                  <span className="text-sm font-medium dark:text-gray-200">{type.name}</span>
                 </label>
               ))}
             </div>
             {fieldErrors.problemType && (
-              <p className="text-red-500 text-sm mt-2">{fieldErrors.problemType}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm mt-2">{fieldErrors.problemType}</p>
             )}
           </div>
 
           {/* Campo "Otro" - Descripción personalizada */}
           {form.problemType.includes("otro") && (
             <div>
-              <label className="block text-lg font-semibold mb-2">
-                Describe la problemática <span className="text-lime-700">*</span>
+              <label className="block text-base sm:text-lg font-semibold mb-2 dark:text-gray-200">
+                Describe la problemática <span className="text-lime-700 dark:text-lime-500">*</span>
               </label>
               <textarea
                 name="problemTypeOther"
@@ -229,36 +229,36 @@ export default function EditApplicationModal({
                 onChange={handleChange}
                 placeholder="Describe la problemática personalizada..."
                 rows="3"
-                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 ${
+                className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 ${
                   fieldErrors.problemTypeOther
                     ? 'border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:ring-lime-500'
+                    : 'border-gray-300 dark:border-slate-600 focus:ring-lime-500'
                 }`}
               />
               {fieldErrors.problemTypeOther && (
-                <p className="text-red-500 text-sm mt-2">{fieldErrors.problemTypeOther}</p>
+                <p className="text-red-500 dark:text-red-400 text-sm mt-2">{fieldErrors.problemTypeOther}</p>
               )}
             </div>
           )}
 
           {/* Vigencia - Fecha límite del proyecto */}
           <div>
-            <label className="block text-lg font-semibold mb-2">
-              Vigencia <span className="text-lime-700">*</span>
+            <label className="block text-base sm:text-lg font-semibold mb-2 dark:text-gray-200">
+              Vigencia <span className="text-lime-700 dark:text-lime-500">*</span>
             </label>
             
             {/* Información del rango de fechas permitidas */}
             {deadlineConstraints.projectTypeName && deadlineConstraints.applicationDate ? (
-              <div className="mb-3 p-4 bg-gradient-to-r from-lime-50 to-lime-100 border-l-4 border-lime-500 rounded-lg shadow-sm">
+              <div className="mb-3 p-3 sm:p-4 bg-gradient-to-r from-lime-50 to-lime-100 dark:from-lime-900/20 dark:to-lime-800/20 border-l-4 border-lime-500 rounded-lg shadow-sm">
                 <div className="flex items-start gap-3">
                   <svg className="w-6 h-6 text-lime-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-lime-900 mb-2">
+                    <p className="text-sm font-bold text-lime-900 dark:text-lime-300 mb-2">
                       {deadlineConstraints.projectTypeName}
                     </p>
-                    <div className="space-y-2 text-xs text-lime-800">
+                    <div className="space-y-2 text-xs text-lime-800 dark:text-lime-300">
                       <p className="bg-lime-600 p-2 rounded text-white w-fit">
                         <span className="font-semibold">Fecha de solicitud:</span>{' '}
                         {formatDateStringSpanish(deadlineConstraints.applicationDate)}
@@ -279,8 +279,8 @@ export default function EditApplicationModal({
                 </div>
               </div>
             ) : (
-              <div className="mb-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-                <p className="text-sm text-yellow-800">
+              <div className="mb-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 rounded">
+                <p className="text-sm text-yellow-800 dark:text-yellow-300">
                   Selecciona un tipo de proyecto para ver el rango de fechas permitidas
                 </p>
               </div>
@@ -295,22 +295,22 @@ export default function EditApplicationModal({
               min={deadlineConstraints.min || undefined}
               max={deadlineConstraints.max || undefined}
               disabled={!deadlineConstraints.min}
-              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${
+              className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 ${
                 fieldErrors.deadline
-                  ? 'border-red-500 focus:ring-red-500 bg-red-50'
+                  ? 'border-red-500 focus:ring-red-500 bg-red-50 dark:bg-red-900/20'
                   : !deadlineConstraints.min
-                  ? 'border-gray-200 bg-gray-100 cursor-not-allowed'
-                  : 'border-gray-300 focus:ring-lime-500 hover:border-gray-400'
+                  ? 'border-gray-200 dark:border-slate-600 bg-gray-100 dark:bg-slate-800 cursor-not-allowed'
+                  : 'border-gray-300 dark:border-slate-600 focus:ring-lime-500 hover:border-gray-400 dark:hover:border-slate-500'
               }`}
             />
             
             {/* Mensaje de error */}
             {fieldErrors.deadline && (
-              <div className="mt-2 p-3 bg-red-50 border-l-4 border-red-500 rounded flex items-start gap-2">
+              <div className="mt-2 p-3 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded flex items-start gap-2">
                 <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
-                <p className="text-red-700 text-sm font-semibold flex-1">
+                <p className="text-red-700 dark:text-red-400 text-sm font-semibold flex-1">
                   {fieldErrors.deadline}
                 </p>
               </div>
@@ -318,11 +318,11 @@ export default function EditApplicationModal({
 
             {/* Mensaje de éxito */}
             {!fieldErrors.deadline && form.deadline && deadlineConstraints.min && (
-              <div className="mt-2 p-3 bg-lime-50 border-l-4 border-lime-500 rounded flex items-start gap-2">
+              <div className="mt-2 p-3 bg-lime-50 dark:bg-lime-900/20 border-l-4 border-lime-500 rounded flex items-start gap-2">
                 <svg className="w-5 h-5 text-lime-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <p className="text-lime-700 text-sm font-semibold">
+                <p className="text-lime-700 dark:text-lime-400 text-sm font-semibold">
                   Fecha válida seleccionada
                 </p>
               </div>
@@ -351,7 +351,7 @@ export default function EditApplicationModal({
           </div>
 
           {/* Información importante */}
-          <div className="p-4 bg-gray-200 border border-gray-300 rounded-lg text-sm text-gray-700">
+          <div className="p-3 sm:p-4 bg-gray-200 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg text-sm text-gray-700 dark:text-gray-300">
             <p className="font-semibold mb-1">Información importante:</p>
             <ul className="list-disc list-inside space-y-1 text-xs">
               <li><strong>"Guardar cambios":</strong> Solo actualiza la información, la solicitud permanece pendiente</li>

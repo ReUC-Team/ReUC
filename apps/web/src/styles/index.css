@@ -9,57 +9,7 @@ textarea {
 .large-text {
   font-size: 1.15rem;
 }
-
-/* Modo oscuro */
-/* Color del texto para elementos específicos en modo oscuro */
-.dark li .flex,
-.dark label,
-.dark button.pb-2,
-.dark label.mb-2,
-.dark span,
-.dark h1,
-.dark h2,
-.dark h3,
-.dark h4,
-.dark .sidebar ul li a, /* Nuevo: para enlaces en la sidebar (Home, Solicitar proyecto, etc.) */
-.dark .sidebar ul li button /* Nuevo: para botones en la sidebar (Mis proyectos, Accesibilidad, etc.) */
-{
-  color: #FFFFFF; /* BLANCO PURO para el texto principal del sidebar */
-}
-
-/* Colores de fondo y texto generales en modo oscuro */
-.dark,
-.dark div.flex,
-.dark p,
-.dark input,
-.dark .bg-white,
-.dark button.px-4,
-.dark button.px-6,
-.dark .flex.flex-col,
-.dark .flex.items-center,
-.dark span.text-gray-700,
-.dark textarea {
-  background-color: #1a1a1a; /* Un gris oscuro para el fondo general */
-  color: #FFFFFF; /* BLANCO PURO para el texto general */
-}
-
-/* Enlaces específicos en modo oscuro (ajustados para buen contraste) */
-.dark a.inline-block {
-  font-weight: bold;
-  color: #8be9fd; /* Un azul claro o turquesa para enlaces resaltados */
-  background-color: #352e25; /* Fondo oscuro para el enlace */
-}
-
-/* Fondos de formularios y botones en modo oscuro */
-.dark form,
-.dark .bg-gray-100,
-.dark button.px-4,
-.dark button.px-6,
-.dark button.ml-4,
-.dark button.px-5 {
-  background-color: #2c2c2c; /* Un gris un poco más claro para formularios/botones */
-}
-
+/* 
 /* Alto contraste */
 /* Mantengo el color original amarillo (#ffff00) para el alto contraste
    porque suele ser un estándar para la alta visibilidad sobre fondo negro.
@@ -147,12 +97,4 @@ textarea {
   background: #a0aec0;
 }
 
-/* Dark mode scrollbar */
-.dark .overflow-y-auto::-webkit-scrollbar-thumb {
-  background: #4a5568;
-}
-
-.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: #718096;
-}
 

@@ -2,7 +2,7 @@ import projectImage from '@/assets/project2.webp'
 
 export default function ProjectImage({ src, alt }) {
   return (
-    <div className="w-9/12 h-auto rounded-xl overflow-hidden mb-5 shadow-md mt-5">
+    <div className="w-full rounded-xl overflow-hidden mb-4 sm:mb-5 shadow-md mt-4 sm:mt-5 border border-gray-200 dark:border-slate-700">
       <img
         src={src || projectImage}
         alt={alt || 'Imagen del proyecto'}

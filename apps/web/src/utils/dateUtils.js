@@ -31,6 +31,32 @@ export const formatDateStringSpanish = (dateString) => {
 };
 
 /**
+ * Formatea fechas ISO del backend (con timestamp) a español
+ * Maneja correctamente la zona horaria para evitar el bug de +1 día
+ */
+export const formatISODateSpanish = (isoString) => {
+  if (!isoString) return '';
+  
+  // Si la fecha viene con timestamp (formato ISO completo)
+  if (isoString.includes('T')) {
+    // Crear objeto Date que automáticamente convierte UTC a local
+    const date = new Date(isoString);
+    
+    // Extraer componentes en zona horaria local
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const day = date.getDate();
+    
+    // Crear nueva fecha con componentes locales
+    const localDate = new Date(year, month, day);
+    return formatDateSpanish(localDate);
+  }
+  
+  // Si es solo fecha YYYY-MM-DD, usar parseDateLocal
+  return formatDateStringSpanish(isoString);
+};
+
+/**
  * Formatea una fecha local a string legible en español CON día de la semana
  */
 export const formatDateSpanishWithWeekday = (date) => {

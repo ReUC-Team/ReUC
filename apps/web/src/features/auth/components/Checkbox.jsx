@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Checkbox = ({ name, checked, onChange }) => (
-  <label className="flex items-center gap-2 text-md font-semibold text-gray-700 ml-2 mb-5">
+  <label className="flex items-center gap-2 text-sm sm:text-base font-semibold text-gray-700 ml-2 mb-5">
     <input
       type="checkbox"
       name={name}

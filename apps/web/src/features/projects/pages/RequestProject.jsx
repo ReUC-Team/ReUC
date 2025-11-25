@@ -33,7 +33,7 @@ const RequestProject = () => {
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-lime-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Verificando perfil...</p>
+          <p className="text-gray-600 dark:text-gray-400">Verificando perfil...</p>
         </div>
       </div>
     );
@@ -47,10 +47,10 @@ const RequestProject = () => {
         showCloseButton={false}
       />
       
-      <section className="flex flex-col items-center justify-start w-full min-h-screen p-10">
-        <div className="flex items-center gap-3 mb-4">
-          <h1 className="text-5xl font-bold">
-            Solicitar un <span className="text-lime-600">proyecto</span>
+      <section className="flex flex-col items-center justify-start w-full min-h-screen p-4 sm:p-6 lg:p-10">
+        <div className="flex flex-col sm:flex-row items-center gap-3 mb-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold dark:text-gray-100">
+            Solicitar un <span className="text-lime-600 dark:text-lime-500">proyecto</span>
           </h1>
           <button
             type="button"
@@ -58,7 +58,7 @@ const RequestProject = () => {
             className="text-blue-600 hover:text-blue-800"
             title="¿Cómo llenar el formulario?"
           >
-            <svg className='text-black w-8 h-auto cursor-pointer mt-3' xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24">
+            <svg className='text-gray-800 dark:text-gray-300 w-6 sm:w-8 h-auto cursor-pointer mt-3' xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 24 24">
               <g fill="none" stroke="#4E4E4E" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 16v-4m0-4h.01"/>
@@ -69,7 +69,7 @@ const RequestProject = () => {
 
         {/* Panel de ayuda con recomendaciones */}
         {showHelp && (
-          <div className="max-w-4xl w-full bg-lime-50 border border-lime-200 text-sm text-lime-800 p-4 rounded mb-8">
+          <div className="max-w-4xl w-full bg-lime-50 dark:bg-lime-900/20 border border-lime-200 dark:border-lime-700 text-sm text-lime-800 dark:text-lime-300 p-4 rounded mb-8">
             <p className="mb-2 font-semibold">Recomendaciones para llenar el formulario:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Título del proyecto:</strong> Sé claro y conciso. Usa un título que describa en pocas palabras el propósito del proyecto.</li>

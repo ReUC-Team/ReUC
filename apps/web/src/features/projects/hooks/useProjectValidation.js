@@ -92,7 +92,7 @@ export default function useProjectValidation(project, constraints = {}, teamMemb
                         + (deadlineDate.getMonth() - createdDate.getMonth());
       
       const minMonths = projectType.minEstimatedMonths || 0;
-      const maxMonths = projectType.maxEstimatedMonths || Infinity;
+      const maxMonths = (projectType.maxEstimatedMonths || Infinity) + 1;
       
       deadlineValid = monthsDiff >= minMonths && monthsDiff <= maxMonths;
       

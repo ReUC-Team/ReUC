@@ -13,35 +13,65 @@ import {
   startProjectHandler,
   rollbackProjectHandler,
   updateDeadlineProjectHandler,
+  uploadProjectResourceFileHandler,
+  editProjectResourceFileHandler,
+  deleteProjectResourceFileHandler,
 } from "./handlers.js";
+import { fileUploadMiddleware } from "./index.js";
 
 export const mobileProjectRouter = express.Router();
 
-mobileProjectRouter.use(
-  requireMobileClient,
-  authMiddleware,
-  requireRole("professor")
-);
+mobileProjectRouter.use(requireMobileClient, authMiddleware);
 
-mobileProjectRouter.post("/create", asyncHandler(createProjectHandler));
+mobileProjectRouter.post(
+  "/create",
+  requireRole("professor"),
+  asyncHandler(createProjectHandler)
+);
 mobileProjectRouter.post(
   "/:uuid/team/create",
+  requireRole("professor"),
   asyncHandler(createProjectTeamHandler)
 );
 mobileProjectRouter.patch(
   "/:uuid/team/members/:uuidUser",
+  requireRole("professor"),
   asyncHandler(updateTeamMemberHandler)
 );
 mobileProjectRouter.delete(
   "/:uuid/team/members/:uuidUser",
+  requireRole("professor"),
   asyncHandler(deleteTeamMemberHandler)
 );
-mobileProjectRouter.post("/:uuid/start", asyncHandler(startProjectHandler));
+mobileProjectRouter.post(
+  "/:uuid/start",
+  requireRole("professor"),
+  asyncHandler(startProjectHandler)
+);
 mobileProjectRouter.post(
   "/:uuid/rollback",
+  requireRole("professor"),
   asyncHandler(rollbackProjectHandler)
 );
 mobileProjectRouter.patch(
   "/:uuid/deadline",
+  requireRole("professor"),
   asyncHandler(updateDeadlineProjectHandler)
+);
+mobileProjectRouter.post(
+  "/:uuid/resources/file",
+  requireRole(["student", "professor"]),
+  fileUploadMiddleware,
+  asyncHandler(uploadProjectResourceFileHandler)
+);
+mobileProjectRouter.put(
+  "/:uuid/resources/file/:uuidResource",
+  requireRole(["student", "professor"]),
+  fileUploadMiddleware,
+  asyncHandler(editProjectResourceFileHandler)
+);
+mobileProjectRouter.delete(
+  "/:uuid/resources/file/:uuidResource",
+  requireRole(["student", "professor"]),
+  asyncHandler(deleteProjectResourceFileHandler)
 );
