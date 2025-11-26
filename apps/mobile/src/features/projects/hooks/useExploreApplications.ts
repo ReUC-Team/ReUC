@@ -4,21 +4,7 @@ import { useState, useEffect } from 'react'
 import { exploreApplications, getExploreApplicationsMetadata } from '../services/projectsService'
 import { AuthenticationError, getDisplayMessage } from '../../../utils/errorHandler'
 import Toast from 'react-native-toast-message'
-
-interface Faculty {
-  faculty_id: number
-  name: string
-  abbreviation: string
-}
-
-interface Application {
-  uuid_application: string
-  title: string
-  shortDescription: string
-  bannerUrl: string | null
-  status: string
-  createdAt: string
-}
+import type { ApplicationListItem, Faculty } from '../types/project.types'
 
 interface Pagination {
   page: number
@@ -28,7 +14,7 @@ interface Pagination {
 }
 
 export default function useExploreApplications() {
-  const [applications, setApplications] = useState<Application[]>([])
+  const [applications, setApplications] = useState<ApplicationListItem[]>([])
   const [faculties, setFaculties] = useState<Faculty[]>([])
   const [selectedFacultyName, setSelectedFacultyName] = useState<string | null>(null)
   const [pagination, setPagination] = useState<Pagination>({

@@ -77,7 +77,7 @@ export async function login(email: string, password: string) {
   const { accessToken, refreshToken } = bodyRes.data.tokens
   await tokenStorage.saveTokens(accessToken, refreshToken)
 
-  console.log('✅ Tokens saved successfully')
+  console.log(' Tokens saved successfully')
 
   
   return { tokens: bodyRes.data.tokens }
@@ -130,6 +130,11 @@ export async function refreshAccessToken(): Promise<string> {
  * Retorna el usuario completo con rol
  * Lanza excepciones estructuradas en caso de error
  */
+/**
+ * Obtiene la sesión actual del usuario desde /auth/me
+ * Retorna el usuario completo con rol
+ * Lanza excepciones estructuradas en caso de error
+ */
 export async function getSession() {
   const accessToken = await tokenStorage.getAccessToken()
 
@@ -159,13 +164,18 @@ export async function getSession() {
     })
   }
 
-  
   const roleData = bodyRes.data.role
 
+  //  Devolver role como objeto {slug, name}
   const userData = {
     uuid: bodyRes.data.user, 
     email: roleData.email || roleData.institutionalEmail || '', 
-    role: roleData.name, 
+    role: {
+      slug: roleData.name,      
+      name: roleData.name,      
+    },
+    firstName: roleData.firstName || '',
+    lastName: roleData.lastName || '',
     roleDetails: roleData, 
   }
 

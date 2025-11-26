@@ -34,7 +34,7 @@ const MyApplicationsList: React.FC = () => {
     navigation.navigate('RequestProject')
   }
 
-  // ✅ Componente del header que se renderiza dentro del FlatList
+  //  Componente del header que se renderiza dentro del FlatList
   const ListHeaderComponent = () => (
     <>
       {/* Título */}
@@ -58,7 +58,7 @@ const MyApplicationsList: React.FC = () => {
     </>
   )
 
-  // ✅ Componente del footer para paginación
+  //  Componente del footer para paginación
   const ListFooterComponent = () => {
     if (filteredApplications.length === 0) return null
 
@@ -100,7 +100,7 @@ const MyApplicationsList: React.FC = () => {
     )
   }
 
-  // ✅ Componente de estado vacío
+  //  Componente de estado vacío
   const ListEmptyComponent = () => {
     if (isLoading) {
       return (
@@ -148,6 +148,7 @@ const MyApplicationsList: React.FC = () => {
           title={item.title}
           description={item.shortDescription}
           image={item.bannerUrl ? { uri: item.bannerUrl } : require('../../../../../web/src/assets/project.webp')}
+          status={item.status}  
           onDetailsClick={() => handleApplicationClick(item.uuid_application)}
         />
       )}

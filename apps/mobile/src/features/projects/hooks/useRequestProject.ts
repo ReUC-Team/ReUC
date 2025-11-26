@@ -1,6 +1,6 @@
 // apps/mobile/src/features/projects/hooks/useRequestProject.ts
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { createApplication } from '../services/projectsService'
 import {
@@ -10,6 +10,7 @@ import {
 import Toast from 'react-native-toast-message'
 import * as DocumentPicker from 'expo-document-picker'
 import * as ImagePicker from 'expo-image-picker'
+import useFormProjectMetadata from './useFormProjectMetadata'
 
 interface FormState {
   title: string
@@ -19,15 +20,24 @@ interface FormState {
   selectedBannerUuid: string
   customBannerFile: any | null
   customBannerName: string
-  projectType: number[] // IDs de tipos de proyecto
-  faculty: number[] // IDs de facultades
-  problemType: number[] // IDs de tipos de problemática
+  projectType: number[]
+  faculty: number[]
+  problemType: number[]
   problemTypeOther: string
   attachments: any[]
 }
 
+interface DeadlineConstraints {
+  min: string | null
+  max: string | null
+  projectTypeName: string | null
+  minMonths: number
+  maxMonths: number
+}
+
 export default function useRequestProject(onClose?: () => void) {
   const navigation = useNavigation<any>()
+  const { projectTypes } = useFormProjectMetadata()
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
 
@@ -46,6 +56,62 @@ export default function useRequestProject(onClose?: () => void) {
     attachments: [],
   })
 
+  const [deadlineConstraints, setDeadlineConstraints] = useState<DeadlineConstraints>({
+    min: null,
+    max: null,
+    projectTypeName: null,
+    minMonths: 0,
+    maxMonths: 0,
+  })
+
+  // Helper para formatear fecha local sin zona horaria
+  const formatDateLocal = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  // Calcular constraints de fecha cuando cambie el tipo de proyecto
+  useEffect(() => {
+    if (form.projectType.length > 0 && projectTypes.length > 0) {
+      const selectedTypeId = Number(form.projectType[0])
+      const projectType = projectTypes.find(pt => pt.project_type_id === selectedTypeId)
+      
+      if (projectType) {
+        const today = new Date()
+        const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+        
+        const minMonths = projectType.minEstimatedMonths || 0
+        const maxMonths = projectType.maxEstimatedMonths || 24
+        
+        // Calcular fecha mínima (hoy + minMonths)
+        const minDate = new Date(todayLocal)
+        minDate.setMonth(minDate.getMonth() + minMonths)
+        
+        // Calcular fecha máxima (hoy + maxMonths + 1 mes de buffer)
+        const maxDate = new Date(todayLocal)
+        maxDate.setMonth(maxDate.getMonth() + maxMonths + 1)
+        
+        setDeadlineConstraints({
+          min: formatDateLocal(minDate),
+          max: formatDateLocal(maxDate),
+          projectTypeName: projectType.name,
+          minMonths,
+          maxMonths: maxMonths + 1
+        })
+      }
+    } else {
+      setDeadlineConstraints({ 
+        min: null, 
+        max: null, 
+        projectTypeName: null,
+        minMonths: 0,
+        maxMonths: 0
+      })
+    }
+  }, [form.projectType, projectTypes])
+
   // Manejar cambio de texto
   const handleChange = (name: keyof FormState, value: any) => {
     // Limpiar error del campo
@@ -55,6 +121,52 @@ export default function useRequestProject(onClose?: () => void) {
         delete newErrors[name]
         return newErrors
       })
+    }
+
+    // Validar fecha en tiempo real
+    if (name === 'deadline' && value && deadlineConstraints && deadlineConstraints.min) {
+      const [year, month, day] = value.split('-').map(Number)
+      const selectedDate = new Date(year, month - 1, day)
+      
+      const [minYear, minMonth, minDay] = deadlineConstraints.min.split('-').map(Number)
+      const minDate = new Date(minYear, minMonth - 1, minDay)
+      
+      const [maxYear, maxMonth, maxDay] = deadlineConstraints.max!.split('-').map(Number)
+      const maxDate = new Date(maxYear, maxMonth - 1, maxDay)
+
+      const today = new Date()
+      const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+
+      // Calcular meses desde hoy
+      const monthsDiff = Math.round(
+        (selectedDate.getFullYear() - todayLocal.getFullYear()) * 12 +
+        (selectedDate.getMonth() - todayLocal.getMonth()) +
+        (selectedDate.getDate() - todayLocal.getDate()) / 30
+      )
+
+      if (selectedDate < minDate) {
+        Toast.show({
+          type: 'info',
+          text1: `Fecha demasiado pronto`,
+          text2: `El proyecto debe durar al menos ${deadlineConstraints.minMonths} meses desde hoy`,
+          position: 'bottom',
+        })
+      } else if (selectedDate > maxDate) {
+        Toast.show({
+          type: 'info',
+          text1: `Fecha demasiado lejana`,
+          text2: `No puede superar ${deadlineConstraints.maxMonths} meses desde hoy`,
+          position: 'bottom',
+        })
+      } else {
+        Toast.show({
+          type: 'success',
+          text1: `Fecha válida`,
+          text2: `${monthsDiff} meses desde hoy`,
+          position: 'bottom',
+          visibilityTime: 2000,
+        })
+      }
     }
 
     setForm((prev) => ({ ...prev, [name]: value }))
@@ -94,7 +206,7 @@ export default function useRequestProject(onClose?: () => void) {
           ...prev,
           customBannerFile: asset,
           customBannerName: asset.fileName || 'banner.jpg',
-          selectedBannerUuid: '', // Limpiar UUID si se sube archivo
+          selectedBannerUuid: '',
         }))
 
         if (fieldErrors.banner) {
@@ -139,11 +251,10 @@ export default function useRequestProject(onClose?: () => void) {
         const currentAttachments = form.attachments
         const newAttachments = result.assets || [result]
 
-        // Limitar a 5 archivos
         const totalFiles = currentAttachments.length + newAttachments.length
         if (totalFiles > 5) {
           Toast.show({
-            type: 'warning',
+            type: 'info',
             text1: 'Máximo 5 archivos',
             text2: 'Solo puedes adjuntar hasta 5 archivos',
             position: 'bottom',
@@ -191,7 +302,22 @@ export default function useRequestProject(onClose?: () => void) {
     }
 
     if (!form.deadline) {
-      errors.deadline = 'La fecha límite es requerida'
+      errors.deadline = 'La fecha de vigencia es obligatoria'
+    } else if (deadlineConstraints && deadlineConstraints.min && deadlineConstraints.max) {
+      const [year, month, day] = form.deadline.split('-').map(Number)
+      const selectedDate = new Date(year, month - 1, day)
+      
+      const [minYear, minMonth, minDay] = deadlineConstraints.min.split('-').map(Number)
+      const minDate = new Date(minYear, minMonth - 1, minDay)
+      
+      const [maxYear, maxMonth, maxDay] = deadlineConstraints.max.split('-').map(Number)
+      const maxDate = new Date(maxYear, maxMonth - 1, maxDay)
+
+      if (selectedDate < minDate) {
+        errors.deadline = `Fecha demasiado pronto. El proyecto debe durar al menos ${deadlineConstraints.minMonths} meses desde hoy.`
+      } else if (selectedDate > maxDate) {
+        errors.deadline = `Fecha demasiado lejana. No puede superar ${deadlineConstraints.maxMonths} meses desde hoy (incluyendo 1 mes de margen).`
+      }
     }
 
     if (!form.selectedBannerUuid && !form.customBannerFile) {
@@ -203,7 +329,6 @@ export default function useRequestProject(onClose?: () => void) {
 
   // Enviar formulario
   const handleSubmit = async () => {
-    // Validar
     const errors = validateForm()
 
     if (Object.keys(errors).length > 0) {
@@ -220,16 +345,13 @@ export default function useRequestProject(onClose?: () => void) {
     setFieldErrors({})
 
     try {
-      // Construir FormData
       const formData = new FormData()
 
-      // Campos básicos
       formData.append('title', form.title)
       formData.append('shortDescription', form.shortDescription)
       formData.append('description', form.description)
       formData.append('deadline', form.deadline)
 
-      // Banner (UUID o archivo custom)
       if (form.selectedBannerUuid) {
         formData.append('selectedBannerUuid', form.selectedBannerUuid)
       } else if (form.customBannerFile) {
@@ -244,33 +366,28 @@ export default function useRequestProject(onClose?: () => void) {
         } as any)
       }
 
-      // Tipo de proyecto (IDs)
       if (form.projectType && form.projectType.length > 0) {
         form.projectType.forEach((id) => {
           formData.append('projectType[]', id.toString())
         })
       }
 
-      // Facultad (IDs)
       if (form.faculty && form.faculty.length > 0) {
         form.faculty.forEach((id) => {
           formData.append('faculty[]', id.toString())
         })
       }
 
-      // Tipo de problemática (IDs)
       if (form.problemType && form.problemType.length > 0) {
         form.problemType.forEach((id) => {
           formData.append('problemType[]', id.toString())
         })
       }
 
-      // Problemática "Otro"
       if (form.problemTypeOther?.trim()) {
         formData.append('problemTypeOther', form.problemTypeOther)
       }
 
-      // Archivos adjuntos
       if (form.attachments && form.attachments.length > 0) {
         form.attachments.forEach((file) => {
           formData.append('attachments', {
@@ -281,10 +398,9 @@ export default function useRequestProject(onClose?: () => void) {
         })
       }
 
-      console.log(' Sending form data...')
+      console.log('📤 Sending form data...')
 
-      // Enviar al backend
-      const response = await createApplication(formData)
+      await createApplication(formData)
 
       Toast.show({
         type: 'success',
@@ -293,14 +409,12 @@ export default function useRequestProject(onClose?: () => void) {
         position: 'bottom',
       })
 
-      // Navegar a MyApplications
       setTimeout(() => {
         navigation.navigate('MyApplications')
       }, 1500)
     } catch (error: any) {
       console.error('❌ Error creating application:', error)
 
-      // Manejo de errores de validación
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
           const processedErrors: Record<string, string> = {}
@@ -362,5 +476,6 @@ export default function useRequestProject(onClose?: () => void) {
     handlePickAttachments,
     handleRemoveAttachment,
     handleSubmit,
+    deadlineConstraints,
   }
 }

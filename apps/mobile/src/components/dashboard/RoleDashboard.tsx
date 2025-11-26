@@ -8,18 +8,23 @@ import DashboardFaculty from '../../features/dashboard/faculty/pages/DashboardFa
 import DashboardAdmin from '../../features/dashboard/admin/pages/DashboardAdmin'
 
 export default function RoleDashboard() {
-  const { user } = useAuth()
+  const { user, isProfessor, isStudent, isOutsider, isAdmin } = useAuth() 
 
-  switch (user?.role) {
-    case 'outsider':
-      return <DashboardMain />
-    case 'student':
-      return <DashboardStudent />
-    case 'professor':
-      return <DashboardFaculty />
-    case 'admin':
-      return <DashboardAdmin />
-    default:
-      return <DashboardMain />
+  if (isAdmin) {
+    return <DashboardAdmin />
   }
+
+  if (isProfessor) {
+    return <DashboardFaculty />
+  }
+
+  if (isStudent) {
+    return <DashboardStudent />
+  }
+
+  if (isOutsider) {
+    return <DashboardMain />
+  }
+
+  return <DashboardMain />
 }

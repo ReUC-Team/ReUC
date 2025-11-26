@@ -136,6 +136,7 @@ const ExploreProjectsList: React.FC = () => {
                     ? { uri: item.bannerUrl }
                     : require('../../../../../web/src/assets/project.webp')
                 }
+                status={item.status}  
                 onDetailsClick={() => handleProjectClick(item.uuid_application)}
               />
             </View>

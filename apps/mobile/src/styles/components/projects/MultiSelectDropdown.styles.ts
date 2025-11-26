@@ -1,11 +1,9 @@
-// apps/mobile/src/styles/components/MultiSelectDropdown.styles.ts
+import { StyleSheet } from 'react-native';
+import { ColorPalette } from '../../theme/colors';
+import { spacing } from '../../theme/spacing';
+import { typography } from '../../theme/typography';
 
-import { StyleSheet } from 'react-native'
-import { ColorPalette } from '../../theme/colors'
-import { spacing } from '../../theme/spacing'
-import { typography } from '../../theme/typography'
-
-export const createMultiSelectDropdownStyles = (palette: ColorPalette, fontMode:string) =>
+export const createMultiSelectDropdownStyles = (palette: ColorPalette, fontMode: string) =>
   StyleSheet.create({
     container: {
       marginBottom: spacing.md,
@@ -21,27 +19,28 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette, fontMode:
       fontSize: typography.sm,
       color: palette.textSecondary,
       fontWeight: '400',
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     selectButton: {
-      backgroundColor: palette.surface,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      backgroundColor: palette.background,
       borderWidth: 1,
       borderColor: palette.grayLight,
-      borderRadius: 8,
+      borderRadius: 12,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.sm,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      minHeight: 48,
     },
     selectButtonError: {
       borderColor: palette.error,
+      borderWidth: 2,
     },
     selectButtonText: {
+      flex: 1,
       fontSize: typography.base,
       color: palette.text,
-      flex: 1,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Regular' : 'System',
     },
     selectButtonTextPlaceholder: {
       color: palette.textSecondary,
@@ -50,31 +49,33 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette, fontMode:
       fontSize: typography.sm,
       color: palette.error,
       marginTop: spacing.xs,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Regular' : 'System',
     },
     modalOverlay: {
       flex: 1,
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       justifyContent: 'center',
       alignItems: 'center',
+      padding: spacing.lg,
     },
     modalContent: {
-      backgroundColor: palette.surface,
-      borderRadius: 12,
-      width: '85%',
-      maxHeight: '70%',
-      overflow: 'hidden',
+      backgroundColor: palette.background,
+      borderRadius: 16,
+      width: '100%',
+      maxHeight: '80%',
+      padding: spacing.lg,
     },
     modalHeader: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      padding: spacing.md,
+      justifyContent: 'space-between',
+      marginBottom: spacing.md,
+      paddingBottom: spacing.sm,
       borderBottomWidth: 1,
       borderBottomColor: palette.grayLight,
     },
     modalTitle: {
-      fontSize: typography.lg,
+      fontSize: typography.xl,
       fontWeight: '700',
       color: palette.text,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
@@ -82,39 +83,42 @@ export const createMultiSelectDropdownStyles = (palette: ColorPalette, fontMode:
     optionItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: spacing.md,
+      paddingVertical: spacing.md,
+      paddingHorizontal: spacing.sm,
       borderBottomWidth: 1,
       borderBottomColor: palette.grayLight,
-    },
-    optionText: {
-      fontSize: typography.base,
-      color: palette.text,
-      marginLeft: spacing.sm,
-      flex: 1,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     checkbox: {
       width: 24,
       height: 24,
-      borderRadius: 4,
+      borderRadius: 6,
       borderWidth: 2,
-      borderColor: palette.primary,
-      justifyContent: 'center',
+      borderColor: palette.grayLight,
+      marginRight: spacing.md,
       alignItems: 'center',
+      justifyContent: 'center',
     },
     checkboxSelected: {
       backgroundColor: palette.primary,
+      borderColor: palette.primary,
+    },
+    optionText: {
+      flex: 1,
+      fontSize: typography.base,
+      color: palette.text,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Regular' : 'System',
     },
     doneButton: {
       backgroundColor: palette.primary,
-      margin: spacing.md,
-      paddingVertical: spacing.sm,
-      borderRadius: 8,
+      paddingVertical: spacing.md,
+      borderRadius: 12,
       alignItems: 'center',
+      marginTop: spacing.md,
     },
     doneButtonText: {
       fontSize: typography.base,
       fontWeight: '600',
       color: palette.onPrimary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
-  })
+  });

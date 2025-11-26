@@ -18,7 +18,7 @@ mobileApplicationRouter.use(requireMobileClient, authMiddleware);
 
 mobileApplicationRouter.post(
   "/create",
-  requireRole("outsider"),
+  requireRole(["outsider", "professor"]),
   fileUploadMiddleware,
   asyncHandler(createApplicationHandler)
 );
