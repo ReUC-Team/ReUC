@@ -74,7 +74,7 @@ const accessibilityItems: AccessibilityItem[] = [
     iconType: 'ionicons',
     label: 'Fuente Dislexia',
     setting: 'fontChange',
-    hasToggle: true, 
+    hasToggle: true,
   },
 ]
 
@@ -91,20 +91,20 @@ export default function RightSidebar({
   const navigation = useNavigation<any>()
   const slideAnim = useRef(new Animated.Value(Dimensions.get('window').width)).current
   const [expandedMenus, setExpandedMenus] = useState<string[]>([])
-  const { themeMode, setThemeMode, fontMode, setFontMode } = useTheme() 
+  const { themeMode, setThemeMode, fontMode, setFontMode } = useTheme()
   const { handleLogout, isLoading: isLoggingOut } = useLogout()
 
   const [accessibilitySettings, setAccessibilitySettings] = useState({
     darkMode: themeMode === 'dark',
     highContrast: themeMode === 'highContrast',
-    dyslexicFont: fontMode === 'dyslexic', 
+    dyslexicFont: fontMode === 'dyslexic',
   })
 
   useEffect(() => {
     setAccessibilitySettings({
       darkMode: themeMode === 'dark',
       highContrast: themeMode === 'highContrast',
-      dyslexicFont: fontMode === 'dyslexic', 
+      dyslexicFont: fontMode === 'dyslexic',
     })
   }, [themeMode, fontMode])
 
@@ -138,16 +138,15 @@ export default function RightSidebar({
       setThemeMode(themeMode === 'highContrast' ? 'light' : 'highContrast')
     }
     if (setting === 'fontChange') {
-      
       setFontMode(fontMode === 'dyslexic' ? 'default' : 'dyslexic')
     }
   }
 
   const renderIcon = (item: MenuItem) => {
     if (item.iconType === 'ionicons') {
-      return <Ionicons name={item.icon as any} size={24} style={styles.menuIcon} />
+      return <Ionicons name={item.icon as any} size={22} style={styles.menuIcon} />
     }
-    return <MaterialIcons name={item.icon as any} size={24} style={styles.menuIcon} />
+    return <MaterialIcons name={item.icon as any} size={22} style={styles.menuIcon} />
   }
 
   const handleMenuPress = (item: MenuItem | string) => {
@@ -165,9 +164,6 @@ export default function RightSidebar({
     }
   }
 
-  /**
-   * Maneja el logout con confirmación
-   */
   const handleLogoutPress = () => {
     Alert.alert('¿Cerrar sesión?', '¿Estás seguro de que quieres salir?', [
       {
@@ -192,9 +188,9 @@ export default function RightSidebar({
         <View key={index} style={styles.submenuItem}>
           <View style={styles.submenuItemContent}>
             {item.iconType === 'ionicons' ? (
-              <Ionicons name={item.icon as any} size={20} style={styles.submenuIcon} />
+              <Ionicons name={item.icon as any} size={18} style={styles.submenuIcon} />
             ) : (
-              <MaterialIcons name={item.icon as any} size={20} style={styles.submenuIcon} />
+              <MaterialIcons name={item.icon as any} size={18} style={styles.submenuIcon} />
             )}
             <Text style={styles.submenuText}>{item.label}</Text>
           </View>
@@ -246,34 +242,54 @@ export default function RightSidebar({
               </View>
 
               {/* Menu Items */}
-              <ScrollView style={styles.menuContainer}>
-                {menuItems.map((item, index) => (
-                  <View key={index}>
-                    <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuPress(item)}>
-                      {renderIcon(item)}
-                      <Text style={styles.menuText}>{item.label}</Text>
-                      {item.hasSubmenu && (
-                        <Ionicons
-                          name={expandedMenus.includes(item.screen) ? 'chevron-up' : 'chevron-down'}
-                          size={20}
-                          style={styles.chevronIcon}
-                        />
-                      )}
-                    </TouchableOpacity>
-                    {item.hasSubmenu && expandedMenus.includes(item.screen) && renderAccessibilitySubmenu()}
-                  </View>
-                ))}
+              <ScrollView style={styles.menuContainer} showsVerticalScrollIndicator={false}>
+                <View style={styles.menuSection}>
+                  <Text style={styles.sectionTitle}>MENÚ</Text>
+                  {menuItems.map((item, index) => (
+                    <View key={index}>
+                      <TouchableOpacity
+                        style={styles.menuItem}
+                        onPress={() => handleMenuPress(item)}
+                        activeOpacity={0.7}
+                      >
+                        <View style={styles.menuItemContent}>
+                          <View style={styles.iconContainer}>
+                            {renderIcon(item)}
+                          </View>
+                          <Text style={styles.menuText}>{item.label}</Text>
+                        </View>
+                        {item.hasSubmenu && (
+                          <Ionicons
+                            name={expandedMenus.includes(item.screen) ? 'chevron-up' : 'chevron-down'}
+                            size={18}
+                            style={styles.chevronIcon}
+                          />
+                        )}
+                      </TouchableOpacity>
+                      {item.hasSubmenu && expandedMenus.includes(item.screen) && renderAccessibilitySubmenu()}
+                    </View>
+                  ))}
+                </View>
               </ScrollView>
 
               {/* Logout Button */}
-              <TouchableOpacity
-                style={[styles.logoutButton, isLoggingOut && { opacity: 0.6 }]}
-                onPress={handleLogoutPress}
-                disabled={isLoggingOut}
-              >
-                <Ionicons name="log-out-outline" size={24} style={styles.logoutIcon} />
-                <Text style={styles.logoutText}>{isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}</Text>
-              </TouchableOpacity>
+              <View style={styles.logoutContainer}>
+                <TouchableOpacity
+                  style={[styles.logoutButton, isLoggingOut && { opacity: 0.6 }]}
+                  onPress={handleLogoutPress}
+                  disabled={isLoggingOut}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.logoutContent}>
+                    <View style={styles.logoutIconContainer}>
+                      <Ionicons name="log-out-outline" size={22} style={styles.logoutIcon} />
+                    </View>
+                    <Text style={styles.logoutText}>
+                      {isLoggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
             </Animated.View>
           </TouchableWithoutFeedback>
         </View>

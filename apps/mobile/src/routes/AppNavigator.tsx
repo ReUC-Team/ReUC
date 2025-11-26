@@ -15,7 +15,7 @@ import RegisterPage from '../features/auth/pages/RegisterPageNative'
 import RoleDashboard from '../components/dashboard/RoleDashboard'
 import ProfileScreen from '../features/profile/pages/ProfileScreen'
 
-// Importar todas las páginas de proyectos
+// Proyectos
 import ExploreProjects from '../features/projects/pages/ExploreProjects'
 import MyProjects from '../features/projects/pages/MyProjects'
 import FavoriteProjects from '../features/projects/pages/FavoriteProjects'
@@ -25,8 +25,19 @@ import MyApplications from '../features/projects/pages/MyApplications'
 import MyApplicationDetails from '../features/projects/pages/MyApplicationDetails'
 import ApplicationDetails from '../features/projects/pages/ApplicationDetails'
 
-// Importar TeamPage
+// Teams
 import TeamPage from '../features/teams/pages/TeamPage'
+
+// Settings - TODAS LAS PANTALLAS
+import SettingsScreen from '../features/settings/pages/SettingsScreen'
+import SettingsGeneralScreen from '../features/settings/pages/SettingsGeneralScreen'
+import SettingsAccessibilityScreen from '../features/settings/pages/SettingsAccessibilityScreen'
+import SettingsNotificationsScreen from '../features/settings/pages/SettingsNotificationsScreen'
+import SettingsPrivacyScreen from '../features/settings/pages/SettingsPrivacyScreen'
+import SettingsTermsScreen from '../features/settings/pages/SettingsTermsScreen'
+import SettingsPrivacyPolicyScreen from '../features/settings/pages/SettingsPrivacyPolicyScreen'
+import SettingsHelpScreen from '../features/settings/pages/SettingsHelpScreen'
+import SettingsLogoutScreen from '../features/settings/pages/SettingsLogoutScreen'
 
 import { useAuth } from '../context/AuthContext'
 
@@ -99,6 +110,91 @@ const DashboardStack = () => (
     </Stack.Screen>
 
     {/* ==================== */}
+    {/* SETTINGS SCREENS     */}
+    {/* ==================== */}
+
+    {/* Settings Main */}
+    <Stack.Screen name="Settings">
+      {() => (
+        <DashboardLayout>
+          <SettingsScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - General */}
+    <Stack.Screen name="SettingsGeneral">
+      {() => (
+        <DashboardLayout>
+          <SettingsGeneralScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - Accessibility */}
+    <Stack.Screen name="SettingsAccessibility">
+      {() => (
+        <DashboardLayout>
+          <SettingsAccessibilityScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - Notifications */}
+    <Stack.Screen name="SettingsNotifications">
+      {() => (
+        <DashboardLayout>
+          <SettingsNotificationsScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - Privacy */}
+    <Stack.Screen name="SettingsPrivacy">
+      {() => (
+        <DashboardLayout>
+          <SettingsPrivacyScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - Terms */}
+    <Stack.Screen name="SettingsTerms">
+      {() => (
+        <DashboardLayout>
+          <SettingsTermsScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - Privacy Policy */}
+    <Stack.Screen name="SettingsPrivacyPolicy">
+      {() => (
+        <DashboardLayout>
+          <SettingsPrivacyPolicyScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - Help */}
+    <Stack.Screen name="SettingsHelp">
+      {() => (
+        <DashboardLayout>
+          <SettingsHelpScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* Settings - Logout */}
+    <Stack.Screen name="SettingsLogout">
+      {() => (
+        <DashboardLayout>
+          <SettingsLogoutScreen />
+        </DashboardLayout>
+      )}
+    </Stack.Screen>
+
+    {/* ==================== */}
     {/* RUTAS DE PROYECTOS   */}
     {/* ==================== */}
 
@@ -165,7 +261,7 @@ const DashboardStack = () => (
       )}
     </Stack.Screen>
 
-    {/* NUEVO: Página de equipo del proyecto */}
+    {/* Página de equipo del proyecto */}
     <Stack.Screen name="TeamPage">
       {() => (
         <DashboardLayout>
