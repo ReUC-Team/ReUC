@@ -408,9 +408,14 @@ export async function getProjectDetails(uuid) {
   const proj = response.data.project;
   const details = proj.details || {};
   const author = proj.author || {};
+  
+  // DEBUG: Ver estructura real del API
+  console.log("🔍 getProjectDetails - response.data.project:", proj);
+  console.log("🔍 getProjectDetails - details:", details);
 
   return {
-    uuid_project: proj.uuid_project,
+    // UUID del proyecto - CRÍTICO para navegación
+    uuid_project: details.uuid_project || proj.uuid_project,
     uuidApplication: proj.uuidApplication,
 
     // Información básica
