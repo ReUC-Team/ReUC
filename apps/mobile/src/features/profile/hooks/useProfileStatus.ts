@@ -14,10 +14,14 @@ export function useProfileStatus() {
   useEffect(() => {
     const checkStatus = async () => {
       try {
+        console.log('🔍 [useProfileStatus] Checking profile status...')
         const data = await getProfileStatus()
+        console.log('📦 [useProfileStatus] Raw response:', JSON.stringify(data, null, 2))
+        console.log('✅ [useProfileStatus] isComplete:', data.status?.isComplete)
+        
         setIsComplete(data.status?.isComplete || false)
       } catch (err: any) {
-        console.error('Error checking profile status:', err)
+        console.error('❌ [useProfileStatus] Error checking profile status:', err)
 
         // Si es error de autenticación, redirigir a login
         if (err instanceof AuthenticationError) {
@@ -27,12 +31,15 @@ export function useProfileStatus() {
 
         setError(err)
       } finally {
+        console.log('🏁 [useProfileStatus] Loading finished')
         setIsLoading(false)
       }
     }
 
     checkStatus()
   }, [])
+
+  console.log('🎯 [useProfileStatus] Current state - isComplete:', isComplete, 'isLoading:', isLoading)
 
   return { isComplete, isLoading, error }
 }

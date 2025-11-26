@@ -8,16 +8,25 @@ import { useThemedStyles } from '../../../../hooks/useThemedStyles'
 import { createDashboardMainStyles } from '../../../../styles/screens/DashboardMain.styles'
 import { useProfileStatus } from '../../../profile/hooks/useProfileStatus'
 import ProfileIncompleteModal from '../../../../components/ProfileIncompleteModal'
-
-const DASHBOARD_MODAL_KEY = '@reuc:dashboardProfileModalShown'
+import { useAuth } from '../../../../context/AuthContext'
 
 export default function DashboardMain() {
   const styles = useThemedStyles(createDashboardMainStyles)
   const { isComplete, isLoading } = useProfileStatus()
+  const { user } = useAuth()
   const [showProfileModal, setShowProfileModal] = useState(false)
+
+  // Key única por usuario
+  const DASHBOARD_MODAL_KEY = `@reuc:dashboardProfileModalShown:${user?.uuid}`
 
   useEffect(() => {
     const checkAndShowModal = async () => {
+      // No hacer nada si no hay usuario
+      if (!user?.uuid) {
+        console.log(' [DashboardMain] No user UUID available')
+        return
+      }
+
       try {
         const hasSeenModal = await AsyncStorage.getItem(DASHBOARD_MODAL_KEY)
 
@@ -25,18 +34,24 @@ export default function DashboardMain() {
         // 1. No está cargando
         // 2. El perfil NO está completo
         // 3. NO ha visto el modal antes (en esta sesión)
-        if (!isLoading && !isComplete && !hasSeenModal) {
+        const shouldShow = !isLoading && !isComplete && !hasSeenModal
+
+
+        if (shouldShow) {
           setShowProfileModal(true)
-          // Marcar como visto
+          // Marcar como visto para esta sesión de este usuario
           await AsyncStorage.setItem(DASHBOARD_MODAL_KEY, 'true')
+          console.log(' [DashboardMain] Modal flag saved to storage')
+        } else {
+          console.log(' [DashboardMain] NOT showing modal')
         }
       } catch (error) {
-        console.error('Error checking modal status:', error)
+        console.error(' [DashboardMain] Error checking modal status:', error)
       }
     }
 
     checkAndShowModal()
-  }, [isComplete, isLoading])
+  }, [isComplete, isLoading, user?.uuid])
 
   const handleCloseModal = () => {
     setShowProfileModal(false)

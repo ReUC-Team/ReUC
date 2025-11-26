@@ -1,18 +1,20 @@
 // apps/mobile/src/features/auth/services/authServiceNative.ts
 
 import { Platform } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { API_URL, MOBILE_API_KEY } from '@env'
 import { tokenStorage } from '../utils/tokenStorage'
 import { createErrorFromResponse } from '../../../utils/errorHandler'
 
 const userAgent = `ReUC/1.0 (${Platform.OS})`
+const DASHBOARD_MODAL_KEY = '@reuc:dashboardProfileModalShown'
 
 export interface RegisterData {
   email: string
   password: string
   confirmPassword?: string
   acceptTerms: boolean
-  studentId?: string
+  universityId?: string
 }
 
 /**
@@ -77,9 +79,8 @@ export async function login(email: string, password: string) {
   const { accessToken, refreshToken } = bodyRes.data.tokens
   await tokenStorage.saveTokens(accessToken, refreshToken)
 
-  console.log(' Tokens saved successfully')
+  console.log('✅ Tokens saved successfully')
 
-  
   return { tokens: bodyRes.data.tokens }
 }
 
@@ -130,11 +131,6 @@ export async function refreshAccessToken(): Promise<string> {
  * Retorna el usuario completo con rol
  * Lanza excepciones estructuradas en caso de error
  */
-/**
- * Obtiene la sesión actual del usuario desde /auth/me
- * Retorna el usuario completo con rol
- * Lanza excepciones estructuradas en caso de error
- */
 export async function getSession() {
   const accessToken = await tokenStorage.getAccessToken()
 
@@ -166,7 +162,7 @@ export async function getSession() {
 
   const roleData = bodyRes.data.role
 
-  //  Devolver role como objeto {slug, name}
+  // Devolver role como objeto {slug, name}
   const userData = {
     uuid: bodyRes.data.user, 
     email: roleData.email || roleData.institutionalEmail || '', 
@@ -188,6 +184,15 @@ export async function getSession() {
  * Cierra sesión (local - solo borra tokens)
  */
 export async function logout() {
-  await tokenStorage.clearTokens()
-  return { message: 'Sesión cerrada' }
+  try {
+    // Limpiar tokens
+    await tokenStorage.clearTokens()
+    
+    console.log(' Logout successful - tokens cleared')
+    
+    return { message: 'Sesión cerrada' }
+  } catch (error) {
+    console.error(' Error during logout:', error)
+    throw error
+  }
 }

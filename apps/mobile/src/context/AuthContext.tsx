@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log(' User session loaded:', userData)
       setUser(userData)
     } catch (error: any) {
-      console.error('❌ Error loading user:', error)
+      console.error(' Error loading user:', error)
       
       if (error instanceof AuthenticationError) {
         await tokenStorage.clearTokens()
@@ -84,9 +84,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   const logout = async () => {
-    console.log(' Logging out...')
-    await tokenStorage.clearTokens()
+    
+    // Limpiar estado local primero
     setUser(null)
+    
+    // Luego limpiar tokens
+    await tokenStorage.clearTokens()
+    
+    console.log(' Logout complete')
   }
 
   const refreshUser = async () => {

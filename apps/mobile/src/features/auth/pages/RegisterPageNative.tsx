@@ -58,8 +58,8 @@ export default function RegisterPageNative() {
             {showStudentField && (
               <AuthInput
                 label="Número de cuenta"
-                value={form.studentId}
-                onChangeText={v => handleChange('studentId', v)}
+                value={form.universityId}
+                onChangeText={v => handleChange('universityId', v)}
                 keyboardType="numeric"
               />
             )}
