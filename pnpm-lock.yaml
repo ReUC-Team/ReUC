@@ -179,6 +179,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.1.3
         version: 4.1.4(vite@6.3.3(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.2)(terser@5.39.2)(yaml@2.8.1))
+      date-fns:
+        specifier: ^4.1.0
+        version: 4.1.0
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
@@ -2770,6 +2773,9 @@ packages:
     resolution: {integrity: sha512-UCtehyEExKTxgiu8UHdGvHj4tnpE/Qctue03Giq5gPgMQ9cg/ciod5blZQ5a4uCEenNQjxyGuzygLdKUmee/bQ==}
     engines: {node: '>= 0.8.0'}
     deprecated: This package is archived and no longer maintained. For support, visit https://github.com/expressjs/express/discussions
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   debounce@1.2.1:
     resolution: {integrity: sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug==}
@@ -8741,6 +8747,8 @@ snapshots:
       cookie-signature: 1.0.6
       csrf: 3.1.0
       http-errors: 1.7.3
+
+  date-fns@4.1.0: {}
 
   debounce@1.2.1: {}
 

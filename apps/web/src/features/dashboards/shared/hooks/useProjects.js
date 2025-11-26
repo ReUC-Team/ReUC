@@ -1,156 +1,86 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import { getMyProjects, getProjectDetails } from '@/features/projects/projectsService';
 
-// Datos de ejemplo
-const mockProjects = [
-  {
-    id: 1,
-    title: 'Sistema de Gestión Escolar',
-    students: [
-      {
-        name: 'Ana García',
-        email: 'ana.garcia@email.com'
-      },
-      {
-        name: 'Luis Rodríguez',
-        email: 'luis.rodriguez@email.com'
-      }
-    ],
-    company: 'Colegio San Martín',
-    status: 'En progreso',
-    assigmentDate: '2024-05-16',
-    progress: 65,
-    lastActivity: '2024-05-22',
-    description: 'Desarrollo de plataforma web para gestión de estudiantes, calificaciones y comunicación con padres.',
-    comments: 3,
-    deliverables: 2
-  },
-  {
-    id: 2,
-    title: 'App Móvil de Delivery',
-    students: [
-      {
-        name: 'Carlos Mendoza',
-        email: 'carlos.mendoza@email.com'
-      }
-    ],
-    company: 'RestaurantePro',
-    status: 'Revision',
-    assigmentDate: '2024-05-10',
-    progress: 85,
-    lastActivity: '2024-05-21',
-    description: 'Aplicación móvil para pedidos en línea con integración de pagos y seguimiento en tiempo real.',
-    comments: 1,
-    deliverables: 4
-  },
-  {
-    id: 3,
-    title: 'Portal de Recursos Humanos',
-    students: [
-      {
-        name: 'María López',
-        email: 'maria.lopez@email.com'
-      },
-      {
-        name: 'Diego Fernández',
-        email: 'diego.fernandez@email.com'
-      },
-      {
-        name: 'Sofía Martín',
-        email: 'sofia.martin@email.com'
-      }
-    ],
-    company: 'TechCorp Inc.',
-    status: 'Completado',
-    assigmentDate: '2024-04-20',
-    progress: 100,
-    lastActivity: '2024-05-20',
-    description: 'Sistema web para gestión de empleados, nóminas y reportes de recursos humanos.',
-    comments: 5,
-    deliverables: 6
-  },
-  {
-    id: 4,
-    title: 'Dashboard de Analytics',
-    students: [
-      {
-        name: 'Pedro Ruiz',
-        email: 'pedro.ruiz@email.com'
-      },
-      {
-        name: 'Carmen Jiménez',
-        email: 'carmen.jimenez@email.com'
-      }
-    ],
-    company: 'DataInsight',
-    status: 'En progreso',
-    assigmentDate: '2024-05-18',
-    progress: 30,
-    lastActivity: '2024-05-23',
-    description: 'Panel de control interactivo para visualización de datos y métricas empresariales.',
-    comments: 0,
-    deliverables: 1
-  }
-]
-
-// Servicio para la API
-const projectsService = {
-  async getProjects(dashboardType) {
-    try {
-      // TODO: Reemplazar con la llamada real al backend
-      // const response = await fetch(`/api/projects/recent?type=${dashboardType}`)
-      // if (!response.ok) throw new Error('Failed to fetch projects')
-      // return await response.json()
-      
-      // Simulación temporal
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Filtrar datos según el tipo de dashboard si es necesario
-          let filteredProjects = mockProjects
-          
-          // Aquí puedes agregar lógica de filtrado según el dashboardType
-          // Por ejemplo: solo proyectos del estudiante actual, solo proyectos de la facultad, etc.
-          
-          resolve(filteredProjects)
-        }, 500)
-      })
-    } catch (error) {
-      console.error('Error fetching projects:', error)
-      throw error
-    }
-  }
-}
-
-export const useProjects = (dashboardType = 'faculty') => {
-  const [projects, setProjects] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+export const useProjects = (dashboardType) => {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const fetchProjects = async () => {
     try {
-      setLoading(true)
-      setError(null)
-      const data = await projectsService.getProjects(dashboardType)
-      setProjects(data)
-    } catch (err) {
-      setError(err.message || 'Error al cargar los proyectos')
-      setProjects([])
-    } finally {
-      setLoading(false)
-    }
-  }
+      setLoading(true);
+      setError(null);
+      
+      // Obtener lista de proyectos del usuario
+      const { projects: projectsList } = await getMyProjects(1, 100);
+      
+      // Limitar a los primeros 5 proyectos para el dashboard (para no hacer muchas requests)
+      const projectsToFetch = projectsList.slice(0, 5);
+      
+      // Obtener detalles completos de cada proyecto
+      const detailedProjectsPromises = projectsToFetch.map(proj => 
+        getProjectDetails(proj.uuid_project).then(details => ({
+          ...details,
+          uuid_project: proj.uuid_project, // Preservar UUID del listado original
+        }))
+      );
+      
+      const detailedProjects = await Promise.all(detailedProjectsPromises);
+      
+      // Transformar proyectos a formato que espera el componente
+      const transformedProjects = detailedProjects.map(project => {
+        console.log("🔍 useProjects - Proyecto recibido de getProjectDetails:", project);
+        
+        return {
+          id: project.uuid_project,
+          uuid_project: project.uuid_project,
+          title: project.title || 'Sin título',
+          description: project.shortDescription || project.description || 'Sin descripción',
+          // Autor completo del proyecto
+          company: project.author?.fullName || project.authorFullName || 'Autor no especificado',
+          status: getStatusLabel(project.status?.slug),
+          // Miembros del equipo reales
+          students: (project.teamMembers || [])
+            .filter(m => m.role === 'Miembro')
+            .map(member => ({
+              name: member.fullName || member.name || 'Sin nombre',
+              email: member.email || 'Sin email',
+            })),
+          progress: 0, // No disponible en backend
+          assigmentDate: project.approvedAt || project.createdAt || new Date().toISOString(),
+          lastActivity: project.updatedAt || project.createdAt || new Date().toISOString(),
+          comments: 0, // No disponible
+          // Recursos reales
+          deliverables: (project.resources || []).length,
+        };
+      });
 
-  const refreshProjects = () => {
-    fetchProjects()
-  }
+      setProjects(transformedProjects);
+    } catch (err) {
+      console.error('Error fetching projects:', err);
+      setError('Error al cargar proyectos');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    fetchProjects()
-  }, [dashboardType])
+    fetchProjects();
+  }, [dashboardType]);
 
-  return {
-    projects,
-    loading,
-    error,
-    refreshProjects
-  }
+  const refreshProjects = () => {
+    fetchProjects();
+  };
+
+  return { projects, loading, error, refreshProjects };
+};
+
+function getStatusLabel(statusSlug) {
+  const statusMap = {
+    'project_approved': 'Aprobado',
+    'project_in_progress': 'En Progreso',
+    'completed': 'Completado',
+    'rejected': 'Rechazado',
+  };
+  return statusMap[statusSlug] || 'Desconocido';
 }
