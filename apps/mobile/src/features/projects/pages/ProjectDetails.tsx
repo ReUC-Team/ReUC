@@ -52,7 +52,7 @@ const ProjectDetails: React.FC = () => {
   const [showRollbackModal, setShowRollbackModal] = useState(false)
   const [showUpdateDeadlineModal, setShowUpdateDeadlineModal] = useState(false)
 
-  // 🔍 LOG 1: Ver datos crudos del proyecto
+  //  Ver datos crudos del proyecto
   console.log('📦 PROJECT RAW DATA:', {
     teamConstraints: project?.teamConstraints,
     teamConstraintsType: typeof project?.teamConstraints,

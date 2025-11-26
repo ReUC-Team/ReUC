@@ -7,6 +7,7 @@ import { useThemedStyles } from '../../../hooks/useThemedStyles'
 import { createProjectCardStyles } from '../../../styles/components/projects/ProjectCard.styles'
 import ProjectStatusBadge from './ProjectStatusBadge'
 import type { StatusObject } from '../types/project.types'
+import { palette } from '@styles'
 
 interface ProjectCardProps {
   uuid?: string
@@ -87,7 +88,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               <Text style={styles.buttonText}>Detalles</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonSecondary} onPress={handleViewTeam}>
-              <Ionicons name="people" size={16} color="#FFFFFF" />
+              <Ionicons name="people" size={16} color={palette.onPrimary} />
               <Text style={styles.buttonText}>Equipo</Text>
             </TouchableOpacity>
           </View>

@@ -20,7 +20,7 @@ export const createUpdateDeadlineModalStyles = (palette: ColorPalette, fontMode:
       padding: spacing.lg,
       width: '100%',
       maxWidth: 500,
-      maxHeight: '80%',
+      maxHeight: '90%',
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
@@ -184,4 +184,31 @@ export const createUpdateDeadlineModalStyles = (palette: ColorPalette, fontMode:
     buttonDisabled: {
       opacity: 0.5,
     },
+
+datePickerWrapper: {
+  marginTop: spacing.md,
+  backgroundColor: '#FFFFFF',
+  borderRadius: 12,
+  padding: spacing.md,
+  borderWidth: 1,
+  borderColor: palette.grayLight,
+},
+iosDatePicker: {
+  width: '100%',
+  height: 200,
+},
+doneButton: {
+  marginTop: spacing.md,
+  backgroundColor: '#84CC16',
+  paddingVertical: spacing.sm,
+  paddingHorizontal: spacing.lg,
+  borderRadius: 8,
+  alignItems: 'center',
+},
+doneButtonText: {
+  fontSize: typography.base,
+  fontWeight: '600',
+  color: '#FFFFFF',
+  fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+},
   })

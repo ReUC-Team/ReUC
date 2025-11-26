@@ -212,6 +212,9 @@ const UpdateDeadlineModal: React.FC<UpdateDeadlineModalProps> = ({
                   onChange={handleDateChange}
                   minimumDate={dateConstraints?.minDate}
                   maximumDate={dateConstraints?.maxDate}
+                  textColor={palette.text}
+                  themeVariant="light"
+                  style={styles.iosDatePicker}
                 />
               )}
             </View>

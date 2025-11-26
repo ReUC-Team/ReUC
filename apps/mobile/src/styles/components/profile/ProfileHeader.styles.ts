@@ -58,7 +58,7 @@ export const createProfileHeaderStyles = (palette: ColorPalette, fontMode: strin
     editButtonText: {
       fontSize: typography.lg,
       fontWeight: '600',
-      color: palette.onGBtn,
+      color: palette.text,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     contactButton: {

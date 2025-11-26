@@ -396,7 +396,7 @@ const ApplicationDetails: React.FC = () => {
 
 
           {/* Botón Ponerse en Contacto */}
-          {(application.author?.email || application.author?.phoneNumber) && (
+{/*           {(application.author?.email || application.author?.phoneNumber) && (
             <TouchableOpacity
               style={[
                 styles.contactButton,
@@ -407,7 +407,7 @@ const ApplicationDetails: React.FC = () => {
             >
               <Text style={styles.contactButtonText}>Ponerse en contacto</Text>
             </TouchableOpacity>
-          )}
+          )} */}
         </View>
      
 
