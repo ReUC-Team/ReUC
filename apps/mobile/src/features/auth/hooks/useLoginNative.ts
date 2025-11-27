@@ -52,7 +52,6 @@ export default function useLoginNative() {
       // y automáticamente mostrará el DashboardStack
 
     } catch (error: any) {
-      console.error('❌ Login error:', error)
 
       if (error instanceof ValidationError) {
         if (error.details && error.details.length > 0) {
@@ -63,7 +62,7 @@ export default function useLoginNative() {
           showError(getDisplayMessage(error))
         }
       } else if (error instanceof AuthenticationError) {
-        showError('Credenciales incorrectas. Verifica tu correo y contraseña.')
+        showError('Credenciales incorrectas.')
       } else {
         showError(getDisplayMessage(error))
       }
