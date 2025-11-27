@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { useThemedStyles, useThemedPalette } from '../../../hooks/useThemedStyles'
 import { createProjectDetailsStyles } from '../../../styles/screens/ProjectDetails.styles'
 import { useAuth } from '../../../context/AuthContext'
+import { useTheme } from '../../../context/ThemeContext'
 import useProjectDetails from '../hooks/useProjectDetails'
 import useProjectActions from '../hooks/useProjectActions'
 import useProjectValidation from '../hooks/useProjectValidation' 
@@ -22,6 +23,7 @@ import { formatDateStringSpanish } from '../../../utils/dateUtils'
 import Toast from 'react-native-toast-message'
 import ProjectImage from '../components/ProjectImage'
 import ProjectSummary from '../components/ProjectSummary'
+import ProjectResourcesSection from '../components/ProjectResourcesSection'
 import ProjectInfoCard from '../components/ProjectInfoCard'
 import AttachmentCard from '../components/AttachmentCard'
 import ProjectStatusBadge from '../components/ProjectStatusBadge'
@@ -36,8 +38,9 @@ const ProjectDetails: React.FC = () => {
   const navigation = useNavigation<any>()
   const { uuid } = route.params || {}
   const { user } = useAuth()
+  const { fontMode } = useTheme()
 
-  const { project, isLoading, error } = useProjectDetails(uuid)
+  const { project, isLoading, error, refetch } = useProjectDetails(uuid)
   const {
     isStarting,
     isRollingBack,
@@ -52,7 +55,7 @@ const ProjectDetails: React.FC = () => {
   const [showRollbackModal, setShowRollbackModal] = useState(false)
   const [showUpdateDeadlineModal, setShowUpdateDeadlineModal] = useState(false)
 
-  //  Ver datos crudos del proyecto
+  // Ver datos crudos del proyecto
   console.log('📦 PROJECT RAW DATA:', {
     teamConstraints: project?.teamConstraints,
     teamConstraintsType: typeof project?.teamConstraints,
@@ -60,12 +63,10 @@ const ProjectDetails: React.FC = () => {
     teamConstraintsJSON: JSON.stringify(project?.teamConstraints, null, 2),
   })
 
-  
+  // Validación del proyecto
+  const validation = useProjectValidation(project, project?.teamConstraints || {})
 
-  //  Validación del proyecto
-const validation = useProjectValidation(project, project?.teamConstraints || {})
-
-  //  Ver resultado de la validación
+  // Ver resultado de la validación
   console.log('🔍 VALIDACIÓN DEL PROYECTO:', {
     canStart: validation.canStart,
     teamValid: validation.teamValid,
@@ -207,44 +208,32 @@ const validation = useProjectValidation(project, project?.teamConstraints || {})
   // Determinar permisos
   const isCreator = user?.uuid === project.uuidCreator
   const isProfessor = user?.role?.slug === 'professor'
+  const isMember = project.teamMembers?.some((member) => member.uuid_user === user?.uuid)
   const statusSlug = typeof project.status === 'string' ? project.status : project.status?.slug
+
+  // Puede gestionar recursos: creador, profesor que aprobó, o cualquier miembro del equipo
+  const canManage = isCreator || isProfessor || isMember
 
   const canStart = isProfessor && isCreator && statusSlug === 'project_approved'
   const canRollback = isProfessor && isCreator && (statusSlug === 'project_approved' || statusSlug === 'project_in_progress')
-  const canUpdateDeadline = isProfessor && (statusSlug === 'project_approved' || statusSlug === 'project_in_progress')
+  const canUpdateDeadline = isProfessor && isCreator
 
-  // Información del proyecto
+  // Información del proyecto para ProjectInfoCard
   const projectInfo = [
-    {
-      label: 'Tipo de proyecto',
-      value: extractNames(project.projectTypes),
-    },
-    {
-      label: 'Facultades',
-      value: extractNames(project.faculties, 'No especificada'),
-    },
-    {
-      label: 'Tipo de problemática',
-      value: extractNames(project.problemTypes),
-    },
-    {
-      label: 'Fecha límite',
-      value: formatDate(project.estimatedDate),
-    },
-    {
-      label: 'Fecha de creación',
-      value: formatDate(project.createdAt),
-    },
-    {
-      label: 'Fecha de aprobación',
-      value: formatDate(project.approvedAt),
-    },
+    { label: 'Autor', value: project.author.fullName || 'Desconocido' },
+    { label: 'Organización', value: project.author.organizationName || 'No especificada' },
+    { label: 'Fecha de creación', value: formatDate(project.createdAt) },
+    { label: 'Fecha de aprobación', value: formatDate(project.approvedAt) },
+    { label: 'Fecha estimada', value: formatDate(project.estimatedDate) },
+    { label: 'Tipo de proyecto', value: extractNames(project.projectTypes) },
+    { label: 'Facultades', value: extractNames(project.faculties) },
+    { label: 'Tipo de problemática', value: extractNames(project.problemTypes) },
   ]
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
+
         <Text style={styles.title}>
           Detalles del <Text style={styles.titleAccent}>proyecto</Text>
         </Text>
@@ -253,6 +242,24 @@ const validation = useProjectValidation(project, project?.teamConstraints || {})
         {project.status && (
           <View style={{ marginTop: 8, alignItems: 'center' }}>
             <ProjectStatusBadge status={project.status} />
+          </View>
+        )}
+
+        {validation.errors.length > 0 && (
+          <View style={{ marginTop: 12 }}>
+            {validation.errors.map((error, idx) => (
+              <Text
+                key={idx}
+                style={{
+                  fontSize: 12,
+                  color: '#DC2626',
+                  textAlign: 'center',
+                  marginTop: 4,
+                }}
+              >
+                {error}
+              </Text>
+            ))}
           </View>
         )}
       </View>
@@ -311,6 +318,15 @@ const validation = useProjectValidation(project, project?.teamConstraints || {})
           </TouchableOpacity>
         </View>
 
+        {/* SECCIÓN DE RECURSOS DEL PROYECTO */}
+        <ProjectResourcesSection
+          project={project}
+          canManage={canManage}
+          palette={palette}
+          fontMode={fontMode}
+          onResourceChange={refetch}
+        />
+
         {/* TÍTULO DE SECCIÓN - ACCIONES DEL PROYECTO */}
         <Text style={styles.sectionTitle}>
           Acciones del <Text style={styles.titleAccent}>proyecto</Text>
@@ -328,7 +344,7 @@ const validation = useProjectValidation(project, project?.teamConstraints || {})
         {/* ACCIONES SOLO PARA PROFESORES CREADORES */}
         {isProfessor && isCreator && (
           <>
-            {/*  BOTÓN INICIAR PROYECTO -  VALIDACIÓN VISUAL */}
+            {/* BOTÓN INICIAR PROYECTO - VALIDACIÓN VISUAL */}
             {canStart && statusSlug === 'project_approved' && (
               <TouchableOpacity
                 style={[
@@ -358,7 +374,7 @@ const validation = useProjectValidation(project, project?.teamConstraints || {})
               </TouchableOpacity>
             )}
 
-            {/*  WARNING BOX - EQUIPO INCOMPLETO O FECHA INVÁLIDA */}
+            {/* WARNING BOX - EQUIPO INCOMPLETO O FECHA INVÁLIDA */}
             {canStart && statusSlug === 'project_approved' && !validation.canStart && (
               <View style={styles.teamIncompleteWarning}>
                 <Ionicons name="warning" size={24} color="#DC2626" style={{ marginTop: 2 }} />

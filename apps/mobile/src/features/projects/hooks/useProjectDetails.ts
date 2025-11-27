@@ -124,5 +124,5 @@ export default function useProjectDetails(uuid: string | undefined) {
     }
   }, [uuid])
 
-  return { project, isLoading, error }
+  return { project, isLoading, error, refetch: fetchProjectDetails }
 }

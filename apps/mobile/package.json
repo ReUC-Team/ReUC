@@ -20,6 +20,7 @@
     "@react-navigation/native-stack": "^7.3.10",
     "@reuc/web": "workspace:*",
     "country-list": "^2.3.0",
+    "date-fns": "^4.1.0",
     "expo": "~54.0.22",
     "expo-clipboard": "~8.0.7",
     "expo-constants": "~18.0.10",

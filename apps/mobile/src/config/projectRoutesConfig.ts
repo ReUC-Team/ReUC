@@ -30,14 +30,14 @@ export const PROJECT_ROUTES: ProjectRoute[] = [
     screen: 'RequestProject',
     label: 'Solicitar proyecto',
     icon: 'add-circle-outline',
-    roles: ['outsider', 'student', 'professor', 'admin'],
+    roles: ['outsider', 'professor', 'admin'],
     showInSidebar: true,
   },
   {
     screen: 'MyApplications',
     label: 'Mis solicitudes',
     icon: 'document-text-outline',
-    roles: ['outsider', 'student', 'professor', 'admin'],
+    roles: ['outsider', 'professor', 'admin'],
     showInSidebar: true,
   },
   {

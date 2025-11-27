@@ -24,13 +24,13 @@ export default function LandingPage() {
 
         <Hero />
 
-        <GoogleBtn />
-
-        <View style={styles.orWrapper}>
+{/*         <GoogleBtn />
+ */}
+{/*         <View style={styles.orWrapper}>
           <View style={styles.line} />
           <Text style={styles.or}>o</Text>
           <View style={styles.line} />
-        </View>
+        </View> */}
 
         <RegisterBtn />
 

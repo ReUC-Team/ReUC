@@ -81,14 +81,14 @@ const DashboardTabs: React.FC = () => {
         }}
       />
 
-      <Tab.Screen
+{/*       <Tab.Screen
         name="Estudiantes"
         component={LinkedStudents}
         options={{
           tabBarLabel: 'Estudiantes',
           tabBarAccessibilityLabel: 'Ver estudiantes vinculados'
         }}
-      />
+      /> */}
 
       <Tab.Screen
         name="Proyectos"
@@ -108,14 +108,14 @@ const DashboardTabs: React.FC = () => {
         )}
       </Tab.Screen>
 
-      <Tab.Screen
+{/*       <Tab.Screen
         name="Enlaces"
         component={UploadedLinks}
         options={{
           tabBarLabel: 'Enlaces',
           tabBarAccessibilityLabel: 'Ver enlaces subidos'
         }}
-      />
+      /> */}
     </Tab.Navigator>
   )
 }

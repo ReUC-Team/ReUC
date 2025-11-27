@@ -1,21 +1,21 @@
-// apps/mobile/src/features/dashboards/faculty/components/FacultyProjectStats.tsx
+// apps/mobile/src/features/dashboard/student/components/StudentProjectStats.tsx
 
 import React, { useRef, useState } from 'react'
-import { View, Text, ScrollView, TouchableOpacity, Dimensions, ActivityIndicator } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useThemedStyles, useThemedPalette } from '../../../../hooks/useThemedStyles'
 import { createProjectStatsStyles } from '../../../../styles/components/dashboard/dashboardComponents.styles'
 import { spacing } from '../../../../styles/theme/spacing'
-import { useFacultyStats } from '../hooks/useFacultyStats'
+import { useDashboardStats } from '../hooks/useDashboardStats'
 
 const { width: screenWidth } = Dimensions.get('window')
 const cardWidth = screenWidth * 0.7
 
-const FacultyProjectStats: React.FC = () => {
+const StudentProjectStats: React.FC = () => {
   const styles = useThemedStyles(createProjectStatsStyles)
   const palette = useThemedPalette()
 
-  const { statsData, stats, isLoading, error } = useFacultyStats()
+  const { stats, isLoading, error } = useDashboardStats()
   const scrollViewRef = useRef<ScrollView>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -32,14 +32,16 @@ const FacultyProjectStats: React.FC = () => {
     })
   }
 
-  const handleExplorarProyectos = () => {
+  const handleMisProyectos = () => {
+    // TODO: Navegar a tab de proyectos o a explorar proyectos
+    console.log('📂 Explorar proyectos')
   }
 
   if (error) {
     return (
       <View style={{ flex: 1, backgroundColor: palette.surface, padding: 16 }}>
         <View style={styles.heroSection}>
-          <Text style={styles.heroTitle}>Panel Académico</Text>
+          <Text style={styles.heroTitle}>Panel de Estudiante</Text>
         </View>
         <View style={{ alignItems: 'center', paddingVertical: 32 }}>
           <MaterialCommunityIcons name="alert-circle-outline" size={48} color={palette.errorText} />
@@ -49,6 +51,30 @@ const FacultyProjectStats: React.FC = () => {
     )
   }
 
+  // Datos para las tarjetas horizontales
+  const statsData = [
+    {
+      label: 'Total Proyectos',
+      value: stats.totalProjects,
+      icon: 'briefcase-outline'
+    },
+    {
+      label: 'Aprobados',
+      value: stats.byStatus.approved,
+      icon: 'check-circle'
+    },
+    {
+      label: 'En Progreso',
+      value: stats.byStatus.inProgress,
+      icon: 'lightning-bolt'
+    },
+    {
+      label: 'Completados',
+      value: stats.byStatus.completed,
+      icon: 'check-circle-outline'
+    },
+  ]
+
   return (
     <ScrollView 
       style={{ flex: 1, backgroundColor: palette.surface }}
@@ -57,23 +83,23 @@ const FacultyProjectStats: React.FC = () => {
     >
       {/* Hero Section */}
       <View style={styles.heroSection}>
-        <Text style={styles.heroTitle}>Panel Académico</Text>
+        <Text style={styles.heroTitle}>Panel de Estudiante</Text>
         <Text style={styles.heroSubtitle}>
-          Supervisa, acompaña y gestiona los proyectos asignados a tu coordinación
+          Consulta tus proyectos, revisa avances y mantente al día con tus asignaciones
         </Text>
-                <TouchableOpacity 
-                  style={styles.heroButton}
-                  onPress={handleExplorarProyectos}
-                  activeOpacity={0.8}
-                >
-                  <Text style={styles.heroButtonText}>Explorar Proyectos</Text>
-                </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.heroButton}
+          onPress={handleMisProyectos}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.heroButtonText}>Mis Proyectos</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Resumen General Section */}
       <View style={styles.summarySection}>
         <Text style={styles.summaryTitle}>Resumen General</Text>
-        <Text style={styles.summarySubtitle}>Estado actual de todos los proyectos asignados</Text>
+        <Text style={styles.summarySubtitle}>Estado actual de tus proyectos</Text>
         
         {isLoading ? (
           <View style={{ paddingVertical: 24 }}>
@@ -83,14 +109,14 @@ const FacultyProjectStats: React.FC = () => {
           <View style={styles.summaryStats}>
             <View style={styles.summaryStatItem}>
               <Text style={styles.summaryStatNumber}>{stats.totalProjects}</Text>
-              <Text style={styles.summaryStatLabel}>Proyectos Asignados</Text>
+              <Text style={styles.summaryStatLabel}>Proyectos Totales</Text>
             </View>
             
             <View style={styles.summaryStatItem}>
               <Text style={styles.summaryStatProgress}>
-                {stats.approvalRate}%
+                {stats.byStatus.inProgress}
               </Text>
-              <Text style={styles.summaryStatLabel}>Tasa Aprobación</Text>
+              <Text style={styles.summaryStatLabel}>En Progreso</Text>
             </View>
           </View>
         )}
@@ -171,10 +197,9 @@ const FacultyProjectStats: React.FC = () => {
         </>
       )}
 
-     
       <View style={{ height: spacing.xl }} />
     </ScrollView>
   )
 }
 
-export default FacultyProjectStats
+export default StudentProjectStats

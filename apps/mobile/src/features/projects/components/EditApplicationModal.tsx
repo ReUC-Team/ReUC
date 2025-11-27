@@ -398,6 +398,10 @@ const EditApplicationModal: React.FC<EditApplicationModalProps> = ({
                   onChange={handleDateChange}
                   minimumDate={deadlineConstraints?.minDate}
                   maximumDate={deadlineConstraints?.maxDate}
+                  textColor={palette.text}
+                  themeVariant="light"
+                  
+                  
                 />
               )}
 

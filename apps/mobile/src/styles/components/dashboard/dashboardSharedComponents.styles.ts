@@ -258,33 +258,36 @@ export const createProjectsStyles = (palette: ColorPalette, fontMode: string) =>
     // Actions
     actions: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
+      justifyContent: 'flex-end',
       gap: spacing.xs,
+      alignContent: 'center',
       paddingTop: spacing.sm,
       borderTopWidth: 1,
       borderTopColor: palette.grayLight,
     },
     actionButton: {
-      paddingHorizontal: spacing.sm,
-      paddingVertical: spacing.xs,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.xl,
+      paddingVertical: spacing.sm+2,
       borderRadius: 6,
     },
     detailsButton: {
-      backgroundColor: '#E0E7FF',
+      backgroundColor: palette.primary,
     },
     detailsButtonText: {
       fontSize: typography.sm,
       fontWeight: '600',
-      color: '#3730A3',
+      color: palette.onPrimary,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     contactButton: {
-      backgroundColor: '#D1FAE5',
+      backgroundColor: palette.onGBtn,
     },
     contactButtonText: {
       fontSize: typography.sm,
       fontWeight: '600',
-      color: '#065F46',
+      color: palette.onPrimary,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     commentButton: {
@@ -305,4 +308,26 @@ export const createProjectsStyles = (palette: ColorPalette, fontMode: string) =>
       color: '#6B21A8',
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
+
+    metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+
+  studentsLabel: {
+    fontSize: typography.sm,
+    fontWeight: '600',
+    color: palette.text,
+    marginBottom: 4,
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+  },
+
+  studentsMore: {
+    fontSize: typography.xs,
+    color: palette.textSecondary,
+    fontStyle: 'italic',
+    fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+  },
   })

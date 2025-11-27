@@ -1,15 +1,49 @@
 // apps/mobile/src/features/dashboards/shared/utils/ProjectsUtils.ts
 
-export type ProjectStatus = 'En progreso' | 'Revision' | 'Completado' | 'Pausado'
+export type ProjectStatus = 
+  | 'Aprobado'
+  | 'En Progreso' 
+  | 'Completado'
+  | 'Rechazado'
+  | 'Desconocido'
+
 export type DashboardType = 'faculty' | 'student' | 'external'
 
-export interface StatusConfig {
+interface StatusConfig {
   color: string
   bgColor: string
   textColor: string
 }
 
-export interface DashboardConfig {
+export const statusConfig: Record<string, StatusConfig> = {
+  'Aprobado': {
+    color: '#84CC16',
+    bgColor: '#D1FAE5',
+    textColor: '#065F46'
+  },
+  'En Progreso': {
+    color: '#3B82F6',
+    bgColor: '#DBEAFE',
+    textColor: '#1E40AF'
+  },
+  'Completado': {
+    color: '#10B981',
+    bgColor: '#D1FAE5',
+    textColor: '#065F46'
+  },
+  'Rechazado': {
+    color: '#EF4444',
+    bgColor: '#FEE2E2',
+    textColor: '#991B1B'
+  },
+  'Desconocido': {
+    color: '#6B7280',
+    bgColor: '#F3F4F6',
+    textColor: '#374151'
+  }
+}
+
+interface DashboardConfig {
   title: string
   subtitle: string
   showStudents: boolean
@@ -21,72 +55,51 @@ export interface DashboardConfig {
   showDetailsButton: boolean
   showCommentButton: boolean
   showDeliverablesButton: boolean
+  maxHeight: string
 }
 
-// Configuración de colores por estado
-export const statusConfig: Record<ProjectStatus, StatusConfig> = {
-  'En progreso': {
-    color: '#3B82F6',
-    bgColor: '#DBEAFE',
-    textColor: '#1E40AF'
-  },
-  'Revision': {
-    color: '#F59E0B',
-    bgColor: '#FEF3C7',
-    textColor: '#92400E'
-  },
-  'Completado': {
-    color: '#10B981',
-    bgColor: '#D1FAE5',
-    textColor: '#065F46'
-  },
-  'Pausado': {
-    color: '#EF4444',
-    bgColor: '#FEE2E2',
-    textColor: '#991B1B'
-  }
-}
-
-// Configuración de campos por tipo de dashboard
-export const dashboardConfig: Record<DashboardType, DashboardConfig> = {
+const dashboardConfig: Record<DashboardType, DashboardConfig> = {
   faculty: {
-    title: 'Proyectos recientes',
+    title: 'Proyectos asignados',
     subtitle: 'proyectos asignados',
     showStudents: true,
     showCompany: true,
-    showProgress: true,
-    showComments: true,
+    showProgress: false,
+    showComments: false,
     showDeliverables: true,
     showContactButton: true,
     showDetailsButton: true,
-    showCommentButton: true,
-    showDeliverablesButton: true
+    showCommentButton: false,
+    showDeliverablesButton: false,
+    maxHeight: '500px'
   },
   student: {
     title: 'Mis proyectos',
     subtitle: 'proyectos en curso',
-    showStudents: false,
+    showStudents: true,
     showCompany: true,
-    showProgress: true,
+    showProgress: false,
     showComments: false,
     showDeliverables: true,
-    showContactButton: false,
+    showContactButton: true,
     showDetailsButton: true,
     showCommentButton: false,
-    showDeliverablesButton: true
+    showDeliverablesButton: false,
+    maxHeight: '400px'
   },
   external: {
     title: 'Proyectos asignados',
     subtitle: 'proyectos de la empresa',
     showStudents: true,
     showCompany: false,
-    showProgress: true,
-    showComments: true,
-    showDeliverables: false,
+    showProgress: false,
+    showComments: false,
+    showDeliverables: true,
     showContactButton: true,
     showDetailsButton: true,
-    showCommentButton: true,
-    showDeliverablesButton: true
+    showCommentButton: false,
+    showDeliverablesButton: false,
+    maxHeight: '500px'
   }
 }
 
@@ -117,11 +130,6 @@ export const projectUtils = {
   getProjectCountText: (count: number, dashboardType: DashboardType): string => {
     const config = dashboardConfig[dashboardType]
     return `${count} ${config.subtitle}`
-  },
-
-  shouldShowField: (fieldName: keyof DashboardConfig, dashboardType: DashboardType): boolean => {
-    const config = dashboardConfig[dashboardType]
-    return config[fieldName] !== false
   },
 
   getDashboardConfig: (dashboardType: DashboardType): DashboardConfig => {

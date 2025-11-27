@@ -123,6 +123,8 @@ export interface ProjectDetails {
   problemTypes: ProblemType[]
   teamMembers?: TeamMember[]
   teamConstraints?: Record<string, RoleConstraint>
+  resources?: ProjectResource[]  
+
 }
 
 /**
@@ -233,4 +235,18 @@ export interface SearchUser {
   lastName: string
   email: string
   universityId?: string
+}
+
+/**
+ * Recurso del proyecto
+ */
+export interface ProjectResource {
+  uuid: string
+  name: string
+  type: string
+  size: number
+  downloadUrl: string
+  createdAt: string
+  deletedAt: string | null
+  uuidAuthor: string
 }

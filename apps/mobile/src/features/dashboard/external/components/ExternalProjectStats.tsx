@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator} from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useThemedStyles, useThemedPalette } from '../../../../hooks/useThemedStyles'
 import { createProjectStatsStyles } from '../../../../styles/components/dashboard/dashboardComponents.styles'
@@ -14,7 +14,7 @@ const ExternalProjectStats: React.FC = () => {
   const styles = useThemedStyles(createProjectStatsStyles)
   const palette = useThemedPalette()
 
-  const { statsData } = useExternalStats()
+  const { statsData, stats, isLoading, error } = useExternalStats()
   const scrollViewRef = useRef<ScrollView>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -32,7 +32,6 @@ const ExternalProjectStats: React.FC = () => {
   }
 
   const handleSolicitarProyecto = () => {
-    console.log('Solicitar nuevo proyecto')
   }
 
   return (
@@ -59,85 +58,105 @@ const ExternalProjectStats: React.FC = () => {
       {/* Resumen General Section */}
       <View style={styles.summarySection}>
         <Text style={styles.summaryTitle}>Resumen General</Text>
-        <Text style={styles.summarySubtitle}>Estado actual de todos los proyectos en el sistema</Text>
+        <Text style={styles.summarySubtitle}>Estado actual de todos los proyectos asignados</Text>
         
-        <View style={styles.summaryStats}>
-          <View style={styles.summaryStatItem}>
-            <Text style={styles.summaryStatNumber}>20</Text>
-            <Text style={styles.summaryStatLabel}>Total Proyectos</Text>
+        {isLoading ? (
+          <View style={{ paddingVertical: 24 }}>
+            <ActivityIndicator size="large" color={palette.primary} />
           </View>
-          
-          <View style={styles.summaryStatItem}>
-            <Text style={styles.summaryStatProgress}>95.0%</Text>
-            <Text style={styles.summaryStatLabel}>Tasa Progreso</Text>
+        ) : (
+          <View style={styles.summaryStats}>
+            <View style={styles.summaryStatItem}>
+              <Text style={styles.summaryStatNumber}>{stats.totalProjects}</Text>
+              <Text style={styles.summaryStatLabel}>Proyectos Asignados</Text>
+            </View>
+            
+            <View style={styles.summaryStatItem}>
+              <Text style={styles.summaryStatProgress}>
+                {stats.approvalRate}%
+              </Text>
+              <Text style={styles.summaryStatLabel}>Tasa Aprobación</Text>
+            </View>
           </View>
-        </View>
+        )}
       </View>
 
       {/* Estadísticas Title */}
       <Text style={styles.sectionTitle}>Estadísticas</Text>
 
-      {/* Horizontal Scrollable Cards */}
-      <ScrollView 
-        ref={scrollViewRef}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.horizontalScrollContainer}
-        decelerationRate="fast"
-        snapToInterval={cardWidth + 16}
-        snapToAlignment="start"
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-        nestedScrollEnabled={true}
-      >
-        {statsData.map((stat, i) => (
-          <TouchableOpacity 
-            key={i} 
-            style={[
-              styles.horizontalCard, 
-              { width: cardWidth },
-              i === 0 && styles.horizontalCardFirst
-            ]}
-            activeOpacity={0.9}
+      {/* Loading State */}
+      {isLoading ? (
+        <View style={{ paddingVertical: 32, alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={palette.primary} />
+          <Text style={{ color: palette.textSecondary, marginTop: 16 }}>
+            Cargando estadísticas...
+          </Text>
+        </View>
+      ) : (
+        <>
+          {/* Horizontal Scrollable Cards */}
+          <ScrollView 
+            ref={scrollViewRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalScrollContainer}
+            decelerationRate="fast"
+            snapToInterval={cardWidth + 16}
+            snapToAlignment="start"
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
+            nestedScrollEnabled={true}
           >
-            {/* Floating Icon */}
-            <View style={styles.floatingIcon}>
-              <MaterialCommunityIcons
-                name={stat.icon as any}
-                size={32}
-                color={palette.primary}
+            {statsData.map((stat, i) => (
+              <TouchableOpacity 
+                key={i} 
+                style={[
+                  styles.horizontalCard, 
+                  { width: cardWidth },
+                  i === 0 && styles.horizontalCardFirst
+                ]}
+                activeOpacity={0.9}
+              >
+                {/* Floating Icon */}
+                <View style={styles.floatingIcon}>
+                  <MaterialCommunityIcons
+                    name={stat.icon as any}
+                    size={32}
+                    color={palette.primary}
+                  />
+                </View>
+
+                {/* Card Content */}
+                <View style={styles.horizontalCardContent}>
+                  <Text style={styles.horizontalLabel}>{stat.label}</Text>
+                  <Text style={styles.horizontalValue}>{stat.value}</Text>
+                </View>
+
+                {/* Gradient Overlay */}
+                <View style={styles.gradientOverlay} />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* Indicadores de posición (puntos) */}
+          <View style={styles.paginationContainer}>
+            {statsData.map((_, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => scrollToIndex(index)}
+                style={[
+                  styles.paginationDot,
+                  currentIndex === index 
+                    ? styles.paginationDotActive 
+                    : styles.paginationDotInactive
+                ]}
               />
-            </View>
+            ))}
+          </View>
+        </>
+      )}
 
-            {/* Card Content */}
-            <View style={styles.horizontalCardContent}>
-              <Text style={styles.horizontalLabel}>{stat.label}</Text>
-              <Text style={styles.horizontalValue}>{stat.value}</Text>
-            </View>
-
-            {/* Gradient Overlay */}
-            <View style={styles.gradientOverlay} />
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      {/* Indicadores de posición (puntos) */}
-      <View style={styles.paginationContainer}>
-        {statsData.map((_, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => scrollToIndex(index)}
-            style={[
-              styles.paginationDot,
-              currentIndex === index 
-                ? styles.paginationDotActive 
-                : styles.paginationDotInactive
-            ]}
-          />
-        ))}
-      </View>
-
-      {/* Espacio adicional al final para scroll completo */}
+     
       <View style={{ height: spacing.xl }} />
     </ScrollView>
   )

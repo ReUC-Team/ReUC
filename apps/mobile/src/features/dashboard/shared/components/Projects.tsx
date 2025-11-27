@@ -3,11 +3,11 @@
 import React from 'react'
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useNavigation } from '@react-navigation/native'
 import { useThemedStyles, useThemedPalette } from '../../../../hooks/useThemedStyles'
 import { createProjectsStyles } from '../../../../styles/components/dashboard/dashboardSharedComponents.styles'
 import { useProjects, Project } from '../hooks/useProjects'
 import { statusConfig, projectUtils, DashboardType } from '../utils/ProjectsUtils'
-import { generateAvatarFromName } from '../../../../utils/generateAvatar'
 import Avatar from '../../../../components/Avatar'
 import { spacing } from '../../../../styles/theme/spacing'
 
@@ -28,6 +28,7 @@ const Projects: React.FC<ProjectsProps> = ({
 }) => {
   const styles = useThemedStyles(createProjectsStyles)
   const palette = useThemedPalette()
+  const navigation = useNavigation()
   const { projects, loading, error, refreshProjects } = useProjects(dashboardType)
   const config = projectUtils.getDashboardConfig(dashboardType)
 
@@ -124,10 +125,7 @@ const Projects: React.FC<ProjectsProps> = ({
                 project={project}
                 config={config}
                 statusConfig={statusConfig}
-                onProjectClick={onProjectClick}
-                onContactStudents={onContactStudents}
-                onUploadComment={onUploadComment}
-                onCheckDeliverables={onCheckDeliverables}
+                navigation={navigation}
                 isLast={index === projects.length - 1}
               />
             ))
@@ -142,10 +140,7 @@ interface ProjectCardProps {
   project: Project
   config: any
   statusConfig: any
-  onProjectClick?: (project: Project) => void
-  onContactStudents?: (project: Project) => void
-  onUploadComment?: (project: Project) => void
-  onCheckDeliverables?: (project: Project) => void
+  navigation: any
   isLast: boolean
 }
 
@@ -153,24 +148,86 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
   config,
   statusConfig,
-  onProjectClick,
-  onContactStudents,
-  onUploadComment,
-  onCheckDeliverables,
+  navigation,
   isLast
 }) => {
   const styles = useThemedStyles(createProjectsStyles)
   const palette = useThemedPalette()
   
-  const statusCfg = statusConfig[project.status]
+  const statusCfg = statusConfig[project.status] || {
+    color: '#6B7280',
+    bgColor: '#F3F4F6',
+    textColor: '#374151'
+  }
 
   return (
-    <View style={[styles.projectCard, !isLast && { marginBottom: spacing.sm }]}>
-      {/* Students Section - Solo si está habilitado */}
-      {config.showStudents && project.students.length > 0 && (
+    <View style={[styles.projectCard, !isLast && { marginBottom: spacing.md }]}>
+      {/* Header: Título y Estado */}
+      <View style={styles.projectHeader}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.projectTitle} numberOfLines={2}>
+            {project.title}
+          </Text>
+          <Text style={styles.projectDescription} numberOfLines={2}>
+            {project.description}
+          </Text>
+          {config.showCompany && (
+            <Text style={styles.projectCompany}>
+              <Text style={styles.projectCompanyLabel}>Titular: </Text>
+              {project.company}
+            </Text>
+          )}
+        </View>
+        
+        {/* Status Badge */}
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: statusCfg.bgColor }
+          ]}
+        >
+          <View 
+            style={[
+              styles.statusDot,
+              { backgroundColor: statusCfg.color }
+            ]} 
+          />
+          <Text style={[styles.statusText, { color: statusCfg.textColor }]}>
+            {project.status}
+          </Text>
+        </View>
+      </View>
+
+      {/* Meta Info: Fechas y Deliverables */}
+      <View style={styles.metaInfo}>
+        <View style={styles.metaRow}>
+          <MaterialCommunityIcons name="calendar" size={16} color={palette.primary} />
+          <Text style={styles.metaText}>
+            Asignado: {projectUtils.formatDate(project.assigmentDate)}
+          </Text>
+        </View>
+        
+        <View style={styles.metaRow}>
+          <MaterialCommunityIcons name="clock-outline" size={16} color={palette.primary} />
+          <Text style={styles.metaText}>
+            Actividad: {projectUtils.calculateDaysElapsed(project.lastActivity)}
+          </Text>
+        </View>
+
+        {config.showDeliverables && project.deliverables > 0 && (
+          <View style={styles.metaRow}>
+            <MaterialCommunityIcons name="file-document-outline" size={16} color={palette.primary} />
+            <Text style={styles.metaText}>
+              {project.deliverables} entregable{project.deliverables !== 1 ? 's' : ''}
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {config.showStudents && project.students && project.students.length > 0 && (
         <View style={styles.studentsSection}>
           <View style={styles.avatarsContainer}>
-            {project.students.map((student, idx) => {
+            {project.students.slice(0, 3).map((student, idx) => {
               const names = student.name.split(' ')
               const firstName = names[0]
               const lastName = names[names.length - 1]
@@ -181,156 +238,67 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
                   firstName={firstName}
                   lastName={lastName}
                   size="small"
-                  style={idx > 0 && { marginLeft: -8 }}
+                  style={idx > 0 ? { marginLeft: -8 } : undefined}
                 />
               )
             })}
           </View>
           
           <View style={styles.studentsInfo}>
-            {project.students.map((student, idx) => (
-              <View 
+            <Text style={styles.studentsLabel}>
+              {project.students.length} miembro{project.students.length !== 1 ? 's' : ''}
+            </Text>
+            {project.students.slice(0, 2).map((student, idx) => (
+              <Text 
                 key={idx} 
-                style={[
-                  styles.studentItem,
-                  idx > 0 && styles.studentItemBorder
-                ]}
+                style={styles.studentName}
+                numberOfLines={1}
               >
-                <Text style={styles.studentName} numberOfLines={1}>
-                  {student.name}
-                </Text>
-                <Text style={styles.studentEmail} numberOfLines={1}>
-                  {student.email}
-                </Text>
-              </View>
+                {student.name}
+              </Text>
             ))}
-            
-            {project.students.length > 1 && (
-              <View style={styles.studentsBadge}>
-                <Text style={styles.studentsBadgeText}>
-                  {project.students.length} estudiantes
-                </Text>
-              </View>
+            {project.students.length > 2 && (
+              <Text style={styles.studentsMore}>
+                +{project.students.length - 2} más
+              </Text>
             )}
           </View>
         </View>
       )}
 
-      {/* Project Info */}
-      <View style={styles.projectInfo}>
-        <View style={styles.projectHeader}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.projectTitle} numberOfLines={2}>
-              {project.title}
-            </Text>
-            <Text style={styles.projectDescription} numberOfLines={2}>
-              {project.description}
-            </Text>
-            {config.showCompany && (
-              <Text style={styles.projectCompany}>
-                <Text style={styles.projectCompanyLabel}>Empresa:</Text> {project.company}
-              </Text>
-            )}
-          </View>
-          
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: statusCfg.bgColor }
-            ]}
+      <View style={styles.actions}>
+        {config.showDetailsButton && (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('ProjectDetails' as never, {
+                uuid: project.uuid_project
+              } as never)
+            }}
+            style={[styles.actionButton, styles.detailsButton]}
+            activeOpacity={0.7}
           >
-            <View 
-              style={[
-                styles.statusDot,
-                { backgroundColor: statusCfg.color }
-              ]} 
-            />
-            <Text style={[styles.statusText, { color: statusCfg.textColor }]}>
-              {project.status}
-            </Text>
-          </View>
-        </View>
-
-        {/* Progress Bar */}
-        {config.showProgress && (
-          <View style={styles.progressSection}>
-            <View style={styles.progressHeader}>
-              <Text style={styles.progressLabel}>Progreso</Text>
-              <Text style={styles.progressValue}>{project.progress}%</Text>
-            </View>
-            <View style={styles.progressBarContainer}>
-              <View 
-                style={[
-                  styles.progressBarFill,
-                  { width: `${project.progress}%` }
-                ]}
-              />
-            </View>
-          </View>
+            <MaterialCommunityIcons name="file-document-outline" size={16} color={palette.onPrimary} />
+            <Text style={styles.detailsButtonText}>Ver detalles</Text>
+          </TouchableOpacity>
         )}
-
-        {/* Meta Info */}
-        <View style={styles.metaInfo}>
-          <Text style={styles.metaText}>
-            📅 Asignado: {projectUtils.formatDate(project.assigmentDate)}
-          </Text>
-          <Text style={styles.metaText}>
-            ⏱️ Última actividad: {projectUtils.calculateDaysElapsed(project.lastActivity)}
-          </Text>
-          {config.showComments && (
-            <Text style={styles.metaText}>💬 {project.comments} comentarios</Text>
-          )}
-          {config.showDeliverables && (
-            <Text style={styles.metaText}>📋 {project.deliverables} entregables</Text>
-          )}
-        </View>
-
-        {/* Action Buttons */}
-        <View style={styles.actions}>
-          {config.showDetailsButton && (
-            <TouchableOpacity
-              onPress={() => onProjectClick?.(project)}
-              style={[styles.actionButton, styles.detailsButton]}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.detailsButtonText}>Ver detalles</Text>
-            </TouchableOpacity>
-          )}
-          
-          {config.showContactButton && (
-            <TouchableOpacity
-              onPress={() => onContactStudents?.(project)}
-              style={[styles.actionButton, styles.contactButton]}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.contactButtonText}>
-                Contactar estudiante{project.students.length > 1 ? 's' : ''}
-              </Text>
-            </TouchableOpacity>
-          )}
-          
-          {config.showCommentButton && (
-            <TouchableOpacity
-              onPress={() => onUploadComment?.(project)}
-              style={[styles.actionButton, styles.commentButton]}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.commentButtonText}>Subir comentario</Text>
-            </TouchableOpacity>
-          )}
-          
-          {config.showDeliverablesButton && (
-            <TouchableOpacity
-              onPress={() => onCheckDeliverables?.(project)}
-              style={[styles.actionButton, styles.deliverablesButton]}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.deliverablesButtonText}>Revisar entregables</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        
+        {config.showContactButton && project.students && project.students.length > 0 && (
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('TeamPage' as never, {
+                uuid: project.uuid_project
+              } as never)
+            }}
+            style={[styles.actionButton, styles.contactButton]}
+            activeOpacity={0.7}
+          >
+            <MaterialCommunityIcons name="account-group" size={16} color={palette.onPrimary} />
+            <Text style={styles.contactButtonText}>Ver equipo</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   )
 }
+
 export default Projects

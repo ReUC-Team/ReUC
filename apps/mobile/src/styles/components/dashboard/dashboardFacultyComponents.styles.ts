@@ -22,15 +22,21 @@ export const createPendingRequestsStyles = (palette: ColorPalette, fontMode: str
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: spacing.md,
+      gap: spacing.sm,
     },
     iconContainer: {
-      marginRight: spacing.sm,
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: palette.grayLight,
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     title: {
       fontSize: typography.lg,
       fontWeight: '600',
       color: palette.text,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
     subtitle: {
       fontSize: typography.sm,
@@ -38,6 +44,8 @@ export const createPendingRequestsStyles = (palette: ColorPalette, fontMode: str
       marginTop: 2,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
+    
+    // Loading State
     loadingState: {
       alignItems: 'center',
       paddingVertical: spacing.xl,
@@ -48,6 +56,8 @@ export const createPendingRequestsStyles = (palette: ColorPalette, fontMode: str
       marginTop: spacing.sm,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
+    
+    // Error State
     errorState: {
       alignItems: 'center',
       paddingVertical: spacing.xl,
@@ -69,68 +79,10 @@ export const createPendingRequestsStyles = (palette: ColorPalette, fontMode: str
       color: palette.onPrimary,
       fontSize: typography.base,
       fontWeight: '600',
-    },
-    requestItem: {
-      borderWidth: 1,
-      borderColor: palette.grayLight,
-      borderRadius: 8,
-      padding: spacing.sm,
-    },
-    requestContent: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-    },
-    requestLeft: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      marginRight: spacing.sm,
-    },
-    statusDot: {
-      width: 12,
-      height: 12,
-      borderRadius: 6,
-      marginRight: spacing.sm,
-      marginTop: 4,
-    },
-    requestTitle: {
-      fontSize: typography.base,
-      fontWeight: '500',
-      color: palette.text,
-      marginBottom: 4,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
-    requestCompany: {
-      fontSize: typography.sm,
-      color: palette.textSecondary,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
-    },
-    requestRight: {
-      alignItems: 'flex-end',
-    },
-    priorityBadge: {
-      paddingHorizontal: spacing.xs,
-      paddingVertical: 4,
-      borderRadius: 12,
-      marginBottom: 4,
-    },
-    priorityText: {
-      fontSize: typography.sm,
-      fontWeight: '500',
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
-    },
-    statusText: {
-      fontSize: typography.sm,
-      fontWeight: '500',
-      marginBottom: 2,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
-    },
-    dateText: {
-      fontSize: typography.sm,
-      color: palette.textSecondary,
-      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
-    },
+    
+    // Empty State
     emptyState: {
       alignItems: 'center',
       paddingVertical: spacing.xl,
@@ -141,6 +93,87 @@ export const createPendingRequestsStyles = (palette: ColorPalette, fontMode: str
     emptyText: {
       fontSize: typography.base,
       color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+    },
+    
+    // Request Item
+    requestItem: {
+      backgroundColor: palette.grayLight,
+      borderRadius: 12,
+      padding: spacing.sm,
+      borderLeftWidth: 4,
+    },
+    requestContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: spacing.sm,
+    },
+    requestLeft: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing.sm,
+    },
+    statusDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginTop: 6,
+    },
+    requestTitle: {
+      fontSize: typography.base,
+      fontWeight: '600',
+      color: palette.text,
+      marginBottom: 4,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+    },
+    requestDescription: {
+      fontSize: typography.sm,
+      color: palette.textSecondary,
+      marginBottom: 4,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+    },
+    requestRight: {
+      alignItems: 'flex-end',
+      justifyContent: 'space-between',
+      gap: spacing.xs,
+    },
+    
+    // Status Badge
+    statusBadge: {
+      paddingHorizontal: spacing.xs,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+    statusBadgeText: {
+      fontSize: typography.xs,
+      fontWeight: '600',
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+    },
+    
+    dateText: {
+      fontSize: typography.xs,
+      color: palette.textSecondary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
+    },
+    viewButton: {
+      marginTop: spacing.xs,
+    },
+    
+    // View All Button
+    viewAllButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: spacing.md,
+      paddingVertical: spacing.sm,
+      gap: spacing.xs,
+    },
+    viewAllButtonText: {
+      fontSize: typography.base,
+      fontWeight: '600',
+      color: palette.primary,
+      fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System'
     },
   })
 
