@@ -99,7 +99,7 @@ export const createExploreProjectsListStyles = (palette: ColorPalette, fontMode:
     filterTagText: {
       fontSize: typography.sm,
       fontWeight: '600',
-      color: palette.onGBtn,
+      color: palette.text,
       fontFamily: fontMode === 'dyslexic' ? 'OpenDyslexic-Bold' : 'System',
     },
     filterTagTextActive: {

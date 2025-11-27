@@ -50,6 +50,7 @@ export default function RegisterPageNative() {
             <AuthInput
               label="Correo electrónico"
               value={form.email}
+              placeholder='ejemplo@ucol.mx'
               onChangeText={v => handleChange('email', v)}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -58,14 +59,16 @@ export default function RegisterPageNative() {
             {showStudentField && (
               <AuthInput
                 label="Número de cuenta"
-                value={form.studentId}
-                onChangeText={v => handleChange('studentId', v)}
+                placeholder='4 dígitos maestro / 8 estudiantes'
+                value={form.universityId}
+                onChangeText={v => handleChange('universityId', v)}
                 keyboardType="numeric"
               />
             )}
 
             <AuthInput
               label="Contraseña"
+              placeholder='••••••••••'
               value={form.password}
               onChangeText={v => handleChange('password', v)}
               secureTextEntry
@@ -73,6 +76,7 @@ export default function RegisterPageNative() {
 
             <AuthInput
               label="Confirmar contraseña"
+              placeholder='••••••••••'
               value={form.confirmPassword}
               onChangeText={v => handleChange('confirmPassword', v)}
               secureTextEntry

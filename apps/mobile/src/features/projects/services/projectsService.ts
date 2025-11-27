@@ -280,6 +280,17 @@ export const getProjectDetails = async (uuid: string): Promise<ProjectDetails> =
     problemTypes: project.details.problemTypes || [],
     teamMembers: project.details.teamMembers || [],
     teamConstraints: project.teamConstraints || {},
+    // Mapeo de recursos
+    resources: project.resources?.map((resource: any) => ({
+      uuid: resource.uuid_file,
+      name: resource.name,
+      type: resource.type,
+      size: resource.size,
+      downloadUrl: `${API_URL}${resource.downloadUrl}`,
+      createdAt: resource.createdAt || new Date().toISOString(),
+      deletedAt: resource.deletedAt || null,
+      uuidAuthor: resource.uuidAuthor,
+    })) || [],
   }
 }
 
@@ -414,6 +425,82 @@ export const updateTeamMemberRole = async (
 export const deleteTeamMember = async (projectUuid: string, memberUuid: string) => {
   const response = await fetchWithAuthAndAutoRefresh(
     `${API_URL}/mobile/project/${projectUuid}/team/members/${memberUuid}`,
+    {
+      method: 'DELETE',
+    }
+  )
+
+  return response.data
+}
+
+/**
+ * ============================================================================
+ * PROJECT RESOURCES ENDPOINTS
+ * ============================================================================
+ */
+
+/**
+ * Sube un nuevo recurso al proyecto
+ */
+export const uploadProjectResource = async (projectUuid: string, file: any) => {
+  const formData = new FormData()
+  
+  formData.append('file', {
+    uri: file.uri,
+    type: file.mimeType || 'application/octet-stream',
+    name: file.name || 'resource.bin',
+  } as any)
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/mobile/project/${projectUuid}/resources/file`,
+    {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  )
+
+  return response.data
+}
+
+/**
+ * Reemplaza un recurso existente
+ */
+export const updateProjectResource = async (
+  projectUuid: string,
+  resourceUuid: string,
+  file: any
+) => {
+  const formData = new FormData()
+  
+  formData.append('file', {
+    uri: file.uri,
+    type: file.mimeType || 'application/octet-stream',
+    name: file.name || 'resource.bin',
+  } as any)
+
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/mobile/project/${projectUuid}/resources/file/${resourceUuid}`,
+    {
+      method: 'PUT',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  )
+
+  return response.data
+}
+
+/**
+ * Elimina un recurso del proyecto
+ */
+export const deleteProjectResource = async (projectUuid: string, resourceUuid: string) => {
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/mobile/project/${projectUuid}/resources/file/${resourceUuid}`,
     {
       method: 'DELETE',
     }

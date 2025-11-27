@@ -37,6 +37,7 @@ export default function LoginPageNative() {
 
         <AuthInput
           label="Correo electrónico"
+          placeholder='ejemplo@ucol.mx'
           value={form.email}
           onChangeText={v => handleChange('email', v)}
           keyboardType="email-address"
@@ -45,6 +46,7 @@ export default function LoginPageNative() {
 
         <AuthInput
           label="Contraseña"
+          placeholder='••••••••••'
           value={form.password}
           onChangeText={v => handleChange('password', v)}
           secureTextEntry

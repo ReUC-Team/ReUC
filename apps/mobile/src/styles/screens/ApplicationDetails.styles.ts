@@ -197,7 +197,7 @@ editButton: {
   paddingHorizontal: spacing.lg,
   borderRadius: 8,
   gap: spacing.xs,
-  marginTop: spacing.lg,
+  marginTop: spacing.xs-1,
   marginBottom: spacing.xs,
 },
 editButtonDisabled: {

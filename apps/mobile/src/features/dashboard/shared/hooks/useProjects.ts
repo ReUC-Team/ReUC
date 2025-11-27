@@ -1,7 +1,8 @@
 // apps/mobile/src/features/dashboards/shared/hooks/useProjects.ts
 
 import { useState, useEffect } from 'react'
-import { DashboardType, ProjectStatus } from '../utils/ProjectsUtils'
+import { getMyProjects, getProjectDetails } from '../../../projects/services/projectsService'
+import { DashboardType } from '../utils/ProjectsUtils'
 
 export interface Student {
   name: string
@@ -9,131 +10,18 @@ export interface Student {
 }
 
 export interface Project {
-  id: number
+  id: string
+  uuid_project: string
   title: string
-  students: Student[]
+  description: string
   company: string
-  status: ProjectStatus
+  status: string
+  students: Student[]
   assigmentDate: string
   progress: number
   lastActivity: string
-  description: string
   comments: number
   deliverables: number
-}
-
-// Datos de ejemplo
-const mockProjects: Project[] = [
-  {
-    id: 1,
-    title: 'Sistema de Gestión Escolar',
-    students: [
-      {
-        name: 'Ana García',
-        email: 'ana.garcia@email.com'
-      },
-      {
-        name: 'Luis Rodríguez',
-        email: 'luis.rodriguez@email.com'
-      }
-    ],
-    company: 'Colegio San Martín',
-    status: 'En progreso',
-    assigmentDate: '2024-05-16',
-    progress: 65,
-    lastActivity: '2024-05-22',
-    description: 'Desarrollo de plataforma web para gestión de estudiantes, calificaciones y comunicación con padres.',
-    comments: 3,
-    deliverables: 2
-  },
-  {
-    id: 2,
-    title: 'App Móvil de Delivery',
-    students: [
-      {
-        name: 'Carlos Mendoza',
-        email: 'carlos.mendoza@email.com'
-      }
-    ],
-    company: 'RestaurantePro',
-    status: 'Revision',
-    assigmentDate: '2024-05-10',
-    progress: 85,
-    lastActivity: '2024-05-21',
-    description: 'Aplicación móvil para pedidos en línea con integración de pagos y seguimiento en tiempo real.',
-    comments: 1,
-    deliverables: 4
-  },
-  {
-    id: 3,
-    title: 'Portal de Recursos Humanos',
-    students: [
-      {
-        name: 'María López',
-        email: 'maria.lopez@email.com'
-      },
-      {
-        name: 'Diego Fernández',
-        email: 'diego.fernandez@email.com'
-      },
-      {
-        name: 'Sofía Martín',
-        email: 'sofia.martin@email.com'
-      }
-    ],
-    company: 'TechCorp Inc.',
-    status: 'Completado',
-    assigmentDate: '2024-04-20',
-    progress: 100,
-    lastActivity: '2024-05-20',
-    description: 'Sistema web para gestión de empleados, nóminas y reportes de recursos humanos.',
-    comments: 5,
-    deliverables: 6
-  },
-  {
-    id: 4,
-    title: 'Dashboard de Analytics',
-    students: [
-      {
-        name: 'Pedro Ruiz',
-        email: 'pedro.ruiz@email.com'
-      },
-      {
-        name: 'Carmen Jiménez',
-        email: 'carmen.jimenez@email.com'
-      }
-    ],
-    company: 'DataInsight',
-    status: 'En progreso',
-    assigmentDate: '2024-05-18',
-    progress: 30,
-    lastActivity: '2024-05-23',
-    description: 'Panel de control interactivo para visualización de datos y métricas empresariales.',
-    comments: 0,
-    deliverables: 1
-  }
-]
-
-// Servicio para la API
-const projectsService = {
-  async getProjects(dashboardType: DashboardType): Promise<Project[]> {
-    try {
-      // TODO: Reemplazar con la llamada real al backend
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          // Filtrar datos según el tipo de dashboard si es necesario
-          let filteredProjects = mockProjects
-          
-          //  agregar lógica de filtrado según el dashboardType
-          
-          resolve(filteredProjects)
-        }, 500)
-      })
-    } catch (error) {
-      console.error('Error fetching projects:', error)
-      throw error
-    }
-  }
 }
 
 export const useProjects = (dashboardType: DashboardType = 'faculty') => {
@@ -145,28 +33,113 @@ export const useProjects = (dashboardType: DashboardType = 'faculty') => {
     try {
       setLoading(true)
       setError(null)
-      const data = await projectsService.getProjects(dashboardType)
-      setProjects(data)
-    } catch (err) {
-      setError((err as Error).message || 'Error al cargar los proyectos')
-      setProjects([])
+      
+      const { projects: projectsList } = await getMyProjects(1, 100)
+      
+      const projectsToFetch = projectsList.slice(0, 5)
+      
+      const detailedProjectsPromises = projectsToFetch.map(proj => 
+        getProjectDetails(proj.uuid_project).then(details => ({
+          ...details,
+          uuid_project: proj.uuid_project,
+        }))
+      )
+      
+      const detailedProjects = await Promise.all(detailedProjectsPromises)
+      
+      const transformedProjects = detailedProjects.map(project => {
+
+        
+        // Intentar múltiples formas de filtrar
+        const allMembers = project.teamMembers || []
+        
+        
+        // Método 1: Por roleName
+        const byRoleName = allMembers.filter(m => {
+          console.log(`   - Miembro: ${m.fullName}, roleName: "${m.roleName}", roleId: ${m.roleId}`)
+          return m.roleName === 'Miembro'
+        })
+        
+        // Método 2: Por roleId
+        const byRoleId = allMembers.filter(m => m.roleId === 2)
+        
+        // Método 3: Excluir líder
+        const notLeader = allMembers.filter(m => 
+          m.roleName !== 'Líder' && m.roleName !== 'Leader' && m.roleId !== 1
+        )
+        
+        // Usar el que tenga más resultados (o todos si ninguno funciona)
+        let students: Student[] = []
+        
+        if (byRoleName.length > 0) {
+          students = byRoleName.map(member => ({
+            name: member.fullName || 'Sin nombre',
+            email: member.email || 'Sin email',
+          }))
+        } else if (byRoleId.length > 0) {
+          students = byRoleId.map(member => ({
+            name: member.fullName || 'Sin nombre',
+            email: member.email || 'Sin email',
+          }))
+        } else if (notLeader.length > 0) {
+          students = notLeader.map(member => ({
+            name: member.fullName || 'Sin nombre',
+            email: member.email || 'Sin email',
+          }))
+        } else if (allMembers.length > 0) {
+          // Si no hay forma de filtrar, usar todos
+          students = allMembers.map(member => ({
+            name: member.fullName || 'Sin nombre',
+            email: member.email || 'Sin email',
+          }))
+        }
+
+
+        
+        return {
+          id: project.uuid_project,
+          uuid_project: project.uuid_project,
+          title: project.title || 'Sin título',
+          description: project.shortDescription || project.detailedDescription || 'Sin descripción',
+          company: project.author?.fullName || 'Autor no especificado',
+          status: getStatusLabel(project.status?.slug),
+          students,
+          progress: 0,
+          assigmentDate: project.approvedAt || project.createdAt || new Date().toISOString(),
+          lastActivity: project.createdAt || new Date().toISOString(),
+          comments: 0,
+          deliverables: 0,
+        }
+      })
+
+
+      
+      setProjects(transformedProjects)
+    } catch (err: any) {
+      console.error('Error fetching projects:', err)
+      setError(err.message || 'Error al cargar proyectos')
     } finally {
       setLoading(false)
     }
-  }
-
-  const refreshProjects = () => {
-    fetchProjects()
   }
 
   useEffect(() => {
     fetchProjects()
   }, [dashboardType])
 
-  return {
-    projects,
-    loading,
-    error,
-    refreshProjects
+  const refreshProjects = () => {
+    fetchProjects()
   }
+
+  return { projects, loading, error, refreshProjects }
+}
+
+function getStatusLabel(statusSlug: string | undefined): string {
+  const statusMap: Record<string, string> = {
+    'project_approved': 'Aprobado',
+    'project_in_progress': 'En Progreso',
+    'completed': 'Completado',
+    'rejected': 'Rechazado',
+  }
+  return statusMap[statusSlug || ''] || 'Desconocido'
 }

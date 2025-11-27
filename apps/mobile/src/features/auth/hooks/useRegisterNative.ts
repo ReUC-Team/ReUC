@@ -16,7 +16,7 @@ interface Form {
   password: string
   confirmPassword: string
   acceptTerms: boolean
-  studentId: string
+  universityId: string
 }
 
 export default function useRegisterNative() {
@@ -25,7 +25,7 @@ export default function useRegisterNative() {
     password: '', 
     confirmPassword: '', 
     acceptTerms: false, 
-    studentId: ''
+    universityId: ''
   })
   const [isLoading, setIsLoading] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<Record<string, any>>({})
