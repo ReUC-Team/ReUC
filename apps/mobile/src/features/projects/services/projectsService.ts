@@ -295,13 +295,19 @@ export const getProjectDetails = async (uuid: string): Promise<ProjectDetails> =
 }
 
 export const startProject = async (uuid: string) => {
-  console.log(' INICIANDO PROYECTO:', uuid)
+  console.log('🚀 INICIANDO PROYECTO:', uuid)
   
-  const response = await fetchWithAuthAndAutoRefresh(`${API_URL}/mobile/project/${uuid}/start`, {
-    method: 'POST',
-  })
+  const response = await fetchWithAuthAndAutoRefresh(
+    `${API_URL}/mobile/project/${uuid}/start`, 
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  )
   
-  console.log(' RESPUESTA:', JSON.stringify(response, null, 2))
+  console.log('✅ RESPUESTA:', JSON.stringify(response, null, 2))
   return response.data
 }
 
