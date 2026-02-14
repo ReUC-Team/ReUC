@@ -5,47 +5,58 @@ Para configurar el proyecto **ReUC** en tu máquina, sigue estas instrucciones b
 
 ## Requisitos previos
 
-Asegúrate de tener instalado lo siguiente:
+* **Node.js**: Versión LTS recomendada.
+* **pnpm**: Versión 10.7.1 (instalable vía `npm install -g pnpm`).
+* **PostgreSQL**: Base de datos para el entorno de desarrollo y despliegue.
+* **Expo CLI**: Para la ejecución de la aplicación móvil.
 
-* **Node.js**: Se recomienda una versión LTS reciente.
-* **pnpm**: El proyecto utiliza la versión 10.7.1. Puedes instalarlo con:
-```bash
-npm install -g pnpm
+## Configuración del Entorno (`.env`)
+
+Debes crear dos archivos de configuración para que el sistema funcione correctamente:
+
+### 1. API (`apps/api/.env`)
+
+Este archivo es crítico para el servidor Express y la gestión de sesiones JWT:
+
+```env
+# Configuración del Servidor
+PORT=3000
+HOST=0.0.0.0
+CORS_ORIGIN=*
+
+# Seguridad JWT
+JWT_SECRET=tu_secreto_para_access_token
+JWT_REFRESH_SECRET=tu_secreto_para_refresh_token
+
+# Tiempos de Expiración
+ACCESS_TOKEN_EXPIRES=15m
+REFRESH_TOKEN_EXPIRES=7d
+REFRESH_TOKEN_EXPIRES_INT=604800000  # 7 días en milisegundos (usado para cookies)
 
 ```
 
+*Nota: Es importante notar que `REFRESH_TOKEN_EXPIRES` se usa como string para la firma de JWT, mientras que `REFRESH_TOKEN_EXPIRES_INT` es el valor numérico en milisegundos para la propiedad `maxAge` de la cookie.*
 
-* **PostgreSQL**: Es el proveedor de base de datos predeterminado.
-* **Expo CLI**: Necesario para la aplicación móvil.
+### 2. Infraestructura (`packages/infrastructure/.env`)
 
-## Configuración General
+Necesario para la conexión de Prisma con la base de datos:
 
-1. **Clonar el repositorio**:
-```bash
-git clone <url-del-repositorio>
-cd ReUC
+```env
+DATABASE_URL="postgresql://usuario:password@localhost:5432/reuc_db"
 
 ```
 
+## Pasos para la Instalación
 
-2. **Instalar dependencias**:
-Desde la raíz del proyecto, ejecuta:
+1. **Instalar dependencias globales**:
 ```bash
 pnpm install
 
 ```
 
 
-3. **Configuración de variables de entorno**:
-Crea un archivo `.env` en `packages/infrastructure/`. Como mínimo, necesitas la cadena de conexión a la base de datos:
-```env
-DATABASE_URL="postgresql://usuario:password@localhost:5432/reuc_db"
-
-```
-
-
-4. **Configuración de la Base de Datos**:
-Inicializa la base de datos y genera el cliente de Prisma:
+2. **Configurar la base de datos**:
+Genera el cliente de Prisma y aplica las migraciones:
 ```bash
 cd packages/infrastructure
 pnpm prisma migrate dev
@@ -54,7 +65,7 @@ pnpm prisma generate
 ```
 
 
-*(Opcional)* Ejecuta el script de semilla para datos iniciales:
+3. **Poblar la base de datos (Opcional)**:
 ```bash
 node seed.js
 
@@ -64,33 +75,13 @@ node seed.js
 
 ## Ejecución del Proyecto
 
-El proyecto utiliza filtros de pnpm para ejecutar aplicaciones específicas desde la raíz.
+Desde la raíz del repositorio, puedes iniciar los diferentes servicios:
 
-* **API (Backend)**:
-```bash
-pnpm dev:api
-
-```
-
-
-* **Web (Frontend)**:
-```bash
-pnpm dev:web
-
-```
-
-
-* **Mobile (Expo)**:
+* **Servidor API**: `pnpm dev:api`.
+* **Aplicación Web**: `pnpm dev:web`.
+* **Aplicación Móvil**:
 ```bash
 cd apps/mobile
 pnpm start
 
 ```
----
-
-## Descripción de la Arquitectura
-
-El proyecto sigue una arquitectura de capas (Dominio, Aplicación, Infraestructura y Presentación) gestionada como un monorepo mediante pnpm workspaces.
-
-* **apps/**: Contiene los puntos de entrada para la API (Express), Web (React) y Móvil (Expo).
-* **packages/**: Contiene la lógica central y la infraestructura de la base de datos.
