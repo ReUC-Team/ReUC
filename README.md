@@ -85,3 +85,7 @@ cd apps/mobile
 pnpm start
 
 ```
+
+
+## Documentacion
+[Google Docs](https://docs.google.com/document/d/12NVU3IfkLUACj4l16kEGhn32uZBqzXSqSV7Z8UVP1pM/edit?tab=t.0)
